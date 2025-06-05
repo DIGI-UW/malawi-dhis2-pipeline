@@ -1,0 +1,76 @@
+services:
+  dhis2:
+    image: ${LOCAL_DHIS2_IMAGE:-$DHIS2_IMAGE}
+    environment:
+      DHIS2_DATABASE_HOST: ${DHIS2_DATABASE_HOST}
+      DHIS2_DATABASE_PORT: ${DHIS2_DATABASE_PORT}
+      DHIS2_DATABASE_NAME: ${DHIS2_DATABASE_NAME}
+      DHIS2_DATABASE_USERNAME: ${DHIS2_DATABASE_USERNAME}
+      DHIS2_DATABASE_PASSWORD: ${DHIS2_DATABASE_PASSWORD}
+      DHIS2_DATABASE_DRIVER: ${DHIS2_DATABASE_DRIVER}
+      DHIS2_DATABASE_DIALECT: ${DHIS2_DATABASE_DIALECT}
+      DHIS2_JDBC_URL: ${DHIS2_JDBC_URL}
+      CATALINA_OPTS: "${DHIS2_CATALINA_OPTS}"
+      JAVA_OPTS: "${DHIS2_JAVA_OPTS}"
+      DHIS2_HOME: "/opt/dhis2"
+    ports:
+      - "${DHIS2_PORT}:8080"
+    volumes:
+      - dhis2-logs:/opt/dhis2/logs
+      - dhis2-apps:/opt/dhis2/apps
+      - dhis2-files:/opt/dhis2/files
+    configs:
+      - source: dhis2.conf
+        target: /opt/dhis2/dhis.conf
+      - source: server.xml
+        target: /usr/local/tomcat/conf/server.xml
+    deploy:
+      replicas: ${DHIS2_REPLICAS}
+      resources:
+        limits:
+          cpus: ${DHIS2_CPU_LIMIT}
+          memory: ${DHIS2_MEMORY_LIMIT}
+        reservations:
+          cpus: ${DHIS2_CPU_RESERVE}
+          memory: ${DHIS2_MEMORY_RESERVE}
+      restart_policy:
+        condition: any
+        delay: 10s
+        max_attempts: 3
+        window: 120s
+    networks:
+      default:
+      postgres:
+      dhis2:
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/dhis-web-commons/security/login.action"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 120s
+
+volumes:
+  dhis2-logs: {}
+  dhis2-apps: {}
+  dhis2-files: {}
+
+configs:
+  dhis2.conf:
+    name: dhis2_conf-${dhis2_conf_DIGEST:?err}
+    file: ./config/dhis.conf
+    labels:
+      name: dhis2
+  server.xml:
+    name: dhis2_server_xml-${dhis2_server_xml_DIGEST:?err}
+    file: ./config/server.xml
+    labels:
+      name: dhis2
+
+networks:
+  default: {}
+  dhis2:
+    name: dhis2_public
+    external: true
+  postgres:
+    name: postgres_public
+    external: true

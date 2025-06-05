@@ -1,0 +1,7 @@
+services:
+  sftp-server:
+    environment:
+      - SFTP_USERS=${SFTP_USER}:${SFTP_PASSWORD}:1001:1001:data
+    ports:
+      - "${SFTP_PORT}:22"
+

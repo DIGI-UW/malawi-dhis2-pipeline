@@ -1,0 +1,33 @@
+{
+    "options": {
+      "start": "get-report-data",
+      "timeout": 1200000
+    },
+    "workflow": {
+      "steps": [
+        {
+          "id": "get-report-data",
+          "adaptor": "@openfn/language-openmrs@5.0.2",
+          "state": "../state/get-report-data.json",
+          "configuration": "../credentials/openmrs-credentials.state.json",
+          "expression": "./jobs/get-report-data.js",
+          "next": {
+            "generate-dhis2-payload": "!state.errors"
+          }
+        },
+        {
+          "id": "generate-dhis2-payload",
+          "adaptor": "@openfn/language-common@latest",
+          "state": "../state/generate-dhis2-payload.json",
+          "expression": "./jobs/generate-dhis2-payload.js"
+        },
+        {
+            "id": "upload-to-dhis2",
+            "adaptor": "@openfn/language-dhis2@6.3.4",
+            "configuration": "../credentials/dhis2-credentials.state.json",
+            "state": {},
+            "expression": "./jobs/upload-to-dhis2.js"
+          }
+      ]
+    }
+  }

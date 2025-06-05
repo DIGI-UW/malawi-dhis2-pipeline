@@ -1,0 +1,40 @@
+services:
+  openfn:
+    image: ${OPENFN_IMAGE}
+    command: >
+      sh -c "/app/bin/lightning start"
+    environment:
+      - DATABASE_URL=${OPENFN_DATABASE_URL}
+      - DISABLE_DB_SSL=${OPENFN_DISABLE_DB_SSL}
+      - IS_RESETTABLE_DEMO=${OPENFN_IS_RESETTABLE_DEMO}
+      - LISTEN_ADDRESS=${OPENFN_LISTEN_ADDRESS}
+      - LOG_LEVEL=${OPENFN_LOG_LEVEL}
+      - ORIGINS=${OPENFN_ORIGINS}
+      - PRIMARY_ENCRYPTION_KEY=${OPENFN_PRIMARY_ENCRYPTION_KEY}
+      - SECRET_KEY_BASE=${OPENFN_SECRET_KEY_BASE}
+      - WORKER_RUNS_PRIVATE_KEY=${OPENFN_WORKER_RUNS_PRIVATE_KEY}
+      - WORKER_SECRET=${OPENFN_WORKER_SECRET}
+      - KAFKA_TRIGGERS_ENABLED=${OPENFN_KAFKA_TRIGGERS_ENABLED}
+      - CORS_ORIGINS=${OPENFN_CORS_ORIGINS}
+      - 'MIX_ENV=${MIX_ENV:-dev}'
+      - 'NODE_ENV=${NODE_ENV:-development}'
+    healthcheck:
+      test: '${DOCKER_WEB_HEALTHCHECK_TEST:-curl localhost:4000/health_check}'
+      interval: '10s'
+      timeout: '3s'
+      start_period: '5s'
+      retries: 3
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "4000:4000"
+  worker:
+    image: ${OPENFN_WORKER_IMAGE}
+    environment:
+      - WORKER_LIGHTNING_PUBLIC_KEY=${OPENFN_WORKER_LIGHTNING_PUBLIC_KEY}
+      - WORKER_SECRET=${OPENFN_WORKER_SECRET}
+      - NODE_ENV=production
+    command: [ 'pnpm', 'start:prod', '-l', 'ws://openfn:${URL_PORT-4000}/worker' ]
+volumes:
+  pgdata:

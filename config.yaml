@@ -1,0 +1,9 @@
+projectName: malawi-dhis2-indicators
+image: malawi-dhis2-indicators:latest
+logPath: /tmp/logs
+
+packages:
+  - database-postgres
+  - dhis2-instance
+  - openfn
+  - sftp-storage

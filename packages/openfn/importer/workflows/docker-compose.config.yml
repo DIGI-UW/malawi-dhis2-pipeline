@@ -1,0 +1,88 @@
+services:
+  openfn_workflow_config:
+    image: node:18-alpine3.20
+    command: sh -c "mkdir -p /app/project/jobs /app/project/state && npm install -g @openfn/cli && if [ \"$${OPENFN_WORKFLOW_MANUAL_CLI}\" = \"true\" ]; then tail -f /dev/null; fi"
+    configs:
+      - source: project.yaml 
+        target: /app/project/project.yaml
+      - source: generate-dhis2-payload.js 
+        target: /app/project/jobs/generate-dhis2-payload.js
+      - source: get-googlesheets-data.js 
+        target: /app/project/jobs/get-googlesheets-data.js
+      - source: get-sftp-data.js 
+        target: /app/project/jobs/get-sftp-data.js
+      - source: process-excel-data.js 
+        target: /app/project/jobs/process-excel-data.js
+      - source: upload-to-dhis2.js 
+        target: /app/project/jobs/upload-to-dhis2.js
+      - source: generate-dhis2-payload.json 
+        target: /app/project/state/generate-dhis2-payload.json
+      - source: get-googlesheets-data.json 
+        target: /app/project/state/get-googlesheets-data.json
+    networks:
+      postgres:
+      sftp:
+    environment:
+      OPENFN_ENDPOINT: ${OPENFN_ENDPOINT}
+      OPENFN_API_KEY: ${OPENFN_API_KEY}
+      OPENFN_ADMIN_USER: ${OPENFN_ADMIN_USER}
+      OPENFN_ADMIN_PASSWORD: ${OPENFN_ADMIN_PASSWORD}
+      SFTP_HOST: ${SFTP_HOST:-sftp-server}
+      SFTP_PORT: ${SFTP_PORT:-22}
+      SFTP_USER: ${SFTP_USER:-openfn}
+      SFTP_PASSWORD: ${SFTP_PASSWORD:-instant101}
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: none
+
+networks:
+  postgres:
+    name: postgres_public
+    external: true
+  sftp:
+    name: sftp-storage_sftp
+    external: true
+
+configs:
+  project.yaml:
+    file: ./reports-data-upload-workflow/project.yaml
+    name: project.yaml-${project_yaml_DIGEST:?err}
+    labels:
+      name: openfn_workflow
+  generate-dhis2-payload.js:
+    file: ./reports-data-upload-workflow/jobs/generate-dhis2-payload.js
+    name: generate-dhis2-payload.js-${generate_dhis2_payload_js_DIGEST:?err} 
+    labels:
+      name: openfn_workflow
+  get-googlesheets-data.js: 
+    file: ./reports-data-upload-workflow/jobs/get-googlesheets-data.js
+    name: get-googlesheets-data.js-${get_googlesheets_data_js_DIGEST:?err} 
+    labels:
+      name: openfn_workflow
+  get-sftp-data.js: 
+    file: ./reports-data-upload-workflow/jobs/get-sftp-data.js
+    name: get-sftp-data.js-${get_sftp_data_js_DIGEST:?err} 
+    labels:
+      name: openfn_workflow
+  process-excel-data.js: 
+    file: ./reports-data-upload-workflow/jobs/process-excel-data.js
+    name: process-excel-data.js-${process_excel_data_js_DIGEST:?err} 
+    labels:
+      name: openfn_workflow
+  upload-to-dhis2.js: 
+    file: ./reports-data-upload-workflow/jobs/upload-to-dhis2.js
+    name: upload-to-dhis2.js-${upload_to_dhis2_js_DIGEST:?err} 
+    labels:
+      name: openfn_workflow
+  generate-dhis2-payload.json: 
+    file: ./state/generate-dhis2-payload.json
+    name: generate-dhis2-payload.json-${generate_dhis2_payload_json_DIGEST:?err} 
+    labels:
+      name: openfn_workflow
+  get-googlesheets-data.json: 
+    file: ./state/get-googlesheets-data.json
+    name: get-googlesheets-data.json-${get_googlesheets_data_json_DIGEST:?err} 
+    labels:
+      name: openfn_workflow
+

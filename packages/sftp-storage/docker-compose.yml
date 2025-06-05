@@ -1,0 +1,32 @@
+services:
+  sftp-server:
+    image: ${SFTP_IMAGE}
+    environment:
+      - SFTP_USERS=${SFTP_USER}:${SFTP_PASSWORD}:1001:1001:data
+    volumes:
+      - sftp-data:/home/${SFTP_USER}/data
+    ports:
+      - "${SFTP_PORT}:22"
+    networks:
+      sftp:
+        aliases:
+          - sftp-server
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      resources:
+        limits:
+          cpus: "${SFTP_CPU_LIMIT}"
+          memory: ${SFTP_MEMORY_LIMIT}
+        reservations:
+          cpus: "${SFTP_CPU_RESERVE}"
+          memory: ${SFTP_MEMORY_RESERVE}
+
+volumes:
+  sftp-data:
+
+networks:
+  sftp:
+    driver: overlay
+    attachable: true

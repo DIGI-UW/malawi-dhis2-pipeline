@@ -1,0 +1,23 @@
+{
+  "id": "sftp-storage",
+  "name": "SFTP File Storage package",
+  "description": "SFTP server for storing and accessing Excel data files",
+  "type": "infrastructure",
+  "version": "0.0.1",
+  "dependencies": [],
+  "environmentVariables": {
+    "SFTP_IMAGE": "atmoz/sftp:latest",
+    "SFTP_USER": "openfn",
+    "SFTP_PASSWORD": "instant101",
+    "SFTP_PORT": "2222",
+    "SFTP_PLACEMENT": "node-1",
+    "SFTP_CPU_LIMIT": "0",
+    "SFTP_CPU_RESERVE": "0",
+    "SFTP_MEMORY_LIMIT": "500M",
+    "SFTP_MEMORY_RESERVE": "100M"
+  },
+  "config": {
+    "dev": "docker-compose.dev.yml",
+    "default": "docker-compose.yml"
+  }
+}

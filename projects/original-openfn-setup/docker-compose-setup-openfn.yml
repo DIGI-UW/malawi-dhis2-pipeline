@@ -1,0 +1,23 @@
+services:
+  setup:
+    image: ${OPENFN_IMAGE}
+    command: >
+      sh -c "/app/bin/lightning eval 'Lightning.Release.migrate()' && /app/bin/lightning eval 'Lightning.Setup.setup_user(%{first_name: \"Admin\",last_name: \"User\",email: \"${OPENFN_ADMIN_EMAIL}\",password: \"${OPENFN_ADMIN_PASSWORD}\", role: :superuser}, \"${OPENFN_API_KEY}\", [%{name: \"OpenMRS\", schema: \"openmrs\", body: %{username: \"${OPENMRS_USERNAME}\", password: \"${OPENMRS_PASSWORD}\", instanceUrl: \"${OPENMRS_URL}\", fhirVersion: \"${OPENMRS_FHIR_VERSION}\"}}, %{name: \"DHIS2\", schema: \"dhis2\", body: %{username: \"${DHIS2_USERNAME}\", password: \"${DHIS2_PASSWORD}\", hostUrl: \"${DHIS2_API_URL}\"}}])'"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      - DATABASE_URL=${OPENFN_DATABASE_URL}
+      - DISABLE_DB_SSL=${OPENFN_DISABLE_DB_SSL}
+      - IS_RESETTABLE_DEMO=${OPENFN_IS_RESETTABLE_DEMO}
+      - LISTEN_ADDRESS=${OPENFN_LISTEN_ADDRESS}
+      - LOG_LEVEL=${OPENFN_LOG_LEVEL}
+      - ORIGINS=${OPENFN_ORIGINS}
+      - PRIMARY_ENCRYPTION_KEY=${OPENFN_PRIMARY_ENCRYPTION_KEY}
+      - SECRET_KEY_BASE=${OPENFN_SECRET_KEY_BASE}
+      - WORKER_RUNS_PRIVATE_KEY=${OPENFN_WORKER_RUNS_PRIVATE_KEY}
+      - WORKER_SECRET=${OPENFN_WORKER_SECRET}
+      - KAFKA_TRIGGERS_ENABLED=${OPENFN_KAFKA_TRIGGERS_ENABLED}
+      - CORS_ORIGINS=${OPENFN_CORS_ORIGINS}
+      - 'MIX_ENV=${MIX_ENV:-dev}'
+      - 'NODE_ENV=${NODE_ENV:-development}'

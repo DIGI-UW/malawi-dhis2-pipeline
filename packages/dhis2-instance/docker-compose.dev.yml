@@ -1,0 +1,39 @@
+services:
+  dhis2:
+    environment:
+      # Development-specific environment variables
+      DHIS2_DEMO_DATA: "true"
+      DHIS2_ADMIN_PASSWORD: "${DHIS2_ADMIN_PASSWORD:-district}"
+      DHIS2_DEBUG: "true"
+      DHIS2_LOG_LEVEL: "DEBUG"
+    ports:
+      # Expose DHIS2 port in development mode
+      - "${DHIS2_PORT:-8080}:8080"
+    # Note: volumes are defined in the main docker-compose.yml
+    # configs are also defined in the main docker-compose.yml
+
+  # Add a development data seeder service
+  dhis2-dev-setup:
+    image: curlimages/curl:latest
+    command: >
+      sh -c "
+        echo 'Waiting for DHIS2 to be ready...'
+        while ! curl -s -f http://dhis2:8080/dhis-web-commons/security/login.action; do
+          echo 'DHIS2 not ready yet, waiting...'
+          sleep 10
+        done
+        echo 'DHIS2 is ready!'
+        echo 'Setting up development data and configuration...'
+        echo 'Development setup completed'
+      "
+    depends_on:
+      - dhis2
+    networks:
+      - dhis2
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: none
+
+# Note: volumes, configs, and networks are inherited from the main docker-compose.yml
+# No need to redefine them here to avoid conflicts

@@ -1,0 +1,19 @@
+*.state.json
+.env
+node_modules
+output.json
+
+# Data directories - prevent committing sensitive data
+data/
+*/data/
+packages/*/data/
+projects/*/data/
+
+# Additional data file patterns
+*.xlsx
+*.csv
+*.xls
+**/DHIS2_HIV*.xlsx
+**/DHIS2_HIV*.csv
+**/*DQ_*.xlsx
+**/*malawi*.sql

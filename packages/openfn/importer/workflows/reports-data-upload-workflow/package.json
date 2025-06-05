@@ -1,0 +1,13 @@
+{
+  "name": "openfn-malawi-workflow",
+  "version": "1.0.0",
+  "description": "OpenFN workflow for Malawi DHIS2 indicators with Excel and Google Sheets support",
+  "dependencies": {
+    "@openfn/language-common": "^2.4.0",
+    "@openfn/language-googlesheets": "^3.0.13",
+    "@openfn/language-dhis2": "^6.3.4",
+    "@openfn/language-sftp": "^1.0.0",
+    "xlsx": "^0.18.5",
+    "csv-parser": "^3.0.0"
+  }
+}

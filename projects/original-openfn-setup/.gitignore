@@ -1,0 +1,4 @@
+*.state.json
+.env
+node_modules
+output.json

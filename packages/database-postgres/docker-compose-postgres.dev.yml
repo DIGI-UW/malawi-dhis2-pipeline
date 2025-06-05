@@ -1,0 +1,7 @@
+
+services:
+  postgres-1:
+    ports:
+      - target: 5432
+        published: 5432
+        mode: host

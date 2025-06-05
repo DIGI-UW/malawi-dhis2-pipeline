@@ -1,0 +1,24 @@
+{
+    "reportConfig": {
+        "catAttrCombo": "HllvX50cXC0",
+        "dataSet": "necyFYLlEI0",
+        "period": "202504",
+        "orgUnit": "drsiURo4DeK",
+        "reportUuid": "27b977d2-02bf-4ef9-b512-9b9c495962b8",
+        "startDate": "2025-05-01",
+        "endDate": "2025-05-31",
+        "hivStagesReportMapping": {
+            "Rapport sur les stades 3 et 4 du VIH en RDC.Mâles": "IQTe97w6j5I",
+            "Rapport sur les stades 3 et 4 du VIH en RDC.Femmes": "b31fxPyPHdZ",
+            "Rapport sur les stades 3 et 4 du VIH en RDC.Tout": "XMQfwO0ODSr",
+            "Rapport sur les stades 3 et 4 du VIH en RDC.Moins de 1 an": "Yz7m8AH66in",
+            "Rapport sur les stades 3 et 4 du VIH en RDC.1 à 4 ans": "Ius3vNNYVKm",
+            "Rapport sur les stades 3 et 4 du VIH en RDC.5 à 9 ans": "xNtnllzbIGc",
+            "Rapport sur les stades 3 et 4 du VIH en RDC.10 à 14 ans": "rmBvQxaGg5f",
+            "Rapport sur les stades 3 et 4 du VIH en RDC.15 à 19 ans": "hbNT17TWRYF",
+            "Rapport sur les stades 3 et 4 du VIH en RDC.20 à 24 ans": "xgycWMkqpHn",
+            "Rapport sur les stades 3 et 4 du VIH en RDC.25 à 49 ans": "IDkk0WXXMQn",
+            "Rapport sur les stades 3 et 4 du VIH en RDC.50 ans et plus": "hehguNKaht5"
+        }
+    }
+}

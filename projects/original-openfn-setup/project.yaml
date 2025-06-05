@@ -1,0 +1,54 @@
+name: drc
+description: null
+collections: null
+credentials:
+  admin@example.org-DHIS2:
+    name: DHIS2
+    owner: admin@example.org
+  admin@example.org-OpenMRS:
+    name: OpenMRS
+    owner: admin@example.org
+workflows:
+  HIV-Stages-Report-to-DHIS2-Workflow:
+    name: HIV Stages Report to DHIS2 Workflow
+    jobs:
+      Get-Report-Data:
+        name: Get Report Data
+        adaptor: '@openfn/language-openmrs@5.0.2'
+        credential: admin@example.org-OpenMRS
+        body:
+          path: ./workflows/reports-data-upload-workflow/jobs/get-report-data.js
+      Generate-DHIS2-Payload:
+        name: Generate DHIS2 Payload
+        adaptor: '@openfn/language-common@2.4.0'
+        credential: null
+        body:
+          path: ./workflows/reports-data-upload-workflow/jobs/generate-dhis2-payload.js
+          
+      Upload-To-DHIS2:
+        name: Upload to DHIS2
+        adaptor: '@openfn/language-dhis2@6.3.4'
+        credential: admin@example.org-DHIS2
+        body:
+          path: ./workflows/reports-data-upload-workflow/jobs/upload-to-dhis2.js
+          
+    triggers:
+      webhook:
+        type: webhook
+        enabled: true
+    edges:
+      webhook->Get-Report-Data:
+        source_trigger: webhook
+        target_job: Get-Report-Data
+        condition_type: always
+        enabled: true
+      Get-Report-Data->Generate-DHIS2-Payload:
+        source_job: Get-Report-Data
+        target_job: Generate-DHIS2-Payload
+        condition_type: on_job_success
+        enabled: true
+      Generate-DHIS2-Payload->Upload-To-DHIS2:
+        source_job: Generate-DHIS2-Payload
+        target_job: Upload-To-DHIS2
+        condition_type: on_job_success
+        enabled: true
