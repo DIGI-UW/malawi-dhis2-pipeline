@@ -1,7 +1,6 @@
 services:
   openfn_workflow_config:
-    image: node:18-alpine3.20
-    command: sh -c "mkdir -p /app/project/jobs /app/project/state && npm install -g @openfn/cli && if [ \"$${OPENFN_WORKFLOW_MANUAL_CLI}\" = \"true\" ]; then tail -f /dev/null; fi"
+    image: ${LOCAL_OPENFN_WORKFLOW_IMAGE}
     configs:
       - source: project.yaml 
         target: /app/project/project.yaml
@@ -15,10 +14,6 @@ services:
         target: /app/project/jobs/process-excel-data.js
       - source: upload-to-dhis2.js 
         target: /app/project/jobs/upload-to-dhis2.js
-      - source: generate-dhis2-payload.json 
-        target: /app/project/state/generate-dhis2-payload.json
-      - source: get-googlesheets-data.json 
-        target: /app/project/state/get-googlesheets-data.json
     networks:
       postgres:
       sftp:
@@ -75,14 +70,3 @@ configs:
     name: upload-to-dhis2.js-${upload_to_dhis2_js_DIGEST:?err} 
     labels:
       name: openfn_workflow
-  generate-dhis2-payload.json: 
-    file: ./state/generate-dhis2-payload.json
-    name: generate-dhis2-payload.json-${generate_dhis2_payload_json_DIGEST:?err} 
-    labels:
-      name: openfn_workflow
-  get-googlesheets-data.json: 
-    file: ./state/get-googlesheets-data.json
-    name: get-googlesheets-data.json-${get_googlesheets_data_json_DIGEST:?err} 
-    labels:
-      name: openfn_workflow
-

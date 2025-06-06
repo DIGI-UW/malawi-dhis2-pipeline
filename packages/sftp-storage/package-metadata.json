@@ -9,7 +9,7 @@
     "SFTP_IMAGE": "atmoz/sftp:latest",
     "SFTP_USER": "openfn",
     "SFTP_PASSWORD": "instant101",
-    "SFTP_PORT": "2222",
+    "SFTP_PORT": "2225",
     "SFTP_PLACEMENT": "node-1",
     "SFTP_CPU_LIMIT": "0",
     "SFTP_CPU_RESERVE": "0",

@@ -126,9 +126,9 @@ function initialize_package() {
             else
                 log info "OPENFN_WORKFLOW_MANUAL_CLI is false. Executing OpenFN deploy command in container $WORKFLOW_CONFIG_CONTAINER_ID..."
                 
-                DEPLOY_CMD="openfn deploy . --no-confirm --log info"
+                DEPLOY_CMD="set -e; echo 'Executing OpenFN deploy...'; source /etc/profile 2>/dev/null || true; export PATH=\"/usr/local/bin:\$PATH\"; cd /app/project && ls -la && pwd && echo 'Checking OpenFN CLI availability:' && (which openfn || echo 'openfn not in PATH') && echo 'Attempting deploy with multiple fallback methods:' && (openfn deploy . --no-confirm --log info 2>&1 || /usr/local/bin/openfn deploy . --no-confirm --log info 2>&1 || /usr/local/bin/node /usr/local/lib/node_modules/@openfn/cli/bin/run.js deploy . --no-confirm --log info 2>&1 || npx @openfn/cli deploy . --no-confirm --log info 2>&1)"
                 log info "Attempting OpenFN deploy in /app/project..."
-                if docker exec "$WORKFLOW_CONFIG_CONTAINER_ID" sh -c "cd /app/project && $DEPLOY_CMD"; then
+                if docker exec "$WORKFLOW_CONFIG_CONTAINER_ID" sh -c "$DEPLOY_CMD"; then
                     log info "OpenFN deploy successful."
                 else
                     log error "OpenFN deploy command failed in container $WORKFLOW_CONFIG_CONTAINER_ID."

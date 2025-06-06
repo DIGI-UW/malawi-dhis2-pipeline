@@ -137,6 +137,9 @@ if [[ $# -eq 0 ]]; then
                 "dhis2")
                     build_custom_image "$project_name" "dhis2-instance"
                     ;;
+                "openfn-workflow")
+                    build_custom_image "$project_name" "openfn"
+                    ;;
                 *)
                     build_custom_image "$project_name" ""
                     ;;
@@ -149,6 +152,9 @@ else
         case "$project_name" in
             "dhis2")
                 build_custom_image "$project_name" "dhis2-instance"
+                ;;
+            "openfn-workflow")
+                build_custom_image "$project_name" "openfn"
                 ;;
             *)
                 build_custom_image "$project_name" ""
