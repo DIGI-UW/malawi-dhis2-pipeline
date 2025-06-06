@@ -13,18 +13,6 @@ services:
       MODE: deploy
       PACKAGE_LIFECYCLE: "true"
       DRY_RUN: ${OPENFN_WORKFLOW_DRY_RUN:-false}
-      # SFTP Configuration
-      SFTP_HOST: ${SFTP_HOST:-sftp-server}
-      SFTP_PORT: ${SFTP_PORT:-22}
-      SFTP_USER: ${SFTP_USER:-openfn}
-      SFTP_PASSWORD: ${SFTP_PASSWORD:-instant101}
-      # DHIS2 Configuration
-      DHIS2_ENDPOINT: ${DHIS2_ENDPOINT:-}
-      DHIS2_USERNAME: ${DHIS2_USERNAME:-}
-      DHIS2_PASSWORD: ${DHIS2_PASSWORD:-}
-      # General Configuration
-      LOG_LEVEL: ${OPENFN_LOG_LEVEL:-info}
-      MAX_RETRIES: ${OPENFN_MAX_RETRIES:-3}
     deploy:
       replicas: 1
       restart_policy:

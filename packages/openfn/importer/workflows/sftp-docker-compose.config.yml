@@ -1,0 +1,79 @@
+services:
+  openfn_sftp_workflow_config:
+    image: ${LOCAL_OPENFN_WORKFLOW_IMAGE}
+    configs:
+      - source: sftp-project.yaml 
+        target: /app/project/project.yaml
+      - source: check-sftp-files.js 
+        target: /app/project/jobs/check-sftp-files.js
+      - source: download-sftp-files.js 
+        target: /app/project/jobs/download-sftp-files.js
+      - source: sftp-process-excel-data.js 
+        target: /app/project/jobs/process-excel-data.js
+      - source: sftp-generate-dhis2-payload.js 
+        target: /app/project/jobs/generate-dhis2-payload.js
+      - source: sftp-upload-to-dhis2.js 
+        target: /app/project/jobs/upload-to-dhis2.js
+      - source: update-file-tracking.js 
+        target: /app/project/jobs/update-file-tracking.js
+    networks:
+      postgres:
+      sftp:
+    environment:
+      OPENFN_ENDPOINT: ${OPENFN_ENDPOINT}
+      OPENFN_API_KEY: ${OPENFN_API_KEY}
+      OPENFN_ADMIN_USER: ${OPENFN_ADMIN_USER}
+      OPENFN_ADMIN_PASSWORD: ${OPENFN_ADMIN_PASSWORD}
+      SFTP_HOST: ${SFTP_HOST:-sftp-server}
+      SFTP_PORT: ${SFTP_PORT:-22}
+      SFTP_USER: ${SFTP_USER:-openfn}
+      SFTP_PASSWORD: ${SFTP_PASSWORD:-instant101}
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: none
+
+networks:
+  postgres:
+    name: postgres_public
+    external: true
+  sftp:
+    name: sftp-storage_sftp
+    external: true
+
+configs:
+  sftp-project.yaml:
+    file: ./sftp-dhis2-workflow/project.yaml
+    name: sftp-project.yaml-${sftp_project_yaml_DIGEST:?err}
+    labels:
+      name: openfn_sftp_workflow
+  check-sftp-files.js:
+    file: ./sftp-dhis2-workflow/jobs/check-sftp-files.js
+    name: check-sftp-files.js-${check_sftp_files_js_DIGEST:?err} 
+    labels:
+      name: openfn_sftp_workflow
+  download-sftp-files.js: 
+    file: ./sftp-dhis2-workflow/jobs/download-sftp-files.js
+    name: download-sftp-files.js-${download_sftp_files_js_DIGEST:?err} 
+    labels:
+      name: openfn_sftp_workflow
+  sftp-process-excel-data.js: 
+    file: ./sftp-dhis2-workflow/jobs/process-excel-data.js
+    name: sftp-process-excel-data.js-${sftp_process_excel_data_js_DIGEST:?err} 
+    labels:
+      name: openfn_sftp_workflow
+  sftp-generate-dhis2-payload.js: 
+    file: ./sftp-dhis2-workflow/jobs/generate-dhis2-payload.js
+    name: sftp-generate-dhis2-payload.js-${sftp_generate_dhis2_payload_js_DIGEST:?err} 
+    labels:
+      name: openfn_sftp_workflow
+  sftp-upload-to-dhis2.js: 
+    file: ./sftp-dhis2-workflow/jobs/upload-to-dhis2.js
+    name: sftp-upload-to-dhis2.js-${sftp_upload_to_dhis2_js_DIGEST:?err} 
+    labels:
+      name: openfn_sftp_workflow
+  update-file-tracking.js: 
+    file: ./sftp-dhis2-workflow/jobs/update-file-tracking.js
+    name: update-file-tracking.js-${update_file_tracking_js_DIGEST:?err} 
+    labels:
+      name: openfn_sftp_workflow

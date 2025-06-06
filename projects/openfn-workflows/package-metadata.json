@@ -1,0 +1,101 @@
+{
+  "name": "openfn-workflows",
+  "version": "1.0.0",
+  "description": "OpenFN Workflows Manager - Centralized workflow management for OpenFN instances",
+  "type": "custom-image",
+  "category": "workflow-management",
+  "dependencies": {
+    "core": [],
+    "external": ["docker"],
+    "optional": ["yq"]
+  },
+  "environment": {
+    "required": [
+      "OPENFN_ENDPOINT"
+    ],
+    "optional": [
+      "OPENFN_API_KEY",
+      "OPENFN_ADMIN_USER", 
+      "OPENFN_ADMIN_PASSWORD",
+      "WORKFLOW_NAME",
+      "WORKFLOW_PATH",
+      "MODE",
+      "DRY_RUN",
+      "PACKAGE_LIFECYCLE"
+    ]
+  },
+  "images": {
+    "main": {
+      "name": "openfn-workflows",
+      "tag": "latest",
+      "dockerfile": "docker/Dockerfile",
+      "context": ".",
+      "registry": "local"
+    }
+  },
+  "volumes": {
+    "workflows": {
+      "type": "bind",
+      "source": "./workflows",
+      "target": "/app/workflows",
+      "description": "Workflow definitions directory (for development)"
+    }
+  },
+  "networks": {
+    "required": [],
+    "optional": ["openfn"]
+  },
+  "ports": {
+    "health": {
+      "internal": 3000,
+      "external": null,
+      "description": "Health check endpoint"
+    }
+  },
+  "features": [
+    "multiple-workflows",
+    "cron-triggers", 
+    "webhook-triggers",
+    "sftp-integration",
+    "excel-processing",
+    "dhis2-integration",
+    "validation",
+    "cli-utility"
+  ],
+  "workflows": {
+    "sftp-dhis2": {
+      "description": "SFTP to DHIS2 workflow with cron and webhook triggers",
+      "triggers": ["cron", "webhook", "manual"],
+      "adaptors": ["@openfn/language-sftp", "@openfn/language-common", "@openfn/language-dhis2"],
+      "status": "active"
+    }
+  },
+  "scripts": {
+    "build": "./build.sh",
+    "deploy": "./scripts/deploy-workflow.sh",
+    "list": "./scripts/list-workflows.sh", 
+    "validate": "./scripts/validate-workflow.sh"
+  },
+  "integration": {
+    "package-lifecycle": {
+      "description": "Can be used as part of OpenFN package deployment",
+      "environment": {
+        "PACKAGE_LIFECYCLE": "true",
+        "OPENFN_WORKFLOWS_IMAGE": "openfn-workflows:latest"
+      }
+    },
+    "standalone": {
+      "description": "Can be used as independent CLI utility",
+      "usage": [
+        "docker run --rm -e MODE=list openfn-workflows:latest",
+        "docker run --rm -e MODE=validate openfn-workflows:latest",
+        "docker run --rm -e OPENFN_ENDPOINT=http://localhost:4000 -e WORKFLOW_NAME=sftp-dhis2 -e MODE=deploy openfn-workflows:latest"
+      ]
+    }
+  },
+  "documentation": {
+    "readme": "README.md",
+    "examples": "examples/",
+    "api": null
+  }
+}

@@ -1,0 +1,59 @@
+services:
+  openfn_sftp_workflow:
+    image: ${LOCAL_OPENFN_SFTP_WORKFLOW_IMAGE}
+    volumes:
+      # Mount the entire project directory - much more scalable than configs
+      - /home/ubuntu/code/malawi-dhis2-pipeline/projects/openfn-sftp-workflow/workflows:/app/workflows:ro
+      # Mount temp directory for SFTP downloads
+      - openfn_sftp_downloads:/tmp/openfn-downloads
+      # Mount tracking state directory
+      - openfn_sftp_state:/app/state
+    networks:
+      postgres:
+      sftp:
+    environment:
+      OPENFN_ENDPOINT: ${OPENFN_ENDPOINT}
+      OPENFN_API_KEY: ${OPENFN_API_KEY}
+      OPENFN_ADMIN_USER: ${OPENFN_ADMIN_USER}
+      OPENFN_ADMIN_PASSWORD: ${OPENFN_ADMIN_PASSWORD}
+      SFTP_HOST: ${SFTP_HOST:-sftp-server}
+      SFTP_PORT: ${SFTP_PORT:-22}
+      SFTP_USER: ${SFTP_USER:-openfn}
+      SFTP_PASSWORD: ${SFTP_PASSWORD:-instant101}
+      # DHIS2 Configuration
+      DHIS2_BASE_URL: ${DHIS2_BASE_URL:-http://dhis2-web:8080}
+      DHIS2_USERNAME: ${DHIS2_USERNAME:-admin}
+      DHIS2_PASSWORD: ${DHIS2_PASSWORD:-district}
+      # Workflow configuration
+      WORKFLOW_PROJECT_PATH: /app/workflows/project.yaml
+      NODE_ENV: production
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 30s
+        max_attempts: 3
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 2G
+    healthcheck:
+      test: ["CMD", "node", "--version"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  postgres:
+    name: postgres_public
+    external: true
+  sftp:
+    name: sftp-storage_sftp
+    external: true
+
+volumes:
+  openfn_sftp_downloads:
+    driver: local
+  openfn_sftp_state:
+    driver: local

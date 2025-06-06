@@ -1,0 +1,109 @@
+name: malawi-sftp
+description: SFTP Excel to DHIS2 HIV Indicators Pipeline with Cron and Webhook Triggers
+collections: null
+workflows:
+  HIV-Indicators-SFTP-to-DHIS2-Workflow:
+    name: HIV Indicators SFTP to DHIS2 Workflow
+    jobs:
+      Check-SFTP-Files:
+        name: Check SFTP for New/Updated Files
+        adaptor: '@openfn/language-sftp@1.0.0'
+        credential: sftp-credentials
+        body:
+          path: ./jobs/check-sftp-files.js
+      Download-SFTP-Files:
+        name: Download New SFTP Files
+        adaptor: '@openfn/language-sftp@1.0.0'
+        credential: sftp-credentials
+        body:
+          path: ./jobs/download-sftp-files.js
+      Process-Excel-Data:
+        name: Process Excel Data
+        adaptor: '@openfn/language-common@2.4.0'
+        credential: null
+        body:
+          path: ./jobs/process-excel-data.js
+      Generate-DHIS2-Payload:
+        name: Generate DHIS2 Payload
+        adaptor: '@openfn/language-common@2.4.0'
+        credential: null
+        body:
+          path: ./jobs/generate-dhis2-payload.js
+      Upload-To-DHIS2:
+        name: Upload to DHIS2
+        adaptor: '@openfn/language-dhis2@6.3.4'
+        credential: dhis2-credentials
+        body:
+          path: ./jobs/upload-to-dhis2.js
+      Update-File-Tracking:
+        name: Update File Tracking State
+        adaptor: '@openfn/language-common@2.4.0'
+        credential: null
+        body:
+          path: ./jobs/update-file-tracking.js
+          
+    triggers:
+      # Cron trigger - runs every 15 minutes to check for new files
+      cron-file-check:
+        type: cron
+        cron_expression: "*/15 * * * *"
+        enabled: true
+      # Webhook trigger - for external file system notifications
+      file-change-webhook:
+        type: webhook
+        enabled: true
+      # Manual trigger for testing
+      manual-trigger:
+        type: webhook
+        enabled: true
+        
+    edges:
+      # Cron-triggered workflow
+      cron-file-check->Check-SFTP-Files:
+        source_trigger: cron-file-check
+        target_job: Check-SFTP-Files
+        condition_type: always
+        enabled: true
+      # Webhook-triggered workflow (skips check, goes straight to download)
+      file-change-webhook->Download-SFTP-Files:
+        source_trigger: file-change-webhook
+        target_job: Download-SFTP-Files
+        condition_type: always
+        enabled: true
+      # Manual trigger for testing
+      manual-trigger->Check-SFTP-Files:
+        source_trigger: manual-trigger
+        target_job: Check-SFTP-Files
+        condition_type: always
+        enabled: true
+      # Job flow after file check
+      Check-SFTP-Files->Download-SFTP-Files:
+        source_job: Check-SFTP-Files
+        target_job: Download-SFTP-Files
+        condition_type: on_job_success
+        condition_expression: "state.newFilesFound === true"
+        enabled: true
+      # Job flow after file download
+      Download-SFTP-Files->Process-Excel-Data:
+        source_job: Download-SFTP-Files
+        target_job: Process-Excel-Data
+        condition_type: on_job_success
+        enabled: true
+      # Job flow after Excel processing
+      Process-Excel-Data->Generate-DHIS2-Payload:
+        source_job: Process-Excel-Data
+        target_job: Generate-DHIS2-Payload
+        condition_type: on_job_success
+        enabled: true
+      # Job flow to DHIS2 upload
+      Generate-DHIS2-Payload->Upload-To-DHIS2:
+        source_job: Generate-DHIS2-Payload
+        target_job: Upload-To-DHIS2
+        condition_type: on_job_success
+        enabled: true
+      # Update tracking after successful upload
+      Upload-To-DHIS2->Update-File-Tracking:
+        source_job: Upload-To-DHIS2
+        target_job: Update-File-Tracking
+        condition_type: on_job_success
+        enabled: true
