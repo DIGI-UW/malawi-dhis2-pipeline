@@ -147,6 +147,9 @@ if [[ $# -eq 0 ]]; then
                 "dhis2")
                     build_custom_image "$project_name" "dhis2-instance"
                     ;;
+                "sftp")
+                    build_custom_image "$project_name" "sftp-storage"
+                    ;;
                 "openfn-workflows")
                     build_custom_image "$project_name" "openfn"
                     ;;
@@ -168,6 +171,9 @@ else
         case "$project_name" in
             "dhis2")
                 build_custom_image "$project_name" "dhis2-instance"
+                ;;
+            "sftp")
+                build_custom_image "$project_name" "sftp-storage"
                 ;;
             "openfn-workflows")
                 build_custom_image "$project_name" "openfn"

@@ -7,6 +7,7 @@
   "dependencies": [],
   "environmentVariables": {
     "SFTP_IMAGE": "atmoz/sftp:latest",
+    "LOCAL_SFTP_IMAGE": "sftp-with-data:latest",
     "SFTP_USER": "openfn",
     "SFTP_PASSWORD": "instant101",
     "SFTP_PORT": "2225",
@@ -15,9 +16,5 @@
     "SFTP_CPU_RESERVE": "0",
     "SFTP_MEMORY_LIMIT": "500M",
     "SFTP_MEMORY_RESERVE": "100M"
-  },
-  "config": {
-    "dev": "docker-compose.dev.yml",
-    "default": "docker-compose.yml"
   }
 }

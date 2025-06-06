@@ -45,6 +45,6 @@ networks:
   postgres:
     name: postgres_public
     external: true
-  sftp:
-    name: sftp-storage_sftp
+  openfn_public:
+    name: openfn_public
     external: true

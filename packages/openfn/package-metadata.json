@@ -1,7 +1,7 @@
 {
   "id": "openfn",
   "name": "OpenFn",
-  "description": "Lightning ⚡ (OpenFn v2) is a workflow automation platform that&#39;s used to automate critical business processes and integrate information systems.",
+  "description": "Lightning",
   "type": "infrastructure",
   "version": "0.0.2",
   "dependencies": [],

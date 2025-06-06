@@ -5,8 +5,7 @@ workflows:
   HIVIndicatorsSFTPtoDHIS2Workflow:
     name: HIV Indicators SFTP to DHIS2 Workflow
     jobs:
-      CheckSFTPFiles:
-        name: Check SFTP for New or Updated Files
+      CheckSFTPFiles:        name: Check SFTP for New or Updated Files
         adaptor: '@openfn/language-sftp@1.0.0'
         credential: null
         body:

@@ -22,9 +22,13 @@
 config::set_config_digests() {
     local -r DOCKER_COMPOSE_PATH="${1:?$(missing_param "set_config_digests")}"
 
-    # Get configs files and names from yml file
-    local -r files=($(yq '.configs."*.*".file' "${DOCKER_COMPOSE_PATH}"))
-    local -r names=($(yq '.configs."*.*".name' "${DOCKER_COMPOSE_PATH}"))
+    # Get configs files and names from yml file using proper array handling
+    local files=()
+    local names=()
+    
+    # Use mapfile to properly handle filenames with spaces
+    mapfile -t files < <(yq '.configs.*.file' "${DOCKER_COMPOSE_PATH}")
+    mapfile -t names < <(yq '.configs.*.name' "${DOCKER_COMPOSE_PATH}")
     local -r compose_folder_path="${DOCKER_COMPOSE_PATH%/*}"
 
     log info "Setting config digests in: $DOCKER_COMPOSE_PATH"
@@ -36,10 +40,20 @@ config::set_config_digests() {
         log info "Setting config digests"
 
         for ((i = 0; i < ${#files[@]}; i++)); do
-            file=${files[$i]}
-            name=${names[$i]}
+            file="${files[$i]}"
+            name="${names[$i]}"
 
-            file_name="${compose_folder_path}${file//\.\///}" # TODO: Throw an error if the file name is too long to allow for a unique enough digest
+            # Sanitize file path by replacing spaces with underscores
+            sanitized_file="${file// /_}"
+            original_file_path="${compose_folder_path}${file//\.\///}"
+            file_name="${compose_folder_path}${sanitized_file//\.\///}"
+            
+            # If the original file has spaces, create a symlink with underscores
+            if [[ "$file" != "$sanitized_file" && -f "$original_file_path" ]]; then
+                log info "Creating sanitized symlink: $file_name -> $original_file_path"
+                ln -sf "$original_file_path" "$file_name"
+            fi
+            
             env_var_name=$(echo "${name}" | grep -P -o "{.*:?err}" | sed 's/[{}]//g' | sed 's/:?err//g')
 
             if [[ -n "$env_var_name" ]]; then
@@ -81,8 +95,9 @@ config::configs_exist() {
         return 1
     fi
 
-    # Get config names from yml file
-    local -r names=($(yq '.configs."*.*".name' "${DOCKER_COMPOSE_PATH}" 2>/dev/null))
+    # Get config names from yml file using proper array handling
+    local names=()
+    mapfile -t names < <(yq '.configs.*.name' "${DOCKER_COMPOSE_PATH}" 2>/dev/null)
 
     if [[ $? -ne 0 ]]; then
         log error "Failed to parse compose file: ${DOCKER_COMPOSE_PATH}"
@@ -91,7 +106,7 @@ config::configs_exist() {
 
     if [[ "${names[*]}" == *"null"* ]] || [[ "${#names[@]}" -eq 0 ]]; then
         log debug "No configs found in compose file"
-        return 0
+        return 1
     fi
 
     # Check if any config names have environment variables that need to be resolved
@@ -133,7 +148,8 @@ config::remove_stale_service_configs() {
     local -r DOCKER_COMPOSE_PATH="${1:?$(missing_param "remove_stale_service_configs" "DOCKER_COMPOSE_PATH")}"
     local -r CONFIG_LABEL="${2:?$(missing_param "remove_stale_service_configs" "CONFIG_LABEL")}"
 
-    local -r compose_names=($(yq '.configs."*.*".name' "${DOCKER_COMPOSE_PATH}"))
+    local compose_names=()
+    mapfile -t compose_names < <(yq '.configs.*.name' "${DOCKER_COMPOSE_PATH}")
     local configs_to_remove=()
 
     if [[ "${compose_names[*]}" != "null" ]]; then

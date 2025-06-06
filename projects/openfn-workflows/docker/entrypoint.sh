@@ -213,7 +213,8 @@ pull_workflow() {
 {
   "endpoint": "$OPENFN_ENDPOINT",
   "apiKey": "$OPENFN_API_KEY",
-  "specPath": "./project.yaml"
+  "specPath": "./project.yaml",
+  "projectId": "$workflow_name"
 }
 EOF
     
