@@ -1,9 +1,8 @@
 services:
   openfn_workflow_manager:
-    image: ${OPENFN_WORKFLOWS_IMAGE:-openfn-workflows:latest}
+    image: ${OPENFN_WORKFLOWS_IMAGE:-openfn-workflows:local}
     networks:
       - postgres
-      - sftp
     environment:
       OPENFN_ENDPOINT: ${OPENFN_ENDPOINT:-http://openfn:4000}
       OPENFN_API_KEY: ${OPENFN_API_KEY:-}
@@ -25,21 +24,6 @@ services:
       # General Configuration
       LOG_LEVEL: ${OPENFN_LOG_LEVEL:-info}
       MAX_RETRIES: ${OPENFN_MAX_RETRIES:-3}
-    deploy:
-      replicas: 1
-      restart_policy:
-        condition: on-failure
-        delay: 10s
-        max_attempts: 3
-        window: 120s
-      labels:
-        - "openfn.workflow.manager=true"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 60s
 
 networks:
   postgres:

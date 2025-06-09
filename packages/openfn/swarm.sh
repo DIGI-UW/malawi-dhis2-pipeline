@@ -90,10 +90,6 @@ function initialize_package() {
     if [[ "${OPENFN_LOAD_WORKFLOW_ON_STARTUP}" == "true" ]]; then
         log info "OPENFN_LOAD_WORKFLOW_ON_STARTUP is true. Deploying OpenFN workflow configuration..."
         
-        # Deploy config importer first - will skip if configs already exist
-        docker::deploy_config_importer $STACK "$COMPOSE_FILE_PATH/importer/workflows/docker-compose.config.yml" "openfn_workflow_config" "openfn_workflow"
-
-        # Now deploy the service for workflow execution
         log info "Deploying workflow service..."
         docker::deploy_service $STACK "$COMPOSE_FILE_PATH/importer/workflows" "docker-compose.config.yml"
 
@@ -114,26 +110,6 @@ function initialize_package() {
             log error "Could not find a running OpenFN workflow config container."
         else
             log info "Found OpenFN workflow config container: $WORKFLOW_CONFIG_CONTAINER_ID"
-            
-            # Check if manual CLI is enabled
-            if [[ "${OPENFN_WORKFLOW_MANUAL_CLI}" == "true" ]]; then
-                log warn "OPENFN_WORKFLOW_MANUAL_CLI is true: Manual OpenFN CLI execution required."
-                log warn "The '${WORKFLOW_CONFIG_SERVICE_COMPOSE_NAME}' container ($WORKFLOW_CONFIG_CONTAINER_ID) is running with OpenFN CLI installed"
-                log warn "Please exec into container $WORKFLOW_CONFIG_CONTAINER_ID (e.g., docker exec -it $WORKFLOW_CONFIG_CONTAINER_ID sh) and run:"
-                log warn "1. cd /app/project"
-                log warn "2. openfn deploy -p . --no-confirm --log info"
-                log warn "(Environment variables are available inside the container.)"
-            else
-                log info "OPENFN_WORKFLOW_MANUAL_CLI is false. Executing OpenFN deploy command in container $WORKFLOW_CONFIG_CONTAINER_ID..."
-                
-                DEPLOY_CMD="set -e; echo 'Executing OpenFN deploy...'; source /etc/profile 2>/dev/null || true; export PATH=\"/usr/local/bin:\$PATH\"; cd /app/project && ls -la && pwd && echo 'Checking OpenFN CLI availability:' && (which openfn || echo 'openfn not in PATH') && echo 'Attempting deploy with multiple fallback methods:' && (openfn deploy . --no-confirm --log info 2>&1 || /usr/local/bin/openfn deploy . --no-confirm --log info 2>&1 || /usr/local/bin/node /usr/local/lib/node_modules/@openfn/cli/bin/run.js deploy . --no-confirm --log info 2>&1 || npx @openfn/cli deploy . --no-confirm --log info 2>&1)"
-                log info "Attempting OpenFN deploy in /app/project..."
-                if docker exec "$WORKFLOW_CONFIG_CONTAINER_ID" sh -c "$DEPLOY_CMD"; then
-                    log info "OpenFN deploy successful."
-                else
-                    log error "OpenFN deploy command failed in container $WORKFLOW_CONFIG_CONTAINER_ID."
-                fi
-            fi
         fi
     else
         log info "OPENFN_LOAD_WORKFLOW_ON_STARTUP is not true. Skipping workflow configuration."
@@ -141,7 +117,7 @@ function initialize_package() {
 
   ) || {
     log error "Failed to deploy package"
-    exit 1
+    exit
   }
 }
 

@@ -139,7 +139,7 @@ if [[ $# -eq 0 ]]; then
     echo "🔍 Scanning for projects to build..."
     
     for project_dir in "$PROJECT_ROOT/projects"/*; do
-        if [[ -d "$project_dir" && -f "$project_dir/Dockerfile" ]]; then
+        if [[ -d "$project_dir" && ( -f "$project_dir/Dockerfile" || -f "$project_dir/docker/Dockerfile" ) ]]; then
             project_name=$(basename "$project_dir")
             
             # Try to map project to package name
@@ -151,12 +151,6 @@ if [[ $# -eq 0 ]]; then
                     build_custom_image "$project_name" "sftp-storage"
                     ;;
                 "openfn-workflows")
-                    build_custom_image "$project_name" "openfn"
-                    ;;
-                "openfn-workflow")
-                    build_custom_image "$project_name" "openfn"
-                    ;;
-                "openfn-sftp-workflow")
                     build_custom_image "$project_name" "openfn"
                     ;;
                 *)
@@ -176,12 +170,6 @@ else
                 build_custom_image "$project_name" "sftp-storage"
                 ;;
             "openfn-workflows")
-                build_custom_image "$project_name" "openfn"
-                ;;
-            "openfn-workflow")
-                build_custom_image "$project_name" "openfn"
-                ;;
-            "openfn-sftp-workflow")
                 build_custom_image "$project_name" "openfn"
                 ;;
             *)
