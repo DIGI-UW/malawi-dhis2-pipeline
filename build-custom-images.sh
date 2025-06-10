@@ -142,14 +142,18 @@ if [[ $# -eq 0 ]]; then
         if [[ -d "$project_dir" && ( -f "$project_dir/Dockerfile" || -f "$project_dir/docker/Dockerfile" ) ]]; then
             project_name=$(basename "$project_dir")
             
-            # Try to map project to package name
+            # Map project name to package name for specific known projects,
+            # otherwise, attempt to build with an empty package name.
             case "$project_name" in
+                # The "dhis2" project corresponds to the "dhis2-instance" package.
                 "dhis2")
                     build_custom_image "$project_name" "dhis2-instance"
                     ;;
+                # The "sftp" project corresponds to the "sftp-storage" package.
                 "sftp")
                     build_custom_image "$project_name" "sftp-storage"
                     ;;
+                # The "openfn-workflows" project corresponds to the "openfn" package.
                 "openfn-workflows")
                     build_custom_image "$project_name" "openfn"
                     ;;
@@ -162,13 +166,18 @@ if [[ $# -eq 0 ]]; then
 else
     # Build specific projects
     for project_name in "$@"; do
+        # Map project name to package name for specific known projects,
+        # otherwise, attempt to build with an empty package name.
         case "$project_name" in
+            # The "dhis2" project corresponds to the "dhis2-instance" package.
             "dhis2")
                 build_custom_image "$project_name" "dhis2-instance"
                 ;;
+            # The "sftp" project corresponds to the "sftp-storage" package.
             "sftp")
                 build_custom_image "$project_name" "sftp-storage"
                 ;;
+            # The "openfn-workflows" project corresponds to the "openfn" package.
             "openfn-workflows")
                 build_custom_image "$project_name" "openfn"
                 ;;
