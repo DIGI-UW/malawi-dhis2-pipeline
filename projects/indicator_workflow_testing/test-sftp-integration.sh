@@ -23,13 +23,31 @@ cd "$PROJECT_ROOT/packages/sftp-storage"
 ./swarm.sh init
 
 echo "Step 2: Wait for SFTP server to be ready..."
-sleep 10
+sftp_ready=false
+for i in {1..10}; do
+  echo "Attempting to connect to SFTP server (attempt $i/10)..."
+  if docker run --rm --network sftp-storage_sftp \
+    alpine/curl:latest \
+    sh -c "apk add --no-cache openssh-client && sftp -P $SFTP_PORT -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=5 $SFTP_USER@sftp-server <<< 'ls' > /dev/null 2>&1"; then
+    echo "SFTP server is ready."
+    sftp_ready=true
+    break
+  fi
+  echo "SFTP server not yet ready. Retrying in 5 seconds..."
+  sleep 5
+done
+
+if [ "$sftp_ready" = false ]; then
+  echo "Error: SFTP server did not become ready after 10 attempts."
+  exit 1
+fi
 
 echo "Step 3: Test SFTP connection and file listing..."
 # Use Docker to test SFTP connection without requiring local SFTP client
+echo "Listing files in data/excel-files/ on the SFTP server..."
 docker run --rm --network sftp-storage_sftp \
   alpine/curl:latest \
-  sh -c "apk add --no-cache openssh-client && sftp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $SFTP_USER@sftp-server:22 <<< 'ls data/excel-files/'" || echo "SFTP connection test failed (expected if network not ready)"
+  sh -c "apk add --no-cache openssh-client && sftp -P $SFTP_PORT -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $SFTP_USER@sftp-server <<< 'ls data/excel-files/'"
 
 echo "Step 4: Deploy OpenFN workflow package..."
 cd "$PROJECT_ROOT/packages/openfn"
