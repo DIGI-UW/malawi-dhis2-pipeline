@@ -305,6 +305,21 @@ main() {
         return $?
     fi
     
+    # Check for manual CLI mode
+    if [[ "${OPENFN_WORKFLOW_MANUAL_CLI}" == "true" ]]; then
+        log "OPENFN_WORKFLOW_MANUAL_CLI is enabled - starting interactive shell mode"
+        log "Container is ready for manual workflow debugging"
+        log "Available commands:"
+        log "  - openfn --help"
+        log "  - /app/entrypoint.sh deploy (to deploy workflows)"
+        log "  - /app/entrypoint.sh validate (to validate workflows)"
+        log "Working directory: /app"
+        log "Workflow path: $WORKFLOW_PATH"
+        
+        # Keep container alive with shell access
+        exec /bin/bash
+    fi
+    
     # Validate environment for non-list modes
     if [[ "$MODE" != "list" ]]; then
         if ! validate_environment; then
