@@ -58,9 +58,17 @@ build_custom_image() {
         return 1
     fi
     
+    # Check for Dockerfile in root or docker/ subdirectory
     local dockerfile_path="$project_dir/Dockerfile"
-    if [[ ! -f "$dockerfile_path" ]]; then
-        echo "❌ Dockerfile not found: $dockerfile_path"
+    local dockerfile_arg=""
+    
+    if [[ -f "$dockerfile_path" ]]; then
+        dockerfile_arg=""  # Use default Dockerfile location
+    elif [[ -f "$project_dir/docker/Dockerfile" ]]; then
+        dockerfile_path="$project_dir/docker/Dockerfile"
+        dockerfile_arg="-f docker/Dockerfile"
+    else
+        echo "❌ Dockerfile not found in: $project_dir/Dockerfile or $project_dir/docker/Dockerfile"
         return 1
     fi
     
@@ -69,7 +77,7 @@ build_custom_image() {
     base_image_var="${base_image_var//-/_}" # Replace hyphens with underscores
     local base_image=$(get_env_value "$base_image_var" "$package_name")
     
-    # Get local image tag from environment/package metadata
+    # For all projects, check for LOCAL_ prefixed variable
     local local_image_var="LOCAL_${project_name^^}_IMAGE"
     local_image_var="${local_image_var//-/_}" # Replace hyphens with underscores
     local local_image_tag=$(get_env_value "$local_image_var" "$package_name")
@@ -92,9 +100,11 @@ build_custom_image() {
     
     # Build the custom image
     echo "🏗️  Building custom image: $local_image_tag"
+    echo "📄 Using Dockerfile: $dockerfile_path"
     
     cd "$project_dir"
     docker build \
+        $dockerfile_arg \
         --build-arg "${project_name^^}_BASE_IMAGE=$base_image" \
         -t "$local_image_tag" \
         .
@@ -129,13 +139,23 @@ if [[ $# -eq 0 ]]; then
     echo "🔍 Scanning for projects to build..."
     
     for project_dir in "$PROJECT_ROOT/projects"/*; do
-        if [[ -d "$project_dir" && -f "$project_dir/Dockerfile" ]]; then
+        if [[ -d "$project_dir" && ( -f "$project_dir/Dockerfile" || -f "$project_dir/docker/Dockerfile" ) ]]; then
             project_name=$(basename "$project_dir")
             
-            # Try to map project to package name
+            # Map project name to package name for specific known projects,
+            # otherwise, attempt to build with an empty package name.
             case "$project_name" in
+                # The "dhis2" project corresponds to the "dhis2-instance" package.
                 "dhis2")
                     build_custom_image "$project_name" "dhis2-instance"
+                    ;;
+                # The "sftp" project corresponds to the "sftp-storage" package.
+                "sftp")
+                    build_custom_image "$project_name" "sftp-storage"
+                    ;;
+                # The "openfn-workflows" project corresponds to the "openfn" package.
+                "openfn-workflows")
+                    build_custom_image "$project_name" "openfn"
                     ;;
                 *)
                     build_custom_image "$project_name" ""
@@ -146,9 +166,20 @@ if [[ $# -eq 0 ]]; then
 else
     # Build specific projects
     for project_name in "$@"; do
+        # Map project name to package name for specific known projects,
+        # otherwise, attempt to build with an empty package name.
         case "$project_name" in
+            # The "dhis2" project corresponds to the "dhis2-instance" package.
             "dhis2")
                 build_custom_image "$project_name" "dhis2-instance"
+                ;;
+            # The "sftp" project corresponds to the "sftp-storage" package.
+            "sftp")
+                build_custom_image "$project_name" "sftp-storage"
+                ;;
+            # The "openfn-workflows" project corresponds to the "openfn" package.
+            "openfn-workflows")
+                build_custom_image "$project_name" "openfn"
                 ;;
             *)
                 build_custom_image "$project_name" ""
