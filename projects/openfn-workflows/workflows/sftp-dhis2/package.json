@@ -1,0 +1,27 @@
+{
+  "name": "sftp-dhis2-workflow",
+  "version": "1.0.0",
+  "description": "SFTP to DHIS2 workflow with cron and webhook triggers for Malawi HIV indicators",
+  "private": true,
+  "dependencies": {
+    "@openfn/language-sftp": "^1.0.0",
+    "@openfn/language-common": "^2.4.0",
+    "@openfn/language-dhis2": "^6.3.4",
+    "xlsx": "^0.18.5"
+  },
+  "scripts": {
+    "deploy": "openfn deploy",
+    "test": "openfn test",
+    "validate": "openfn validate"
+  },
+  "keywords": [
+    "openfn",
+    "dhis2",
+    "sftp",
+    "hiv-indicators",
+    "malawi",
+    "health-data"
+  ],
+  "author": "Malawi DHIS2 Pipeline Team",
+  "license": "MIT"
+}

@@ -1,6 +1,6 @@
 services:
   sftp-server:
-    image: ${SFTP_IMAGE}
+    image: ${LOCAL_SFTP_IMAGE:-$SFTP_IMAGE}
     environment:
       - SFTP_USERS=${SFTP_USER}:${SFTP_PASSWORD}:1001:1001:data
     volumes:
@@ -8,9 +8,8 @@ services:
     ports:
       - "${SFTP_PORT}:22"
     networks:
-      sftp:
-        aliases:
-          - sftp-server
+      - openfn_public
+      
     deploy:
       replicas: 1
       restart_policy:
@@ -26,7 +25,8 @@ services:
 volumes:
   sftp-data:
 
+    
 networks:
-  sftp:
-    driver: overlay
-    attachable: true
+  openfn_public:
+    name: openfn_public
+    external: true

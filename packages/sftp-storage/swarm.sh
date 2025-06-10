@@ -56,13 +56,6 @@ function initialize_package() {
     docker::deploy_sanity $STACK "$COMPOSE_FILE_PATH/$package_dev_compose_filename"
     docker::await_container_startup $STACK "sftp-server"
     
-    # Then import data files using the config importer approach (only on init)
-    if [[ "${ACTION}" == "init" ]]; then
-        log info "Importing Excel data files to SFTP storage..."
-        docker::deploy_config_importer $STACK "$COMPOSE_FILE_PATH/importer/docker-compose.config.yml" "sftp_data_config" "sftp_data"
-        log info "Data import completed successfully"
-    fi
-    
     log info "SFTP server is ready at localhost:${SFTP_PORT}"
     log info "Excel files available at: sftp://${SFTP_USER}@localhost:${SFTP_PORT}/data/excel-files/"
     log info "Use password: ${SFTP_PASSWORD}"

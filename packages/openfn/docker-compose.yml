@@ -46,9 +46,13 @@ services:
     command: [ 'pnpm', 'start:prod', '-l', 'ws://openfn:${URL_PORT-4000}/worker' ]
     networks:
       - kafka_public
+      - openfn_public
       - postgres
 
 networks:
+  openfn_public:
+    name: openfn_public
+    external: true
   kafka_public:
     name: kafka_public
     external: true
