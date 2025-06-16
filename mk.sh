@@ -6,11 +6,14 @@
 #./instant project destroy --env-file .env
 #./instant project init --env-file .env
 
-./instant package destroy -n database-postgres
-./instant package init -n database-postgres -d
+#./instant package destroy -n reverse-proxy-traefik
+#./instant package init -n reverse-proxy-traefik
 
-./instant package destroy -n openfn
-./instant package init -n openfn -d
+# ./instant package destroy -n database-postgres
+# ./instant package init -n database-postgres -d
+
+# ./instant package destroy -n openfn
+# ./instant package init -n openfn -d
 
 # ./instant package destroy -n sftp-storage
 # ./instant package init -n sftp-storage -d

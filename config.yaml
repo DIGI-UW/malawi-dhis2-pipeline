@@ -7,3 +7,4 @@ packages:
   - dhis2-instance
   - openfn
   - sftp-storage
+  - reverse-proxy-traefik

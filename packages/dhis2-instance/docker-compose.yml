@@ -26,6 +26,24 @@ services:
         target: /usr/local/tomcat/conf/server.xml
     deploy:
       replicas: ${DHIS2_REPLICAS}
+      labels:
+        # Enable Traefik for this service
+        - traefik.enable=true
+        
+        # HTTPS router for root domain (mwdhis2.info and www.mwdhis2.info)
+        - traefik.http.routers.dhis2.rule=Host(`mwdhis2.info`) || Host(`www.mwdhis2.info`)
+        - traefik.http.routers.dhis2.entrypoints=websecure
+        - traefik.http.routers.dhis2.tls=true
+        - traefik.http.routers.dhis2.tls.certresolver=le
+        - traefik.http.services.dhis2.loadbalancer.server.port=8080
+        
+        # HTTP to HTTPS redirect for root domain
+        - traefik.http.routers.dhis2-http.rule=Host(`mwdhis2.info`) || Host(`www.mwdhis2.info`)
+        - traefik.http.routers.dhis2-http.entrypoints=web
+        - traefik.http.routers.dhis2-http.middlewares=to-https
+        
+        # Apply bigfiles middleware for large uploads
+        - traefik.http.routers.dhis2.middlewares=bigfiles
       resources:
         limits:
           cpus: ${DHIS2_CPU_LIMIT}
@@ -42,6 +60,7 @@ services:
       default:
       postgres:
       dhis2:
+      traefik:
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/dhis-web-commons/security/login.action"]
       interval: 30s
@@ -73,4 +92,9 @@ networks:
     external: true
   postgres:
     name: postgres_public
+    external: true
+  traefik:
+    name: reverse-proxy-traefik_public
+    external: true
+  traefik:
     external: true

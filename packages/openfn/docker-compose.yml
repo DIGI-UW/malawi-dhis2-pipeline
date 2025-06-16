@@ -7,6 +7,24 @@ services:
     command: >
       sh -c "/app/bin/lightning eval 'Lightning.Release.migrate()' && /app/bin/lightning start"
     deploy:
+      labels:
+        # Enable Traefik for this service
+        - traefik.enable=true
+        
+        # HTTPS router for OpenFN subdomain
+        - traefik.http.routers.openfn.rule=Host(`openfn.mwdhis2.info`)
+        - traefik.http.routers.openfn.entrypoints=websecure
+        - traefik.http.routers.openfn.tls=true
+        - traefik.http.routers.openfn.tls.certresolver=le
+        - traefik.http.services.openfn.loadbalancer.server.port=4000
+        
+        # HTTP to HTTPS redirect for OpenFN subdomain
+        - traefik.http.routers.openfn-http.rule=Host(`openfn.mwdhis2.info`)
+        - traefik.http.routers.openfn-http.entrypoints=web
+        - traefik.http.routers.openfn-http.middlewares=to-https
+        
+        # Apply bigfiles middleware for large uploads
+        - traefik.http.routers.openfn.middlewares=bigfiles
       resources:
         limits:
           cpus: '${OPENFN_DOCKER_WEB_CPUS:-0}'
@@ -32,6 +50,7 @@ services:
     networks:
       - kafka_public
       - postgres
+      - traefik
   worker:
     image: ${OPENFN_WORKER_IMAGE}
     deploy:
@@ -58,4 +77,9 @@ networks:
     external: true
   postgres:
     name: postgres_public
+    external: true
+  traefik:
+    name: reverse-proxy-traefik_public
+    external: true
+  traefik:
     external: true
