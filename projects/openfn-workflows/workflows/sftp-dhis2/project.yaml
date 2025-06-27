@@ -42,10 +42,10 @@ workflows:
           path: ./jobs/update-file-tracking.js
           
     triggers:
-      # Cron trigger - runs every 15 minutes to check for new files
+      # Cron trigger - runs every 5 minutes for testing (was 15 minutes)
       cron-file-check:
         type: cron
-        cron_expression: "*/15 * * * *"
+        cron_expression: "*/5 * * * *"
         enabled: true
       # Webhook trigger - for external file system notifications
       file-change-webhook:

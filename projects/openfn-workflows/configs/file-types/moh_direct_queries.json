@@ -1,0 +1,150 @@
+{
+  "fileType": "moh_direct_queries",
+  "displayName": "MoH Direct Queries Reports",
+  "description": "Configuration for processing quarterly MoH direct query reports",
+  "filePatterns": ["*Direct*Queries*.xlsx", "*MoH*Reports*.xlsx", "Direct Queries - Q1 2025 MoH Reports.xlsx"],
+  "sheetConfig": {
+    "multiSheet": true,
+    "sheetPatterns": ["HIV*", "TB*", "Malaria*", "Summary"],
+    "headerRow": 1,
+    "dataStartRow": 2
+  },
+  "columnMappings": {
+    "facility": {
+      "sourceColumns": ["Facility", "facility", "Health Facility", "Site", "Facility Name"],
+      "targetField": "orgUnit",
+      "required": true
+    },
+    "district": {
+      "sourceColumns": ["District", "district", "District Name"],
+      "targetField": "orgUnitParent",
+      "required": false
+    },
+    "indicator": {
+      "sourceColumns": ["Indicator", "indicator", "Query", "Data Element", "Measure"],
+      "targetField": "dataElement",
+      "required": true
+    },
+    "value": {
+      "sourceColumns": ["Value", "value", "Result", "Count", "Total"],
+      "targetField": "value",
+      "required": true,
+      "dataType": "numeric"
+    },
+    "numerator": {
+      "sourceColumns": ["Numerator", "numerator", "Num"],
+      "targetField": "numerator",
+      "required": false,
+      "dataType": "numeric"
+    },
+    "denominator": {
+      "sourceColumns": ["Denominator", "denominator", "Denom", "Den"],
+      "targetField": "denominator",
+      "required": false,
+      "dataType": "numeric"
+    },
+    "period": {
+      "sourceColumns": ["Period", "period", "Quarter", "Month", "Reporting Period"],
+      "targetField": "period",
+      "required": true,
+      "format": "flexible"
+    },
+    "target": {
+      "sourceColumns": ["Target", "target", "Expected", "Goal"],
+      "targetField": "attributeOptions.target",
+      "required": false,
+      "dataType": "numeric"
+    },
+    "comment": {
+      "sourceColumns": ["Comment", "comment", "Note", "Remark"],
+      "targetField": "comment",
+      "required": false
+    }
+  },
+  "dataValidation": {
+    "rules": [
+      {
+        "field": "value",
+        "type": "numeric",
+        "min": 0,
+        "max": 9999999,
+        "allowNull": false
+      },
+      {
+        "field": "period",
+        "type": "flexible",
+        "formats": ["YYYYMM", "YYYY-MM", "MMM YYYY", "Q[1-4] YYYY", "YYYY Q[1-4]"],
+        "message": "Period must be a valid date format"
+      },
+      {
+        "field": "numerator",
+        "type": "conditionalRequired",
+        "condition": "denominator",
+        "message": "Numerator required when denominator is present"
+      }
+    ],
+    "skipEmptyRows": true,
+    "stopOnError": false,
+    "customValidation": {
+      "checkPercentages": true,
+      "checkOutliers": true,
+      "outlierThreshold": 3.5
+    }
+  },
+  "transformations": [
+    {
+      "field": "period",
+      "type": "flexibleDateParse",
+      "formats": [
+        {"from": "Q1 2025", "to": "202501"},
+        {"from": "Q2 2025", "to": "202504"},
+        {"from": "Q3 2025", "to": "202507"},
+        {"from": "Q4 2025", "to": "202510"},
+        {"from": "January 2025", "to": "202501"},
+        {"from": "Jan 2025", "to": "202501"}
+      ],
+      "defaultQuarterStart": true
+    },
+    {
+      "field": "value",
+      "type": "calculateIfMissing",
+      "formula": "numerator / denominator * 100",
+      "condition": "numerator && denominator && !value",
+      "precision": 2
+    },
+    {
+      "field": "orgUnit",
+      "type": "lookup",
+      "lookupFile": "../metadata/org_unit_mapping.json",
+      "keyField": "name",
+      "valueField": "id"
+    }
+  ],
+  "aggregation": {
+    "enabled": true,
+    "groupBy": ["orgUnit", "dataElement", "period"],
+    "method": "sum",
+    "handleDuplicates": "warn"
+  },
+  "dhis2Config": {
+    "dataSetId": "MoHQuarterlyReports",
+    "importStrategy": "CREATE_AND_UPDATE",
+    "skipAudit": false,
+    "dryRun": false,
+    "idScheme": "UID",
+    "orgUnitIdScheme": "CODE",
+    "dataElementIdScheme": "CODE",
+    "preheatCache": true
+  },
+  "postProcessing": {
+    "generateSummaryReport": true,
+    "validateAgainstTargets": true,
+    "calculateIndicators": [
+      {
+        "name": "ART Coverage",
+        "formula": "CurrentOnART / EstimatedPLHIV * 100",
+        "dataElements": ["CurrentOnART", "EstimatedPLHIV"]
+      }
+    ]
+  }
+} 

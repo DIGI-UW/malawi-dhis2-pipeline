@@ -1,0 +1,113 @@
+{
+  "fileType": "dq_sites",
+  "displayName": "Data Quality Sites Report",
+  "description": "Configuration for processing quarterly DQ site reports",
+  "filePatterns": ["*Q*FY*DQ*sites*.xlsx", "*DQ*253*sites*.xlsx", "Q2FY25_DQ_253_sites.xlsx"],
+  "sheetConfig": {
+    "targetSheet": 0,
+    "headerRow": 1,
+    "dataStartRow": 2
+  },
+  "columnMappings": {
+    "site": {
+      "sourceColumns": ["Site", "site", "Facility", "Health Facility", "Site Name"],
+      "targetField": "orgUnit",
+      "required": true
+    },
+    "indicator": {
+      "sourceColumns": ["Indicator", "indicator", "Data Element", "Measure"],
+      "targetField": "dataElement",
+      "required": true
+    },
+    "value": {
+      "sourceColumns": ["Value", "value", "Score", "Result", "Count"],
+      "targetField": "value",
+      "required": true,
+      "dataType": "numeric"
+    },
+    "period": {
+      "sourceColumns": ["Period", "period", "Quarter", "Reporting Period"],
+      "targetField": "period",
+      "required": true,
+      "format": "YYYYQQ"
+    },
+    "dataQualityScore": {
+      "sourceColumns": ["DQ Score", "Quality Score", "Score", "Completeness"],
+      "targetField": "attributeOptions.dqScore",
+      "required": false,
+      "dataType": "numeric"
+    },
+    "completeness": {
+      "sourceColumns": ["Completeness", "completeness", "Complete %", "Reporting Rate"],
+      "targetField": "attributeOptions.completeness",
+      "required": false,
+      "dataType": "percentage"
+    },
+    "timeliness": {
+      "sourceColumns": ["Timeliness", "timeliness", "On Time", "Timely Submission"],
+      "targetField": "attributeOptions.timeliness",
+      "required": false,
+      "dataType": "percentage"
+    }
+  },
+  "dataValidation": {
+    "rules": [
+      {
+        "field": "value",
+        "type": "numeric",
+        "min": 0,
+        "max": 999999,
+        "allowNull": false
+      },
+      {
+        "field": "period",
+        "type": "regex",
+        "pattern": "^\\d{4}Q[1-4]$",
+        "message": "Period must be in YYYYQQ format (e.g., 2025Q2)"
+      },
+      {
+        "field": "dataQualityScore",
+        "type": "numeric",
+        "min": 0,
+        "max": 100,
+        "allowNull": true
+      }
+    ],
+    "skipEmptyRows": true,
+    "stopOnError": false
+  },
+  "transformations": [
+    {
+      "field": "period",
+      "type": "quarterToMonth",
+      "from": ["Q1 FY25", "Q2 FY25", "Q3 FY25", "Q4 FY25", "Q1FY25", "Q2FY25"],
+      "fiscalYearStart": 7,
+      "to": "YYYYMM"
+    },
+    {
+      "field": "value",
+      "type": "numeric",
+      "removeCommas": true,
+      "defaultValue": 0
+    },
+    {
+      "field": "completeness",
+      "type": "percentage",
+      "from": "decimal",
+      "to": "whole"
+    }
+  ],
+  "aggregation": {
+    "enabled": false,
+    "groupBy": ["orgUnit", "dataElement", "period"],
+    "method": "average"
+  },
+  "dhis2Config": {
+    "dataSetId": "DataQualityMonitoring",
+    "importStrategy": "CREATE_AND_UPDATE",
+    "skipAudit": false,
+    "dryRun": false,
+    "idScheme": "UID",
+    "orgUnitIdScheme": "CODE"
+  }
+} 

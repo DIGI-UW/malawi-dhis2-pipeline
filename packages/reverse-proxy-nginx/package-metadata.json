@@ -1,0 +1,21 @@
+{
+  "id": "reverse-proxy-nginx",
+  "name": "Nginx Reverse Proxy package",
+  "description": "nginx reverse proxy",
+  "type": "use-case",
+  "version": "0.0.1",
+  "dependencies": [],
+  "environmentVariables": {
+    "REVERSE_PROXY_INSTANCES": "1",
+    "NGINX_CPU_LIMIT": "0",
+    "NGINX_CPU_RESERVE": "0.05",
+    "NGINX_MEMORY_LIMIT": "3G",
+    "NGINX_MEMORY_RESERVE": "500M",
+    "DOMAIN_NAME": "mwdhis2.info",
+    "SUBDOMAINS": "openfn.mwdhis2.info,sftp.mwdhis2.info,dhis2.mwdhis2.info",
+    "RENEWAL_EMAIL": "admin@mwdhis2.info",
+    "STAGING": "true",
+    "INSECURE": "false",
+    "INSECURE_PORTS": ""
+  }
+}

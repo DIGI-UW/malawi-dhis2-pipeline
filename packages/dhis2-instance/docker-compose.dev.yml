@@ -1,14 +1,10 @@
 services:
   dhis2:
     environment:
-      # Development-specific environment variables
       DHIS2_DEMO_DATA: "true"
       DHIS2_ADMIN_PASSWORD: "${DHIS2_ADMIN_PASSWORD:-district}"
       DHIS2_DEBUG: "true"
       DHIS2_LOG_LEVEL: "DEBUG"
     ports:
-      # Expose DHIS2 port in development mode
       - "${DHIS2_PORT:-8080}:8080"
-    # Note: volumes are defined in the main docker-compose.yml
-    # configs are also defined in the main docker-compose.yml
 
