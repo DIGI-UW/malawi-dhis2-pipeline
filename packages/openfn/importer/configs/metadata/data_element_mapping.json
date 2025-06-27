@@ -1,0 +1,177 @@
+{
+  "mappingType": "dataElements",
+  "version": "1.0.0",
+  "lastUpdated": "2025-01-01",
+  "description": "Data element mapping for HIV/TB indicators",
+  "mappings": {
+    "hiv_indicators": [
+      {
+        "name": "Number of adults and children currently receiving antiretroviral therapy (ART)",
+        "code": "HIV_ART_CURR",
+        "id": "de1a2b3c4d5e",
+        "dhis2Id": "de1a2b3c4d5e",
+        "dataSet": "ARTSupervisionDataSet",
+        "categoryCombo": "Age/Sex",
+        "alternateNames": [
+          "Currently on ART",
+          "ART Current",
+          "Active ART patients"
+        ]
+      },
+      {
+        "name": "Number of adults and children newly enrolled on antiretroviral therapy (ART)",
+        "code": "HIV_ART_NEW",
+        "id": "de2b3c4d5e6f",
+        "dhis2Id": "de2b3c4d5e6f",
+        "dataSet": "ARTSupervisionDataSet",
+        "categoryCombo": "Age/Sex",
+        "alternateNames": [
+          "New on ART",
+          "ART New Enrollments",
+          "ART Initiations"
+        ]
+      },
+      {
+        "name": "Number of HIV-positive pregnant women who received ART during pregnancy",
+        "code": "PMTCT_ART",
+        "id": "de3c4d5e6f7g",
+        "dhis2Id": "de3c4d5e6f7g",
+        "dataSet": "PMTCTDataSet",
+        "categoryCombo": "default",
+        "alternateNames": [
+          "PMTCT ART",
+          "Pregnant women on ART"
+        ]
+      },
+      {
+        "name": "Number of patients who have been on ART for at least 12 months",
+        "code": "HIV_ART_12M",
+        "id": "de4d5e6f7g8h",
+        "dhis2Id": "de4d5e6f7g8h",
+        "dataSet": "ARTSupervisionDataSet",
+        "categoryCombo": "Age/Sex",
+        "alternateNames": [
+          "12 month retention",
+          "ART retention 12 months"
+        ]
+      },
+      {
+        "name": "Number of patients with suppressed viral load",
+        "code": "HIV_VL_SUPP",
+        "id": "de5e6f7g8h9i",
+        "dhis2Id": "de5e6f7g8h9i",
+        "dataSet": "ViralLoadDataSet",
+        "categoryCombo": "Age/Sex",
+        "alternateNames": [
+          "VL Suppressed",
+          "Viral Load Suppression"
+        ]
+      }
+    ],
+    "tb_indicators": [
+      {
+        "name": "Number of TB cases notified",
+        "code": "TB_NOTIFIED",
+        "id": "de6f7g8h9i0j",
+        "dhis2Id": "de6f7g8h9i0j",
+        "dataSet": "TBNotificationDataSet",
+        "categoryCombo": "TB Type",
+        "alternateNames": [
+          "TB Notifications",
+          "New TB Cases"
+        ]
+      },
+      {
+        "name": "Number of TB patients tested for HIV",
+        "code": "TB_HIV_TEST",
+        "id": "de7g8h9i0j1k",
+        "dhis2Id": "de7g8h9i0j1k",
+        "dataSet": "TBHIVDataSet",
+        "categoryCombo": "default",
+        "alternateNames": [
+          "TB/HIV Testing",
+          "TB patients HIV tested"
+        ]
+      }
+    ],
+    "dq_indicators": [
+      {
+        "name": "Data Completeness Score",
+        "code": "DQ_COMPLETE",
+        "id": "de8h9i0j1k2l",
+        "dhis2Id": "de8h9i0j1k2l",
+        "dataSet": "DataQualityMonitoring",
+        "categoryCombo": "default",
+        "dataType": "PERCENTAGE"
+      },
+      {
+        "name": "Data Timeliness Score",
+        "code": "DQ_TIMELY",
+        "id": "de9i0j1k2l3m",
+        "dhis2Id": "de9i0j1k2l3m",
+        "dataSet": "DataQualityMonitoring",
+        "categoryCombo": "default",
+        "dataType": "PERCENTAGE"
+      },
+      {
+        "name": "Data Accuracy Score",
+        "code": "DQ_ACCURACY",
+        "id": "de0j1k2l3m4n",
+        "dhis2Id": "de0j1k2l3m4n",
+        "dataSet": "DataQualityMonitoring",
+        "categoryCombo": "default",
+        "dataType": "PERCENTAGE"
+      }
+    ]
+  },
+  "categoryCombos": {
+    "default": {
+      "id": "cc1default",
+      "name": "default",
+      "categories": []
+    },
+    "Age/Sex": {
+      "id": "cc2agesex",
+      "name": "Age and Sex",
+      "categories": [
+        {
+          "id": "cat1age",
+          "name": "Age Group",
+          "options": [
+            {"id": "opt1", "name": "<15", "code": "AGE_LT15"},
+            {"id": "opt2", "name": "15+", "code": "AGE_15PLUS"}
+          ]
+        },
+        {
+          "id": "cat2sex",
+          "name": "Sex",
+          "options": [
+            {"id": "opt3", "name": "Male", "code": "SEX_M"},
+            {"id": "opt4", "name": "Female", "code": "SEX_F"}
+          ]
+        }
+      ]
+    },
+    "TB Type": {
+      "id": "cc3tbtype",
+      "name": "TB Type",
+      "categories": [
+        {
+          "id": "cat3type",
+          "name": "TB Type",
+          "options": [
+            {"id": "opt5", "name": "Pulmonary", "code": "TB_PULM"},
+            {"id": "opt6", "name": "Extra-pulmonary", "code": "TB_EXTRA"}
+          ]
+        }
+      ]
+    }
+  },
+  "lookupRules": {
+    "caseSensitive": false,
+    "trimWhitespace": true,
+    "useAlternateNames": true,
+    "fuzzyMatchThreshold": 0.80,
+    "priorityOrder": ["code", "name", "alternateNames"]
+  }
+} 

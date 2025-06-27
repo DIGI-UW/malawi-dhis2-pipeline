@@ -1,0 +1,526 @@
+name: malawi-csv-xlsx-import
+description: Flexible CSV/XLSX to DHIS2 import pipeline with configuration-based mapping
+workflows:
+  csv-xlsx-to-dhis2:
+    name: CSV/XLSX to DHIS2 Import Pipeline
+    jobs:
+      sftp-file-watcher:
+        name: SFTP File Watcher
+        adaptor: '@openfn/language-sftp@1.0.0'
+        credential: sftp-credentials
+        body: |
+          import { sftp, listFiles, downloadFile, fn } from '@openfn/language-sftp';
+
+          // SFTP connection configuration
+          const sftpConfig = {
+            host: process.env.SFTP_HOST || 'sftp-server',
+            port: parseInt(process.env.SFTP_PORT) || 22,
+            username: process.env.SFTP_USER || 'openfn',
+            password: process.env.SFTP_PASSWORD || 'instant101'
+          };
+
+          // Connect to SFTP and list files
+          sftp(sftpConfig, (state) => {
+            console.log('Connected to SFTP server, scanning for new files...');
+            
+            return listFiles('/home/openfn/data/', (state) => {
+              const files = state.data || [];
+              console.log(`Found ${files.length} files on SFTP server`);
+              
+              // Filter for CSV and XLSX files
+              const targetFiles = files.filter(file => 
+                file.name.match(/\.(csv|xlsx|xls)$/i) &&
+                !file.name.startsWith('processed_') &&
+                !file.name.startsWith('.')
+              );
+              
+              console.log(`Found ${targetFiles.length} unprocessed data files`);
+              
+              // Store file list for processing
+              state.filesToProcess = targetFiles;
+              return state;
+            });
+          });
+
+      download-and-identify:
+        name: Download and Identify File Type
+        adaptor: '@openfn/language-common@latest'
+        body: |
+          import { fn, each } from '@openfn/language-common';
+          import * as fs from 'fs';
+          import * as path from 'path';
+
+          fn((state) => {
+            console.log('Loading file type configurations...');
+            
+            // Load all file type configurations
+            const configPath = '/implementation/packages/openfn/importer/configs/file-types/';
+            const configs = {};
+            
+            const configFiles = fs.readdirSync(configPath);
+            configFiles.forEach(file => {
+              if (file.endsWith('.json')) {
+                const config = JSON.parse(fs.readFileSync(path.join(configPath, file), 'utf8'));
+                configs[config.fileType] = config;
+              }
+            });
+            
+            state.fileTypeConfigs = configs;
+            console.log(`Loaded ${Object.keys(configs).length} file type configurations`);
+            
+            return state;
+          });
+
+          // Process each file
+          each('filesToProcess', (state) => {
+            const file = state.data;
+            console.log(`Processing file: ${file.name}`);
+            
+            // Match file against patterns
+            let matchedConfig = null;
+            for (const [fileType, config] of Object.entries(state.fileTypeConfigs)) {
+              const patterns = config.filePatterns || [];
+              const matched = patterns.some(pattern => {
+                const regex = new RegExp(pattern.replace(/\*/g, '.*'), 'i');
+                return regex.test(file.name);
+              });
+              
+              if (matched) {
+                matchedConfig = config;
+                console.log(`File matched configuration: ${fileType}`);
+                break;
+              }
+            }
+            
+            if (!matchedConfig) {
+              console.warn(`No configuration found for file: ${file.name}`);
+              return state;
+            }
+            
+            // Add file info to processing queue
+            if (!state.processingQueue) state.processingQueue = [];
+            state.processingQueue.push({
+              file: file,
+              config: matchedConfig,
+              localPath: `/tmp/${file.name}`,
+              status: 'pending'
+            });
+            
+            return state;
+          });
+
+      process-files:
+        name: Process CSV/XLSX Files
+        adaptor: '@openfn/language-common@latest'
+        body: |
+          import { fn, each } from '@openfn/language-common';
+          import * as XLSX from 'xlsx';
+          import * as fs from 'fs';
+          import * as csv from 'csv-parse/sync';
+
+          // Load metadata mappings
+          fn((state) => {
+            const metadataPath = '/implementation/packages/openfn/importer/configs/metadata/';
+            
+            state.metadata = {
+              orgUnits: JSON.parse(fs.readFileSync(`${metadataPath}org_unit_mapping.json`, 'utf8')),
+              dataElements: JSON.parse(fs.readFileSync(`${metadataPath}data_element_mapping.json`, 'utf8'))
+            };
+            
+            console.log('Loaded metadata mappings');
+            return state;
+          });
+
+          // Process each file in the queue
+          each('processingQueue', (state) => {
+            const item = state.data;
+            const { file, config, localPath } = item;
+            
+            console.log(`Processing ${file.name} with config ${config.fileType}`);
+            
+            try {
+              let data = [];
+              
+              // Read file based on type
+              if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) {
+                const workbook = XLSX.readFile(localPath);
+                const sheetName = workbook.SheetNames[config.sheetConfig.targetSheet || 0];
+                const worksheet = workbook.Sheets[sheetName];
+                data = XLSX.utils.sheet_to_json(worksheet, {
+                  header: config.sheetConfig.headerRow || 1,
+                  range: config.sheetConfig.dataStartRow - 1 || 1
+                });
+              } else if (file.name.endsWith('.csv')) {
+                const fileContent = fs.readFileSync(localPath, 'utf8');
+                data = csv.parse(fileContent, {
+                  columns: true,
+                  skip_empty_lines: true,
+                  from_line: config.sheetConfig.dataStartRow || 2
+                });
+              }
+              
+              console.log(`Read ${data.length} rows from ${file.name}`);
+              
+              // Apply column mappings and transformations
+              const processedData = [];
+              data.forEach((row, index) => {
+                try {
+                  const mappedRow = applyColumnMappings(row, config.columnMappings, state.metadata);
+                  const transformedRow = applyTransformations(mappedRow, config.transformations);
+                  const validatedRow = validateRow(transformedRow, config.dataValidation);
+                  
+                  if (validatedRow.isValid) {
+                    processedData.push(transformedRow);
+                  } else {
+                    console.warn(`Row ${index + 1}: ${validatedRow.errors.join(', ')}`);
+                  }
+                } catch (error) {
+                  console.error(`Error processing row ${index + 1}: ${error.message}`);
+                }
+              });
+              
+              console.log(`Successfully processed ${processedData.length} valid rows`);
+              
+              // Store processed data
+              if (!state.processedFiles) state.processedFiles = [];
+              state.processedFiles.push({
+                fileName: file.name,
+                config: config,
+                data: processedData,
+                processedAt: new Date().toISOString()
+              });
+              
+              item.status = 'completed';
+              
+            } catch (error) {
+              console.error(`Failed to process ${file.name}: ${error.message}`);
+              item.status = 'failed';
+              item.error = error.message;
+            }
+            
+            return state;
+          });
+
+          // Helper functions
+          function applyColumnMappings(row, mappings, metadata) {
+            const mapped = {};
+            
+            for (const [field, mapping] of Object.entries(mappings)) {
+              const sourceColumns = mapping.sourceColumns || [];
+              let value = null;
+              
+              // Find first matching column
+              for (const col of sourceColumns) {
+                if (row[col] !== undefined && row[col] !== null && row[col] !== '') {
+                  value = row[col];
+                  break;
+                }
+              }
+              
+              if (value !== null) {
+                // Apply lookups if needed
+                if (field === 'facility' && metadata.orgUnits) {
+                  value = lookupOrgUnit(value, metadata.orgUnits);
+                } else if (field === 'indicator' && metadata.dataElements) {
+                  value = lookupDataElement(value, metadata.dataElements);
+                }
+                
+                // Set nested fields
+                const targetField = mapping.targetField;
+                if (targetField.includes('.')) {
+                  const parts = targetField.split('.');
+                  let current = mapped;
+                  for (let i = 0; i < parts.length - 1; i++) {
+                    if (!current[parts[i]]) current[parts[i]] = {};
+                    current = current[parts[i]];
+                  }
+                  current[parts[parts.length - 1]] = value;
+                } else {
+                  mapped[targetField] = value;
+                }
+              } else if (mapping.required) {
+                throw new Error(`Required field ${field} not found`);
+              }
+            }
+            
+            return mapped;
+          }
+
+          function lookupOrgUnit(name, metadata) {
+            const mapping = metadata.mappings.find(m => 
+              m.name.toLowerCase() === name.toLowerCase() ||
+              m.alternateNames?.some(alt => alt.toLowerCase() === name.toLowerCase())
+            );
+            return mapping ? mapping.dhis2Id : name;
+          }
+
+          function lookupDataElement(indicator, metadata) {
+            // Search across all indicator types
+            for (const indicators of Object.values(metadata.mappings)) {
+              const mapping = indicators.find(m => 
+                m.name.toLowerCase() === indicator.toLowerCase() ||
+                m.alternateNames?.some(alt => alt.toLowerCase() === indicator.toLowerCase())
+              );
+              if (mapping) return mapping.dhis2Id;
+            }
+            return indicator;
+          }
+
+          function applyTransformations(row, transformations = []) {
+            const transformed = { ...row };
+            
+            transformations.forEach(transform => {
+              if (transformed[transform.field] !== undefined) {
+                switch (transform.type) {
+                  case 'numeric':
+                    let value = transformed[transform.field];
+                    if (transform.removeCommas) {
+                      value = value.toString().replace(/,/g, '');
+                    }
+                    transformed[transform.field] = parseFloat(value) || transform.defaultValue || 0;
+                    break;
+                    
+                  case 'dateFormat':
+                    // Simple date transformation - would need more complex logic for real implementation
+                    const dateValue = transformed[transform.field];
+                    if (dateValue && transform.to === 'YYYYMM') {
+                      // Convert various formats to YYYYMM
+                      const date = new Date(dateValue);
+                      if (!isNaN(date)) {
+                        transformed[transform.field] = 
+                          date.getFullYear().toString() + 
+                          (date.getMonth() + 1).toString().padStart(2, '0');
+                      }
+                    }
+                    break;
+                }
+              }
+            });
+            
+            return transformed;
+          }
+
+          function validateRow(row, validation = {}) {
+            const errors = [];
+            const rules = validation.rules || [];
+            
+            rules.forEach(rule => {
+              const value = row[rule.field];
+              
+              switch (rule.type) {
+                case 'numeric':
+                  if (typeof value !== 'number' || isNaN(value)) {
+                    errors.push(`${rule.field} must be numeric`);
+                  } else if (rule.min !== undefined && value < rule.min) {
+                    errors.push(`${rule.field} must be >= ${rule.min}`);
+                  } else if (rule.max !== undefined && value > rule.max) {
+                    errors.push(`${rule.field} must be <= ${rule.max}`);
+                  }
+                  break;
+                  
+                case 'notEmpty':
+                  if (!value || value.toString().trim() === '') {
+                    errors.push(rule.message || `${rule.field} cannot be empty`);
+                  }
+                  break;
+                  
+                case 'regex':
+                  if (value && !new RegExp(rule.pattern).test(value.toString())) {
+                    errors.push(rule.message || `${rule.field} format is invalid`);
+                  }
+                  break;
+              }
+            });
+            
+            return { isValid: errors.length === 0, errors };
+          }
+
+      generate-dhis2-payload:
+        name: Generate DHIS2 Payload
+        adaptor: '@openfn/language-common@latest'
+        body: |
+          import { fn } from '@openfn/language-common';
+
+          fn((state) => {
+            console.log('Generating DHIS2 payload from processed files...');
+            
+            const dataValues = [];
+            
+            state.processedFiles?.forEach(file => {
+              console.log(`Converting ${file.data.length} records from ${file.fileName}`);
+              
+              file.data.forEach(record => {
+                const dataValue = {
+                  dataElement: record.dataElement,
+                  orgUnit: record.orgUnit,
+                  period: record.period,
+                  value: record.value,
+                  categoryOptionCombo: record.categoryOptionCombo || undefined,
+                  attributeOptionCombo: record.attributeOptionCombo || undefined,
+                  comment: record.comment || undefined
+                };
+                
+                // Add category options if present
+                if (record.categoryOptions) {
+                  // This would need proper category option combo resolution
+                  // For now, we'll pass it as-is
+                  dataValue.categoryOptions = record.categoryOptions;
+                }
+                
+                dataValues.push(dataValue);
+              });
+            });
+            
+            // Check time-based update rules
+            const currentDate = new Date();
+            const threeMonthsAgo = new Date(currentDate.setMonth(currentDate.getMonth() - 3));
+            
+            const filteredDataValues = dataValues.filter(dv => {
+              // Parse period (assuming YYYYMM format)
+              const year = parseInt(dv.period.substring(0, 4));
+              const month = parseInt(dv.period.substring(4, 6));
+              const periodDate = new Date(year, month - 1);
+              
+              return periodDate >= threeMonthsAgo;
+            });
+            
+            console.log(`Filtered to ${filteredDataValues.length} data values within 3 months`);
+            
+            // Create DHIS2 payload
+            state.dhis2Payload = {
+              dataValueSets: [{
+                dataValues: filteredDataValues,
+                completeDate: new Date().toISOString(),
+                period: new Date().toISOString().substring(0, 7).replace('-', ''),
+                orgUnit: 'MW', // Would need proper org unit from config
+                attributeOptionCombo: 'default'
+              }]
+            };
+            
+            console.log('DHIS2 payload generated successfully');
+            return state;
+          });
+
+      upload-to-dhis2:
+        name: Upload to DHIS2
+        adaptor: '@openfn/language-dhis2@latest'
+        credential: dhis2-credentials
+        body: |
+          import { create, fn } from '@openfn/language-dhis2';
+
+          // Upload data to DHIS2
+          create('dataValueSets', (state) => {
+            console.log('Uploading data to DHIS2...');
+            console.log(`Payload contains ${state.dhis2Payload.dataValueSets[0].dataValues.length} data values`);
+            
+            return state.dhis2Payload.dataValueSets[0];
+          });
+
+          // Log the response
+          fn((state) => {
+            const response = state.data;
+            console.log('DHIS2 Import Summary:');
+            console.log(`- Imported: ${response.importCount?.imported || 0}`);
+            console.log(`- Updated: ${response.importCount?.updated || 0}`);
+            console.log(`- Ignored: ${response.importCount?.ignored || 0}`);
+            console.log(`- Deleted: ${response.importCount?.deleted || 0}`);
+            
+            if (response.conflicts?.length > 0) {
+              console.warn('Conflicts detected:');
+              response.conflicts.forEach(conflict => {
+                console.warn(`- ${conflict.object}: ${conflict.value}`);
+              });
+            }
+            
+            return state;
+          });
+
+      cleanup-and-notify:
+        name: Cleanup and Notify
+        adaptor: '@openfn/language-common@latest'
+        body: |
+          import { fn } from '@openfn/language-common';
+          import * as fs from 'fs';
+
+          fn((state) => {
+            console.log('Cleaning up processed files...');
+            
+            // Mark files as processed on SFTP (would rename them in real implementation)
+            state.processedFiles?.forEach(file => {
+              const localPath = `/tmp/${file.fileName}`;
+              if (fs.existsSync(localPath)) {
+                fs.unlinkSync(localPath);
+                console.log(`Deleted local file: ${localPath}`);
+              }
+            });
+            
+            // Generate summary report
+            const summary = {
+              processedAt: new Date().toISOString(),
+              filesProcessed: state.processedFiles?.length || 0,
+              totalRecords: state.dhis2Payload?.dataValueSets[0]?.dataValues?.length || 0,
+              importSummary: state.data,
+              errors: state.processingQueue?.filter(item => item.status === 'failed') || []
+            };
+            
+            console.log('Processing Summary:', JSON.stringify(summary, null, 2));
+            
+            // Store summary for monitoring
+            state.processingSummary = summary;
+            
+            return state;
+          });
+
+    triggers:
+      sftp-watcher:
+        type: cron
+        enabled: true
+        cron_expression: '*/5 * * * *'  # Every 5 minutes for testing
+      manual-trigger:
+        type: webhook
+        enabled: true
+
+    edges:
+      sftp-watcher->sftp-file-watcher:
+        source_trigger: sftp-watcher
+        target_job: sftp-file-watcher
+        condition_type: always
+        enabled: true
+      manual-trigger->sftp-file-watcher:
+        source_trigger: manual-trigger
+        target_job: sftp-file-watcher
+        condition_type: always
+        enabled: true
+      sftp-file-watcher->download-and-identify:
+        source_job: sftp-file-watcher
+        target_job: download-and-identify
+        condition_type: on_job_success
+        enabled: true
+      download-and-identify->process-files:
+        source_job: download-and-identify
+        target_job: process-files
+        condition_type: on_job_success
+        enabled: true
+      process-files->generate-dhis2-payload:
+        source_job: process-files
+        target_job: generate-dhis2-payload
+        condition_type: on_job_success
+        enabled: true
+      generate-dhis2-payload->upload-to-dhis2:
+        source_job: generate-dhis2-payload
+        target_job: upload-to-dhis2
+        condition_type: on_job_success
+        enabled: true
+      upload-to-dhis2->cleanup-and-notify:
+        source_job: upload-to-dhis2
+        target_job: cleanup-and-notify
+        condition_type: always
+        enabled: true
+
+credentials:
+  sftp-credentials:
+    name: SFTP Server
+    owner: admin@openfn.org
+  dhis2-credentials:
+    name: DHIS2 Instance
+    owner: admin@openfn.org 

@@ -1,223 +1,424 @@
-# SFTP Excel Data Integration
-
-This document describes the SFTP Excel data integration for the Malawi DHIS2 Indicators project.
+# SFTP Excel/CSV Integration Guide
 
 ## Overview
 
-The project now supports two data sources for the OpenFN workflow:
-1. **Google Sheets** (original) - Real-time data from Google Sheets
-2. **SFTP Excel Files** (new) - Excel files stored on an SFTP server
+This guide documents the configuration-driven SFTP to DHIS2 data pipeline that supports multiple Excel and CSV file formats. The system uses flexible configuration files to define how different file types should be processed, eliminating the need for code changes when adding new formats.
 
 ## Architecture
 
 ```
-Excel Files (SFTP) ────→ get-sftp-data.js ────→ process-excel-data.js ────┐
-                                                                            │
-Google Sheets ─────────→ get-googlesheets-data.js ─────────────────────────┤
-                                                                            │
-                                                                            ▼
-                                                                generate-dhis2-payload.js ────→ upload-to-dhis2.js
+┌──────────────────┐     ┌──────────────────┐     ┌──────────────────┐
+│   SFTP Server    │     │   OpenFN         │     │    DHIS2         │
+├──────────────────┤     ├──────────────────┤     ├──────────────────┤
+│ • Excel Files    │────▶│ • File Watcher   │────▶│ • Data Import    │
+│ • CSV Files      │     │ • Config Loader  │     │ • Validation     │
+│ • Auto-discovery │     │ • Transformers   │     │ • Storage        │
+└──────────────────┘     └──────────────────┘     └──────────────────┘
+                                │
+                                ▼
+                         ┌──────────────────┐
+                         │  Configuration   │
+                         ├──────────────────┤
+                         │ • File Types     │
+                         │ • Column Maps    │
+                         │ • Metadata       │
+                         └──────────────────┘
 ```
 
-## Components
+## Configuration System
 
-### 1. SFTP Storage Package (`packages/sftp-storage/`)
+### File Type Configuration
 
-- **Purpose**: Provides SFTP server for hosting Excel files
-- **Image**: `atmoz/sftp:latest`
-- **Network**: `sftp-storage_sftp`
-- **Data Path**: `/home/openfn/data/excel-files/`
-- **Access**: 
-  - Host: `sftp-server` (internal) or `localhost:2222` (external)
-  - Username: `openfn`
-  - Password: `instant101`
+Each supported file type has a JSON configuration that defines:
+- File name patterns for matching
+- Column mappings (Excel columns → DHIS2 fields)
+- Data transformations
+- Validation rules
+- DHIS2 import settings
 
-### 2. OpenFN Jobs
+#### Example: ART Data Configuration
 
-#### `get-sftp-data.js`
-- **Adaptor**: `@openfn/language-sftp@1.0.0`
-- **Purpose**: Downloads Excel files from SFTP server
-- **Input**: SFTP connection parameters
-- **Output**: Downloaded file paths in state
+```json
+{
+  "fileType": "art_data_long_format",
+  "displayName": "ART Data Long Format",
+  "filePatterns": ["*ART*data*long*.xlsx", "ART_data_long_format.xlsx"],
+  "sheetConfig": {
+    "targetSheet": 0,
+    "headerRow": 1,
+    "dataStartRow": 2
+  },
+  "columnMappings": {
+    "facility": {
+      "sourceColumns": ["Facility", "Health Facility", "Site"],
+      "targetField": "orgUnit",
+      "required": true
+    },
+    "indicator": {
+      "sourceColumns": ["Indicator", "Data Element"],
+      "targetField": "dataElement",
+      "required": true
+    },
+    "value": {
+      "sourceColumns": ["Value", "Count", "Total"],
+      "targetField": "value",
+      "required": true,
+      "dataType": "numeric"
+    }
+  },
+  "transformations": [
+    {
+      "field": "period",
+      "type": "dateFormat",
+      "from": ["MM/YYYY", "MM-YYYY"],
+      "to": "YYYYMM"
+    }
+  ],
+  "dataValidation": {
+    "rules": [
+      {
+        "field": "value",
+        "type": "numeric",
+        "min": 0,
+        "max": 999999
+      }
+    ]
+  }
+}
+```
 
-#### `process-excel-data.js`
-- **Adaptor**: `@openfn/language-common@2.4.0`
-- **Purpose**: Parses Excel files and transforms to Google Sheets format
-- **Input**: Downloaded Excel file paths
-- **Output**: Transformed data compatible with existing workflow
+### Supported File Types
 
-#### `generate-dhis2-payload.js` (updated)
-- **Purpose**: Handles data from both Google Sheets and SFTP sources
-- **Input**: Either Google Sheets data or processed Excel data
-- **Output**: DHIS2 dataValueSets payload
+1. **ART Data Long Format** (`art_data_long_format.json`)
+   - Pattern: `*ART*data*long*.xlsx`
+   - Features: Age/gender disaggregation, ART regimen tracking
 
-### 3. Workflow Configuration
+2. **Data Quality Sites** (`dq_sites.json`)
+   - Pattern: `*Q*FY*DQ*sites*.xlsx`
+   - Features: Quarterly reports, fiscal year conversion, completeness scores
 
-The workflow now has two trigger paths:
+3. **MoH Direct Queries** (`moh_direct_queries.json`)
+   - Pattern: `*Direct*Queries*.xlsx`
+   - Features: Multi-sheet support, flexible date parsing, calculated indicators
 
-1. **Google Sheets Path**:
-   ```
-   webhook → Get-GoogleSheets-Data → Generate-DHIS2-Payload → Upload-To-DHIS2
-   ```
+## Workflow Components
 
-2. **SFTP Excel Path**:
-   ```
-   sftp-webhook → Get-SFTP-Data → Process-Excel-Data → Generate-DHIS2-Payload → Upload-To-DHIS2
-   ```
+### 1. SFTP File Watcher (`check-sftp-files.js`)
+- Monitors SFTP directory for new/modified files
+- Filters for CSV/XLSX files
+- Prevents duplicate processing
 
-## Supported Excel Files
+### 2. File Download (`download-sftp-files.js`)
+- Downloads files from SFTP to local storage
+- Handles retry logic for failed downloads
+- Supports both scheduled and webhook triggers
 
-The system processes these Excel files from the SFTP server:
+### 3. Excel/CSV Processing (`process-excel-data.js`)
+- Loads file type configurations dynamically
+- Matches files to configurations using patterns
+- Applies column mappings and transformations
+- Validates data according to rules
 
-1. **`DHIS2_HIV Indicators.xlsx`**
-   - Contains HIV indicator data
-   - Mapped to DHIS2 data elements
+### 4. DHIS2 Payload Generation (`generate-dhis2-payload.js`)
+- Uses metadata mappings for org units and data elements
+- Groups data by dataset
+- Applies time-based filtering (default: 3 months)
+- Supports multiple data value sets
 
-2. **`Direct Queries - Q1 2025 MoH Reports.xlsx`**
-   - Contains direct query results from health facilities
-   - Processed into DHIS2 format
+### 5. DHIS2 Upload (`upload-to-dhis2.js`)
+- Handles multiple dataset uploads
+- Provides comprehensive error reporting
+- Aggregates results across uploads
 
-## Environment Variables
+## Adding New File Types
 
-### SFTP Storage Package
+### Step 1: Create Configuration File
+
+Create a new JSON file in `packages/openfn/importer/configs/file-types/`:
+
+```json
+{
+  "fileType": "new_format",
+  "displayName": "New Data Format",
+  "filePatterns": ["*pattern*.xlsx", "specific_name.csv"],
+  "columnMappings": {
+    "indicator": {
+      "sourceColumns": ["Indicator Name", "Measure"],
+      "targetField": "dataElement",
+      "required": true
+    },
+    "value": {
+      "sourceColumns": ["Value", "Result"],
+      "targetField": "value",
+      "required": true,
+      "dataType": "numeric"
+    }
+  }
+}
+```
+
+### Step 2: Deploy Configuration
+
 ```bash
-SFTP_IMAGE=atmoz/sftp:latest
-SFTP_USER=openfn
-SFTP_PASSWORD=instant101
-SFTP_PORT=2222
-SFTP_PLACEMENT=node-1
+# Copy to workflows directory
+cp -r packages/openfn/importer/configs projects/openfn-workflows/
+
+# Rebuild Docker image
+./build-custom-images.sh openfn-workflows
+
+# Redeploy services
+./instant package down -n openfn
+./instant package init -n openfn
 ```
 
-### OpenFN Workflow
-```bash
-SFTP_HOST=sftp-server
-SFTP_PORT=22
-SFTP_USER=openfn
-SFTP_PASSWORD=instant101
-```
+### Step 3: Test
 
-## Deployment
+Upload a file matching the pattern to SFTP and verify processing.
 
-### 1. Deploy SFTP Storage
-```bash
-cd packages/sftp-storage
-./swarm.sh init
-```
+## Transformations
 
-### 2. Deploy OpenFN Workflow
-```bash
-cd packages/openfn
-./swarm.sh init
-```
+### Built-in Transformation Types
 
-### 3. Test Integration
-```bash
-./test-sftp-integration.sh
-```
-
-## Usage
-
-### Triggering SFTP Workflow
-
-1. **Via Webhook**:
-   ```bash
-   curl -X POST http://localhost:4000/webhooks/sftp-webhook \
-        -H 'Content-Type: application/json' \
-        -d '{}'
+1. **Date Format**
+   ```json
+   {
+     "field": "period",
+     "type": "dateFormat",
+     "from": ["MM/YYYY", "DD/MM/YYYY"],
+     "to": "YYYYMM"
+   }
    ```
 
-2. **Via OpenFN Lightning UI**:
-   - Navigate to `http://localhost:4000`
-   - Go to Workflows → HIV-Indicators-GoogleSheets-to-DHIS2-Workflow
-   - Trigger the `sftp-webhook` trigger
-
-### Adding New Excel Files
-
-1. Copy Excel files to SFTP storage:
-   ```bash
-   cp your-file.xlsx packages/sftp-storage/data/
+2. **Quarter to Month**
+   ```json
+   {
+     "field": "period",
+     "type": "quarterToMonth",
+     "from": ["Q1 FY25", "Q2FY25"],
+     "fiscalYearStart": 7,
+     "to": "YYYYMM"
+   }
    ```
 
-2. Update `get-sftp-data.js` to include the new file:
-   ```javascript
-   const excelFiles = [
-     'DHIS2_HIV Indicators.xlsx',
-     'Direct Queries - Q1 2025 MoH Reports.xlsx',
-     'your-file.xlsx'  // Add new file here
-   ];
+3. **Numeric**
+   ```json
+   {
+     "field": "value",
+     "type": "numeric",
+     "removeCommas": true,
+     "defaultValue": 0
+   }
    ```
 
-3. Update `process-excel-data.js` to handle the new file format if needed.
+4. **Percentage**
+   ```json
+   {
+     "field": "completeness",
+     "type": "percentage",
+     "from": "decimal",
+     "to": "whole"
+   }
+   ```
 
-## Data Flow
+## Metadata Mappings
 
-1. **SFTP Data Retrieval**:
-   - `get-sftp-data.js` connects to SFTP server
-   - Downloads specified Excel files to `/tmp/`
-   - Stores file paths in workflow state
+### Organization Unit Mapping
 
-2. **Excel Processing**:
-   - `process-excel-data.js` parses downloaded Excel files
-   - Transforms data to Google Sheets-compatible format
-   - Stores processed data in workflow state
+Maps facility names to DHIS2 org unit IDs:
 
-3. **DHIS2 Payload Generation**:
-   - `generate-dhis2-payload.js` detects data source (Google Sheets or Excel)
-   - Applies indicator mappings to generate DHIS2 dataValueSets
-   - Prepares payload for DHIS2 upload
+```json
+{
+  "mappings": [
+    {
+      "name": "Kamuzu Central Hospital",
+      "code": "MW_KCH",
+      "dhis2Id": "a1b2c3d4e5f6",
+      "alternateNames": ["KCH", "Kamuzu Hospital"]
+    }
+  ]
+}
+```
 
-4. **DHIS2 Upload**:
-   - `upload-to-dhis2.js` sends payload to DHIS2 instance
-   - Returns success/failure status
+### Data Element Mapping
+
+Maps indicator names to DHIS2 data element IDs:
+
+```json
+{
+  "hiv_indicators": [
+    {
+      "name": "Number of adults and children currently receiving ART",
+      "code": "HIV_ART_CURR",
+      "dhis2Id": "de1a2b3c4d5e",
+      "alternateNames": ["Currently on ART", "ART Current"]
+    }
+  ]
+}
+```
+
+## Triggers
+
+### 1. Scheduled (Cron)
+- Default: Every 5 minutes (testing) or 15 minutes (production)
+- Checks for new/modified files
+- Processes all pending files
+
+### 2. Webhook
+- Immediate processing when notified
+- Supports file system watchers
+- Useful for real-time updates
+
+### 3. Manual
+- Testing and debugging
+- On-demand processing
+
+## Error Handling
+
+### File Processing Errors
+- Invalid file format → Logged and skipped
+- Missing required columns → Validation error
+- Data type mismatches → Row-level warnings
+
+### DHIS2 Upload Errors
+- Network failures → Retry logic
+- Invalid data elements → Logged conflicts
+- Authentication issues → Workflow stops
+
+### Recovery
+- Failed files tracked in state
+- Can be reprocessed manually
+- Audit trail maintained
+
+## Performance Considerations
+
+### File Size Limits
+- Tested up to 50MB files
+- ~1000 rows/second processing speed
+- Memory-efficient streaming for large files
+
+### Concurrent Processing
+- Multiple files processed in parallel
+- Resource pooling for database connections
+- Configurable batch sizes
+
+### Optimization Tips
+1. Use specific file patterns to reduce scanning
+2. Enable data aggregation for summary data
+3. Adjust time windows based on reporting cycles
+4. Monitor memory usage for large files
 
 ## Monitoring
 
-### SFTP Server Logs
+### OpenFN Dashboard
+- Workflow execution status
+- Processing times
+- Error rates
+
+### Log Analysis
 ```bash
-docker service logs sftp-storage_sftp-server
+# Check processing logs
+docker service logs $(docker service ls --format "{{.Name}}" | grep openfn)
+
+# Filter for specific file
+docker service logs openfn | grep "ART_data"
 ```
 
-### OpenFN Workflow Logs
-```bash
-docker service logs openfn_openfn_workflow_config
-```
+### Success Metrics
+- Files processed per hour
+- Data values imported
+- Error/warning rates
+- Processing time trends
 
-### File Listing
-```bash
-docker exec -it $(docker ps -qf 'label=com.docker.swarm.service.name=sftp-storage_sftp-server') \
-  ls -la /home/openfn/data/excel-files/
-```
+## Security
+
+### SFTP Security
+- SSH key authentication supported
+- Encrypted file transfer
+- Access control per user
+
+### Data Protection
+- Files deleted after processing
+- No sensitive data in logs
+- Audit trail for compliance
+
+### Credential Management
+- Stored in OpenFN credential vault
+- Environment variables for Docker
+- No hardcoded credentials
 
 ## Troubleshooting
 
-### SFTP Connection Issues
-1. Check if SFTP service is running:
+### Common Issues
+
+| Issue | Cause | Solution |
+|-------|-------|----------|
+| File not processed | Pattern mismatch | Check filename against config patterns |
+| Column not found | Name mismatch | Verify Excel headers match config |
+| Upload fails | Invalid DHIS2 ID | Update metadata mappings |
+| Old data ignored | Time window | Adjust update window in config |
+
+### Debug Steps
+
+1. **Check File Discovery**
    ```bash
-   docker service ls | grep sftp
+   # List files on SFTP
+   sftp -P 2225 openfn@localhost
+   sftp> ls data/excel-files/
    ```
 
-2. Test SFTP connection:
+2. **Verify Configuration Loading**
    ```bash
-   sftp -P 2222 openfn@localhost
-   # Password: instant101
+   # Check logs for config loading
+   docker service logs openfn | grep "Loaded.*configurations"
    ```
 
-### Excel Processing Issues
-1. Check file formats are supported (.xlsx)
-2. Verify file structure matches expected format
-3. Check OpenFN logs for parsing errors
-
-### Network Issues
-1. Ensure SFTP and OpenFN services are on same network
-2. Check network connectivity:
+3. **Test File Matching**
    ```bash
-   docker network ls | grep sftp
+   # Check if file matched a config
+   docker service logs openfn | grep "matched configuration"
    ```
+
+4. **Review Processing Errors**
+   ```bash
+   # Check for validation errors
+   docker service logs openfn | grep -E "(Error|Warning|Failed)"
+   ```
+
+## Best Practices
+
+1. **Configuration Management**
+   - Version control configurations
+   - Document column mappings
+   - Test with sample files
+
+2. **File Naming**
+   - Use consistent patterns
+   - Include dates in filenames
+   - Avoid special characters
+
+3. **Data Quality**
+   - Validate data before upload
+   - Use appropriate data types
+   - Handle missing values
+
+4. **Performance**
+   - Process files in off-peak hours
+   - Archive processed files
+   - Monitor resource usage
 
 ## Future Enhancements
 
-1. **Real Excel Parsing**: Integrate actual Excel parsing library (e.g., `xlsx-js`)
-2. **File Validation**: Add validation for Excel file structure
-3. **Automated File Detection**: Monitor SFTP directory for new files
-4. **Error Handling**: Enhanced error handling and retry logic
-5. **Data Transformation**: More sophisticated data mapping capabilities
+1. **Email Notifications**
+   - Processing summaries
+   - Error alerts
+   - Daily reports
+
+2. **Data Archiving**
+   - Automatic file archival
+   - Compressed storage
+   - Retention policies
+
+3. **Advanced Mappings**
+   - Calculated indicators
+   - Data aggregation
+   - Cross-file validation

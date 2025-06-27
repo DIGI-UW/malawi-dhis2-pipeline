@@ -8,12 +8,13 @@ RUN apk add --no-cache curl bash jq
 
 # Create app directory structure
 WORKDIR /app
-RUN mkdir -p /app/workflows /app/shared /app/scripts
+RUN mkdir -p /app/workflows /app/shared /app/scripts /app/configs
 
 # Copy the workflows and shared components
 COPY workflows/. /app/workflows/
 COPY shared/ /app/shared/
 COPY scripts/ /app/scripts/
+COPY configs/ /app/configs/
 COPY docker/entrypoint.sh /app/entrypoint.sh
 
 # Make scripts executable
@@ -25,6 +26,7 @@ RUN chmod +x /app/scripts/*.sh /app/entrypoint.sh
 ENV OPENFN_ENDPOINT=""
 ENV WORKFLOW_NAME=""
 ENV WORKFLOW_PATH="/app/workflows"
+ENV CONFIG_PATH="/app/configs"
 ENV MODE="deploy"
 ENV DRY_RUN="false"
 
