@@ -23,9 +23,6 @@ services:
       - WORKER_RUNS_PRIVATE_KEY=${OPENFN_WORKER_RUNS_PRIVATE_KEY}
       - WORKER_SECRET=${OPENFN_WORKER_SECRET}
       - KAFKA_TRIGGERS_ENABLED=${OPENFN_KAFKA_TRIGGERS_ENABLED}
-    volumes:
-      - /implementation/packages/openfn/importer/configs:/app/configs:ro
-      - /implementation/packages/openfn/importer/workflows:/app/workflows:ro
     healthcheck:
       test: '${DOCKER_WEB_HEALTHCHECK_TEST:-curl localhost:4000/health_check}'
       interval: '10s'
@@ -48,9 +45,6 @@ services:
       - WORKER_SECRET=${OPENFN_WORKER_SECRET}
       - NODE_ENV=production
     command: [ 'pnpm', 'start:prod', '-l', 'ws://openfn:${URL_PORT-4000}/worker' ]
-    volumes:
-      - /implementation/packages/openfn/importer/configs:/app/configs:ro
-      - /implementation/packages/openfn/importer/workflows:/app/workflows:ro
     networks:
       - kafka_public
       - openfn_public

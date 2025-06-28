@@ -82,6 +82,13 @@
   - Summary reports of daily/weekly processing
 
 ### 7. **Testing Infrastructure**
+* **Automated Testing Framework:**
+  - **Location:** `projects/indicator_workflow_testing/` directory
+  - **API Tests:** Health checks, authentication, workflow validation (`tests/api-tests.sh`)
+  - **Excel Tests:** Multi-sheet parsing and validation (`tests/excel-parsing-tests.js`)
+  - **SFTP Tests:** File transfer and workflow integration (`tests/sftp-integration-tests.sh`)
+  - **Integration Tests:** End-to-end data processing validation (`tests/integration-tests.js`)
+  - **Test Runner:** Unified test execution with `./run-tests.sh`
 * **Docker Swarm Test Environment:**
   - Pre-configured SFTP server with sample data files
   - Test DHIS2 instance with sample metadata
