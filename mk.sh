@@ -1,4 +1,5 @@
-
+#!/bin/bash
+./build-custom-images.sh
 ./build-image.sh
 
 #./instant project up --env-file .env -d
@@ -7,13 +8,13 @@
 #./instant project init --env-file .env
 
 # ./instant package destroy -n reverse-proxy-nginx
-./instant package init -n reverse-proxy-nginx
+#./instant package init -n reverse-proxy-nginx
 
-# ./instant package destroy -n database-postgres
-# ./instant package init -n database-postgres -d
+./instant package destroy -n database-postgres
+./instant package init -n database-postgres -d
 
-# ./instant package destroy -n openfn
-# ./instant package init -n openfn -d
+./instant package destroy -n openfn
+./instant package init -n openfn -d
 
 # ./instant package destroy -n sftp-storage
 # ./instant package init -n sftp-storage -d

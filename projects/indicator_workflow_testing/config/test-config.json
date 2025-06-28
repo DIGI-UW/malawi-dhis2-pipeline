@@ -1,0 +1,54 @@
+{
+  "openfn": {
+    "url": "http://localhost:4000",
+    "apiKey": "apiKey",
+    "adminUser": "root@openhim.org",
+    "adminPassword": "instant101"
+  },
+  "sftp": {
+    "host": "localhost",
+    "port": 2225,
+    "user": "openfn",
+    "password": "instant101",
+    "dataPath": "/data/excel-files/"
+  },
+  "dhis2": {
+    "url": "http://localhost:8080",
+    "username": "admin",
+    "password": "district"
+  },
+  "testData": {
+    "excelFiles": [
+      "data/DHIS2_HIV Indicators.xlsx",
+      "data/Direct Queries - Q1 2025 MoH Reports.xlsx",
+      "data/Q2FY25_DQ_253_sites.xlsx"
+    ],
+    "sftpFiles": [
+      "projects/sftp/data/excel-files/ART_data_long_format.xlsx",
+      "projects/sftp/data/excel-files/Direct Queries Q1 2025 MoH Reports.xlsx",
+      "projects/sftp/data/excel-files/Q2FY25_DQ_253_sites.xlsx"
+    ]
+  },
+  "testing": {
+    "timeout": 30000,
+    "retries": 3,
+    "verbose": false,
+    "logLevel": "info"
+  },
+  "workflows": {
+    "expectedWorkflows": [
+      "sftp-dhis2",
+      "sheets-to-dhis2"
+    ],
+    "expectedJobs": [
+      "get-sftp-data",
+      "process-excel-data", 
+      "generate-dhis2-payload",
+      "upload-to-dhis2"
+    ],
+    "expectedTriggers": [
+      "cron",
+      "webhook"
+    ]
+  }
+} 

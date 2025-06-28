@@ -54,7 +54,20 @@ function initialize_package() {
   fi
 
   (
-    log info "Configuring postgres database"
+    log info "🔧 OPENFN PACKAGE INITIALIZATION"
+    log info "================================="
+    log info "Action: ${ACTION}"
+    log info "Mode: ${MODE}"
+    log info "Stack: ${STACK}"
+    log info ""
+    log info "🌍 KEY ENVIRONMENT VARIABLES:"
+    log info "  OPENFN_ENDPOINT='${OPENFN_ENDPOINT}'"
+    log info "  OPENFN_WORKFLOWS_IMAGE='${OPENFN_WORKFLOWS_IMAGE}'"
+    log info "  OPENFN_WORKFLOW_MANUAL_CLI='${OPENFN_WORKFLOW_MANUAL_CLI}'"
+    log info "  OPENFN_LOAD_WORKFLOWS_ON_STARTUP='${OPENFN_LOAD_WORKFLOWS_ON_STARTUP}'"
+    log info ""
+    
+    log info "🗄️  Configuring postgres database"
     docker::await_service_status "postgres" "postgres-1" "Running" 
     
     if [[ "${ACTION}" == "init" ]]; then
@@ -67,29 +80,125 @@ function initialize_package() {
 
     if [[ "${ACTION}" == "init" ]]; then
         # Setup initial user
+        log info "👤 Setting up initial OpenFN user..."
+        log info "  API Key: ${OPENFN_API_KEY:0:8}***"
+        log info "  Admin User: ${OPENFN_ADMIN_USER}"
+        log info "  Endpoint: ${OPENFN_ENDPOINT}"
+        
+        log info "⏳ Waiting for OpenFN service to be ready..."
+        docker::await_service_status "openfn" "openfn" "Running"
+        sleep 10  # Give the service time to fully initialize
+        
         OPENFN_CONTAINER_ID=$(docker ps --filter "label=com.docker.swarm.service.name=openfn_openfn" --filter "status=running" -q | head -n 1)
         if [ -n "$OPENFN_CONTAINER_ID" ]; then
-           log info "Performing initial OpenFn user setup..."
-           SETUP_USER_CMD="/app/bin/lightning eval 'Lightning.Setup.setup_user(%{first_name: \"Test\", last_name: \"User\",email: \"root@openhim.org\", password: \"instant101\", role: :superuser}, \"${OPENFN_API_KEY}\")'"
-           docker exec "$OPENFN_CONTAINER_ID" sh -c "$SETUP_USER_CMD" || log error "User setup failed"
+           log info "🔧 Performing initial OpenFn user setup..."
+           log info "  Container ID: ${OPENFN_CONTAINER_ID:0:12}..."
+           
+           SETUP_USER_CMD="/app/bin/lightning eval 'Lightning.Setup.setup_user(%{first_name: \"Test\", last_name: \"User\",email: \"${OPENFN_ADMIN_USER}\", password: \"${OPENFN_ADMIN_PASSWORD}\", role: :superuser}, \"${OPENFN_API_KEY}\")'"
+           
+           if docker exec "$OPENFN_CONTAINER_ID" sh -c "$SETUP_USER_CMD"; then
+               log info "✅ User setup completed successfully"
+           else
+               log error "❌ User setup failed"
+           fi
+        else
+           log error "❌ Could not find OpenFN container for user setup"
         fi
     fi
 
     # Handle workflow loading
+    log info "🔧 WORKFLOW LOADING CONFIGURATION:"
+    log info "  OPENFN_WORKFLOW_MANUAL_CLI='${OPENFN_WORKFLOW_MANUAL_CLI}'"
+    log info "  OPENFN_LOAD_WORKFLOWS_ON_STARTUP='${OPENFN_LOAD_WORKFLOWS_ON_STARTUP}'"
+    
+    # Debug environment variable sources
+    log info ""
+    log info "🔍 ENVIRONMENT VARIABLE DEBUGGING:"
+    log info "=================================="
+    
+    # Check if variables are set and their sources
+    if [[ -n "${OPENFN_WORKFLOW_MANUAL_CLI:-}" ]]; then
+        log info "✅ OPENFN_WORKFLOW_MANUAL_CLI is set to: '${OPENFN_WORKFLOW_MANUAL_CLI}'"
+    else
+        log info "❌ OPENFN_WORKFLOW_MANUAL_CLI is not set"
+    fi
+    
+    if [[ -n "${OPENFN_LOAD_WORKFLOWS_ON_STARTUP:-}" ]]; then
+        log info "✅ OPENFN_LOAD_WORKFLOWS_ON_STARTUP is set to: '${OPENFN_LOAD_WORKFLOWS_ON_STARTUP}'"
+    else
+        log info "❌ OPENFN_LOAD_WORKFLOWS_ON_STARTUP is not set"
+    fi
+    
+    # Show all OPENFN related environment variables
+    log info ""
+    log info "📋 ALL OPENFN ENVIRONMENT VARIABLES:"
+    env | grep -E "^OPENFN_" | sort | while read -r line; do
+        log info "    $line"
+    done
+    
+    # Logic explanation
+    log info ""
+    log info "🧠 DECISION LOGIC:"
     if [[ "${OPENFN_WORKFLOW_MANUAL_CLI}" == "true" ]]; then
-        log info "Starting workflow manager in interactive mode for manual debugging"
+        log info "  → Will use MANUAL CLI mode (because OPENFN_WORKFLOW_MANUAL_CLI=true)"
+    elif [[ "${OPENFN_LOAD_WORKFLOWS_ON_STARTUP}" == "true" ]]; then
+        log info "  → Will use AUTOMATIC LOADING mode (because OPENFN_LOAD_WORKFLOWS_ON_STARTUP=true)"
+    else
+        log info "  → Will SKIP workflow loading (both flags are false/unset)"
+    fi
+    
+    # Run workflow sync hook if enabled
+    if [[ -f "${COMPOSE_FILE_PATH}/workflow-sync.sh" ]] && [[ "${OPENFN_SYNC_ON_STARTUP}" == "true" ]]; then
+        log info "🔄 Running workflow sync startup hook..."
+        chmod +x "${COMPOSE_FILE_PATH}/workflow-sync.sh"
+        "${COMPOSE_FILE_PATH}/workflow-sync.sh" hook startup || log warning "Workflow sync hook failed"
+    fi
+    
+    if [[ "${OPENFN_WORKFLOW_MANUAL_CLI}" == "true" ]]; then
+        log info "🛠️  Starting workflow manager in interactive mode for manual debugging"
         # Run the debug script that starts a separate container with volume mounts
         chmod +x "${COMPOSE_FILE_PATH}/debug-workflow.sh"
         "${COMPOSE_FILE_PATH}/debug-workflow.sh"
-    elif [[ "${OPENFN_LOAD_WORKFLOW_ON_STARTUP}" == "true" ]]; then
-        log info "Loading workflows automatically on startup"
-        docker::deploy_service $STACK "$COMPOSE_FILE_PATH/importer/workflows" "docker-compose.config.yml"
+    elif [[ "${OPENFN_LOAD_WORKFLOWS_ON_STARTUP}" == "true" ]]; then
+        log info "🚀 Loading workflows automatically on startup"
+        
+        # Use static workflow loader configuration
+        local workflow_config_file="$COMPOSE_FILE_PATH/importer/workflows/docker-compose.yml"
+        log info "📁 Using static workflow config at: $workflow_config_file"
+        
+        # Deploy the workflow loader
+        log info "🚢 Deploying workflow loader service..."
+        log info "  Stack: $STACK"
+        log info "  Config: $workflow_config_file" 
+        log info "  Service name: workflow_loader"
+        log info "  Container name: openfn-workflows"
+        
+        if docker::deploy_service "$STACK" "$(dirname "$workflow_config_file")" "$(basename "$workflow_config_file")"; then
+            log info "✅ Workflow loader deployment initiated successfully"
+            
+            # Wait a moment and check if the service is starting
+            sleep 5
+            local service_name=$(docker service ls --format "{{.Name}}" | grep -E "(workflow|openfn.*workflow)" | head -1)
+            if [[ -n "$service_name" ]]; then
+                local service_status=$(docker service ps "$service_name" --format "{{.CurrentState}}" 2>/dev/null | head -1)
+                log info "📊 Workflow loader service '$service_name' status: $service_status"
+            else
+                log warning "⚠️  Could not find workflow loader service"
+            fi
+        else
+            log error "❌ Failed to deploy workflow loader service"
+            log error "🔍 Check Docker service logs with: docker service ls | grep workflow"
+        fi
     else
-        log info "OpenFN started without workflow loading"
+        log info "⏭️  OpenFN started without workflow loading (both MANUAL_CLI and LOAD_ON_STARTUP are false)"
     fi
+    
+    log info ""
+    log info "🎯 OPENFN INITIALIZATION COMPLETE"
+    log info "================================="
 
   ) || {
-    log error "Failed to deploy package"
+    log error "❌ Failed to deploy package"
     exit 1
   }
 }

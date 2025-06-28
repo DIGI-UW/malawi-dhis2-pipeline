@@ -64,6 +64,106 @@ cp .env.example .env
 # SFTP: sftp://localhost:2225
 ```
 
+### OpenFN Workflow Management
+
+The system provides comprehensive workflow management with bidirectional sync between code and UI.
+
+#### Workflow Sync System
+
+**Quick Start:**
+```bash
+# Check sync status
+./packages/openfn/instant-workflow-sync.sh status
+
+# Download workflows from UI
+./packages/openfn/instant-workflow-sync.sh download
+
+# Upload workflows to UI
+./packages/openfn/instant-workflow-sync.sh upload
+
+# Enable auto-sync watch mode
+./packages/openfn/instant-workflow-sync.sh watch
+```
+
+**Key Features:**
+- **Bidirectional Sync**: Download from UI or upload from code
+- **Version Management**: Track changes with lock_version support
+- **Conflict Resolution**: Automatic or manual conflict handling
+- **Snapshot System**: Automatic backups before changes
+- **Watch Mode**: Auto-sync on file changes
+
+**Configuration** (in `.env`):
+```bash
+OPENFN_SYNC_MODE=manual              # manual|auto-download|auto-upload
+OPENFN_CONFLICT_RESOLUTION=prompt    # prompt|local-wins|remote-wins
+OPENFN_ENABLE_AUTO_SNAPSHOT=true     # Auto-create snapshots
+```
+
+See [Workflow Sync Documentation](docs/openfn-workflow-sync.md) for full details.
+
+#### Workflow Loading Process
+
+1. **Build Workflow Image**: `./build-custom-images.sh openfn-workflows`
+   - Packages workflow files into Docker image
+   - Includes YAML configurations and job definitions
+
+2. **Deploy with Workflow Loading**: `./mk.sh`
+   - Sets `OPENFN_LOAD_WORKFLOWS_ON_STARTUP=true`
+   - Deploys workflow-loader service that reads from `/app/workflows/`
+   - Uses OpenFN CLI to deploy via provisioning API
+
+3. **Verify Deployment**: 
+   ```bash
+   # Test workflow loading
+   cd projects/indicator_workflow_testing
+   ./run-tests.sh --workflows
+   
+   # Check OpenFN UI
+   # Navigate to http://localhost:4000
+   ```
+
+#### Workflow Structure
+
+Workflows are defined in `projects/openfn-workflows/workflows/sftp-dhis2/`:
+- `project.yaml` - Project configuration with workflows, jobs, triggers
+- `jobs/` - Individual job definitions (.js files)
+- `.versions/` - Downloaded workflow versions (auto-created)
+- `.snapshots/` - Workflow snapshots (auto-created)
+- `README.md` - Workflow documentation
+
+#### Development Workflows
+
+**Option 1: UI-First Development**
+1. Make changes in OpenFN UI
+2. Test workflows in UI
+3. Download to code: `./packages/openfn/instant-workflow-sync.sh download`
+4. Commit changes to git
+
+**Option 2: Code-First Development**
+1. Edit workflow files locally
+2. Upload to test: `./packages/openfn/instant-workflow-sync.sh upload`
+3. Test in UI
+4. Commit changes to git
+
+#### Key Environment Variables
+
+- `OPENFN_LOAD_WORKFLOWS_ON_STARTUP=true` - Enables automatic loading
+- `OPENFN_WORKFLOW_MANUAL_CLI=false` - Uses packaged workflows (not external files)
+- `OPENFN_SYNC_MODE=manual` - Workflow sync mode
+- `OPENFN_CONFLICT_RESOLUTION=prompt` - How to handle conflicts
+
+#### Faster Development Iteration
+
+For workflow changes without full rebuild:
+```bash
+# Quick sync and redeploy
+./packages/openfn/instant-workflow-sync.sh upload
+./instant package up -n openfn -d
+
+# Full rebuild (if workflow structure changed)
+./mk.sh
+```
+
 ## Documentation Index
 
 ### 📋 Project Documentation
@@ -77,8 +177,15 @@ cp .env.example .env
 
 - **[Google Sheets Setup](docs/google-sheets-setup.md)** - Google Sheets API configuration
 - **[SFTP Excel Integration](docs/sftp-excel-integration.md)** - SFTP-based file processing
+- **[OpenFN Workflow Sync](docs/openfn-workflow-sync.md)** - Bidirectional workflow synchronization
 - **[OpenFN State Management](docs/openfn-state-management-guide.md)** - State management best practices
 - **[OpenFN Testing Guide](docs/openfn-testing-guide.md)** - OpenFN-specific testing procedures
+
+### 🧪 Testing & Validation
+
+- **[Workflow Testing Framework](projects/indicator_workflow_testing/README.md)** - Automated testing suite for workflows
+- **[Testing Guide](docs/Testing-Guide-CSV-XLSX.md)** - Comprehensive testing procedures
+- **[API Testing](projects/indicator_workflow_testing/tests/)** - OpenFN API connectivity tests
 
 ### 🔄 Migration & History
 
@@ -156,9 +263,31 @@ Example structure:
 
 ## Testing
 
+The project includes a comprehensive testing framework for validating workflows and API functionality:
+
+### Quick Testing
+```bash
+# Run all tests
+./projects/indicator_workflow_testing/run-tests.sh
+
+# Run specific test suites
+./projects/indicator_workflow_testing/run-tests.sh --api          # API connectivity tests
+./projects/indicator_workflow_testing/run-tests.sh --excel       # Excel parsing tests
+./projects/indicator_workflow_testing/run-tests.sh --sftp        # SFTP integration tests
+./projects/indicator_workflow_testing/run-tests.sh --integration # End-to-end tests
+```
+
+### Manual Testing
 - **Unit Tests**: `npm test`
 - **Integration Tests**: See [Testing Guide](docs/Testing-Guide-CSV-XLSX.md)
 - **Validation**: `npm run validate-sheets` (for Google Sheets)
+
+### Testing Framework
+- **[Automated Testing Suite](projects/indicator_workflow_testing/README.md)** - Comprehensive test framework
+- **API Tests**: Health checks, authentication, workflow validation
+- **Excel Tests**: Multi-sheet parsing and data transformation validation
+- **SFTP Tests**: File transfer and workflow integration
+- **Integration Tests**: End-to-end workflow execution with sample data
 
 ## Monitoring
 
