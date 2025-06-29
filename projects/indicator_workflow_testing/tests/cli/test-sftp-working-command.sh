@@ -6,11 +6,8 @@ echo "🚀 Running SFTP Test with Working Configuration"
 echo "=============================================="
 echo ""
 
-# Change to the correct directory
-cd projects/openfn-workflows
-
-# Run the working Docker command with proper CLI flags
-docker run --rm -it -v "$(pwd)/tests/e2e:/e2e" openfn-cli-test:latest /bin/sh -c "
+# Run the working Docker command with proper CLI flags from project root
+docker run --rm -it -v "$(pwd)/../fixtures:/e2e" openfn-cli-test:latest /bin/sh -c "
 # Create proper OpenFN project structure
 mkdir -p /tmp/myproject/workflows/test-workflow
 
@@ -30,8 +27,8 @@ cat > /tmp/myproject/workflows/test-workflow/test-workflow.json << 'EOF'
   \"id\": \"test-workflow\",
   \"steps\": [
     {
-      \"adaptor\": \"@openfn/language-sftp@2.0.14-custom\",
-      \"expression\": \"console.log('=== SFTP Connection Test ===');\\nlist('/', (state) => {\\n  console.log('SFTP Connection successful!');\\n  console.log('Files found:', state.data);\\n  console.log('Total files:', state.data ? state.data.length : 0);\\n  return state;\\n});\"
+      \"adaptor\": \"@openfn/language-sftp@2.0.14\",
+      \"expression\": \"list('/data/excel-files', (state) => { console.log('SFTP Files:', state.data); return state; });\"
     }
   ]
 }
@@ -62,5 +59,5 @@ echo ""
 echo "📋 Key learnings:"
 echo "  • Use -s flag for state input (not -i which is autoinstall)"
 echo "  • State must have configuration nested: { data: {}, configuration: { host, port, username, password } }"
-echo "  • Custom adaptor @openfn/language-sftp@2.0.14-custom works correctly"
+echo "  • Testing official adaptor @openfn/language-sftp@2.0.14"
 echo "  • OpenFN CLI requires proper project structure with openfn.json" 

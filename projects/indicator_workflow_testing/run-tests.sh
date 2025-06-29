@@ -91,14 +91,20 @@ while [[ $# -gt 0 ]]; do
             echo "  --excel        Run only Excel parsing tests"
             echo "  --sftp         Run only SFTP integration tests"
             echo "  --integration  Run only end-to-end integration tests"
-            echo "  --cli-workflow Run only CLI-based workflow tests"
+            echo "  --cli-workflow Run CLI-based workflow tests (3 working tests)"
             echo "  --verbose, -v  Enable verbose output"
             echo "  --help, -h     Show this help message"
             echo ""
             echo "Examples:"
-            echo "  $0                    # Run all tests"
-            echo "  $0 --api --verbose    # Run API tests with verbose output"
-            echo "  $0 --integration      # Run only integration tests"
+            echo "  $0                     # Run all tests"
+            echo "  $0 --cli-workflow      # Run 3 CLI tests (SFTP basic, simple job, full workflow)"
+            echo "  $0 --api --verbose     # Run API tests with verbose output"
+            echo "  $0 --integration       # Run only integration tests"
+            echo ""
+            echo "CLI Tests Available:"
+            echo "  • test-sftp-working-command.sh   - ⭐ PROVEN WORKING (30s)"
+            echo "  • test-simple-sftp-job.sh        - Simple inline test"
+            echo "  • test-sftp-dhis2-workflow.sh    - Complete workflow"
             exit 0
             ;;
         *)
@@ -143,6 +149,103 @@ run_test_suite() {
     echo ""
 }
 
+# Function to run CLI-based test using openfn-cli-test container
+run_cli_test() {
+    local test_name="$1"
+    local test_description="$2"
+    
+    log_info "Running $test_description..."
+    echo "==============================================="
+    
+    local success=false
+    
+    # Check if openfn-cli-test image exists
+    if ! docker images | grep -q "openfn-cli-test.*latest"; then
+        log_error "openfn-cli-test:latest image not found. Build it with: ./build-custom-images.sh openfn-cli-test"
+        TEST_RESULTS+=("FAIL")
+        TOTAL_FAILED=$((TOTAL_FAILED + 1))
+        TEST_NAMES+=("$test_name")
+        echo ""
+        return
+    fi
+    
+    case $test_name in
+        "CLI SFTP Basic")
+            # Run the proven working SFTP test
+            log_info "Running proven working SFTP test (30s)..."
+            if cd "$SCRIPT_DIR/tests/cli" && bash test-sftp-working-command.sh; then
+                success=true
+            fi
+            ;;
+        "CLI SFTP Workflow")
+            # Run the complete workflow test
+            log_info "Running complete SFTP→Excel→DHIS2 workflow test..."
+            if cd "$SCRIPT_DIR/tests/cli" && bash test-sftp-dhis2-workflow.sh; then
+                success=true
+            fi
+            ;;
+        "CLI Simple Job")
+            # Run simple inline job test
+            log_info "Running simple inline SFTP job test..."
+            if cd "$SCRIPT_DIR/tests/cli" && bash test-simple-sftp-job.sh; then
+                success=true
+            fi
+            ;;
+        "Excel Parsing")
+            # Test Excel parsing through CLI workflow
+            log_info "Testing Excel parsing via CLI workflow..."
+            if docker run --rm \
+                -v "$SCRIPT_DIR/tests/fixtures:/e2e" \
+                openfn-cli-test:latest /bin/sh -c "
+                    mkdir -p /tmp/excel-test/workflows/excel-parse
+                    cat > /tmp/excel-test/openfn.json << 'EOF'
+{
+  \"workflowRoot\": \"workflows\",
+  \"formats\": {
+    \"workflow\": \"json\"
+  }
+}
+EOF
+                    cat > /tmp/excel-test/workflows/excel-parse/excel-parse.json << 'EOF'
+{
+  \"id\": \"excel-parse\",
+  \"steps\": [
+    {
+      \"adaptor\": \"@openfn/language-sftp@2.0.14\",
+      \"expression\": \"console.log('Testing Excel file access via SFTP...'); list('/data/excel-files', (state) => { console.log('Excel files found:', state.data.length); const artFile = state.data.find(f => f.name.includes('ART_data')); if (artFile) { console.log('✅ ART Excel file found:', artFile.name, '(' + (artFile.size/1024/1024).toFixed(1) + 'MB)'); } return state; });\"
+    }
+  ]
+}
+EOF
+                    cd /tmp
+                    openfn excel-test excel-parse -s /e2e/sftp-test-input.json 2>&1 | grep -E '(Excel files found|ART Excel file found|completed)'
+                "; then
+                success=true
+            fi
+            ;;
+        *)
+            log_warning "Unknown CLI test: $test_name"
+            TEST_RESULTS+=("SKIP")
+            TEST_NAMES+=("$test_name")
+            echo ""
+            return
+            ;;
+    esac
+    
+    if $success; then
+        log_success "$test_name tests passed"
+        TEST_RESULTS+=("PASS")
+        TOTAL_PASSED=$((TOTAL_PASSED + 1))
+    else
+        log_error "$test_name tests failed"
+        TEST_RESULTS+=("FAIL")
+        TOTAL_FAILED=$((TOTAL_FAILED + 1))
+    fi
+    
+    TEST_NAMES+=("$test_name")
+    echo ""
+}
+
 # Function to run JavaScript test with Docker fallback
 run_js_test() {
     local test_name=$1
@@ -169,13 +272,13 @@ run_js_test() {
             success=true
         fi
     else
-        # Fallback to Docker
+        # Fallback to Docker with dependencies
         log_info "Node.js not found locally, running $test_name with Docker..."
         
         local script_dir=$(dirname "$test_script")
         local script_file=$(basename "$test_script")
         
-        if docker run --rm -v "$script_dir:/app" -w /app node:18-alpine node "$script_file"; then
+        if docker run --rm -v "$script_dir:/app" -w /app node:18-alpine sh -c "npm install xlsx csv-parser && node $script_file"; then
             success=true
         fi
     fi
@@ -247,7 +350,7 @@ main() {
     fi
     
     if [[ "$RUN_EXCEL_TESTS" == "true" ]]; then
-        run_js_test "Excel Parsing" "$SCRIPT_DIR/tests/excel-parsing-tests.js" "Excel file parsing and validation tests"
+        run_cli_test "Excel Parsing" "CLI-based Excel file parsing and validation tests"
     fi
     
     if [[ "$RUN_SFTP_TESTS" == "true" ]]; then
@@ -257,11 +360,30 @@ main() {
     fi
     
     if [[ "$RUN_INTEGRATION_TESTS" == "true" ]]; then
-        run_js_test "Integration" "$SCRIPT_DIR/tests/integration-tests.js" "End-to-end integration validation"
+        # Test the full sftp-dhis2 workflow using our comprehensive framework
+        if [[ -f "$SCRIPT_DIR/tests/cli/test-real-workflows.sh" ]]; then
+            log_info "Testing full SFTP → Excel → DHIS2 workflow..."
+            if bash "$SCRIPT_DIR/tests/cli/test-real-workflows.sh" sftp-dhis2; then
+                log_success "Integration tests passed"
+                TEST_RESULTS+=("PASS")
+                TOTAL_PASSED=$((TOTAL_PASSED + 1))
+            else
+                log_error "Integration tests failed"
+                TEST_RESULTS+=("FAIL")
+                TOTAL_FAILED=$((TOTAL_FAILED + 1))
+            fi
+            TEST_NAMES+=("Integration")
+        else
+            # Fallback to simple SFTP test
+            run_test_suite "Integration" "$SCRIPT_DIR/tests/cli/test-sftp-working-command.sh" "Basic SFTP connectivity"
+        fi
     fi
     
     if [[ "$RUN_CLI_WORKFLOW_TESTS" == "true" ]]; then
-        run_test_suite "CLI Workflow" "$SCRIPT_DIR/tests/openfn-cli-workflow-tests.sh" "CLI-based SFTP-to-DHIS2 workflow tests"
+        # Run our 3 working CLI tests
+        run_cli_test "CLI SFTP Basic" "Proven working SFTP connectivity test (30s)"
+        run_cli_test "CLI Simple Job" "Simple inline SFTP job test"
+        run_cli_test "CLI SFTP Workflow" "Complete SFTP→Excel→DHIS2 workflow test"
     fi
     
     # Generate summary

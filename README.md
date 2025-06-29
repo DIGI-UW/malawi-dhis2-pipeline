@@ -323,3 +323,45 @@ Common issues and solutions:
 - **Issues**: GitHub Issues
 - **Documentation**: This README and linked guides
 - **Community**: [Community channels]
+
+## 🧩 Key Components
+
+### 1. **Core Workflow Engine** (OpenFN Lightning)
+- OpenFN Lightning v2.8+ with web UI and API
+- Custom Docker images with working SFTP adaptor
+- Automated workflow execution and monitoring
+
+### 2. **SFTP File Storage**
+- Secure file upload endpoint for partners
+- Pre-loaded with sample Excel files for testing
+- Automated file monitoring and processing
+
+### 3. **DHIS2 Data Warehouse**
+- DHIS2 v2.39+ configured for Malawi health programs
+- Pre-configured metadata for HIV/TB indicators
+- RESTful API for data import/export
+
+### 4. **Testing Framework**
+- Comprehensive test suite for all workflows
+- Docker-based testing environment
+- CLI and integration testing tools
+
+## 📚 Documentation
+
+### Workflow Development & Testing
+All workflow documentation has been consolidated in [`projects/openfn-workflows/docs/`](projects/openfn-workflows/docs/):
+
+1. **[Overview](projects/openfn-workflows/docs/01-overview.md)** - Project architecture and quick start
+2. **[Development Guide](projects/openfn-workflows/docs/02-development-guide.md)** - How to create and modify workflows
+3. **[Testing Strategy](projects/openfn-workflows/docs/03-testing-strategy.md)** - Comprehensive testing approach
+4. **[SFTP to DHIS2 Testing Plan](projects/openfn-workflows/docs/04-sftp-dhis2-testing-plan.md)** - Detailed testing plan
+5. **[Docker Environment](projects/openfn-workflows/docs/05-docker-environment.md)** - Docker setup and configuration
+6. **[Troubleshooting Guide](projects/openfn-workflows/docs/06-troubleshooting.md)** - Common issues and solutions
+
+### Testing Framework
+For the complete testing framework documentation, see:
+- [`projects/indicator_workflow_testing/TESTING-INDEX.md`](projects/indicator_workflow_testing/TESTING-INDEX.md)
+
+### Other Documentation
+- [`docs/Deliverables.md`](docs/Deliverables.md) - Project deliverables and milestones
+- [`docs/MCP-SERVERS.md`](docs/MCP-SERVERS.md) - MCP server integration

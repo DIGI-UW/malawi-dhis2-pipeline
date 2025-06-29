@@ -20,7 +20,7 @@ log_workflow() { echo -e "${CYAN}[WORKFLOW]${NC} $1"; }
 
 # Configuration
 DOCKER_IMAGE="openfn-cli-test:latest"
-WORKFLOWS_DIR="../openfn-workflows/workflows"
+WORKFLOWS_DIR="../../../openfn-workflows/workflows"
 FIXTURES_DIR="./fixtures"
 OUTPUTS_DIR="./outputs"
 PROJECT_ROOT="/home/ubuntu/code/malawi-dhis2-pipeline"

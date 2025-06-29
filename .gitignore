@@ -38,3 +38,5 @@ projects/openfn-workflows/workflows/*/.current-state.json
 projects/openfn-workflows/workflows/*/.deployed-state.json
 projects/openfn-workflows/workflows/*/.last-deployed.json
 projects/openfn-workflows/workflows/*/.state-backups/
+
+*.bkp

@@ -1,20 +1,4 @@
-# Multi-stage build: Custom SFTP adaptor + CLI environment
-FROM node:18-alpine AS adaptor-builder
-
-# Install pnpm for building OpenFN adaptors
-RUN npm install -g pnpm
-
-# Set working directory for adaptor build
-WORKDIR /build
-
-    # Copy our custom adaptors project
-    COPY openfn-adaptors/ ./
-
-# Install dependencies and build only the SFTP adaptor
-RUN pnpm install
-RUN cd packages/sftp && pnpm build
-
-# Main CLI testing stage
+# CLI Testing Environment with Official SFTP Package (Fixed Build)
 FROM node:18-alpine
 
 # Install dependencies for building and debugging
@@ -31,39 +15,36 @@ WORKDIR /workspace
 # Install OpenFN CLI globally
 RUN npm install -g @openfn/cli@latest
 
-# Install adaptors with fixed dependencies (excluding SFTP - we'll use custom)
+# Create adaptors directory with proper structure
 RUN mkdir -p /adaptors && cd /adaptors && \
-    npm init -y && \
-    npm install @openfn/language-http@6.4.5 @openfn/language-common@2.5.0
+    npm init -y
 
-# Copy and install our custom SFTP adaptor with fixed dependencies
-COPY --from=adaptor-builder /build/packages/sftp/ /adaptors/custom-sftp/
-RUN cd /adaptors/custom-sftp && \
-    rm -rf node_modules package-lock.json && \
-    sed -i 's/"@openfn\/language-common": "workspace:\*"/"@openfn\/language-common": "^2.5.0"/' package.json && \
-    npm install --omit=dev
-
-# Create symlink so CLI can find our custom SFTP adaptor
+# Install official packages with PROPER npm install (not broken symlinks)
+# This is the key fix - ensure clean installation
 RUN cd /adaptors && \
-    ln -sf /adaptors/custom-sftp node_modules/@openfn/language-sftp
+    rm -rf node_modules package-lock.json && \
+    npm install --no-optional --no-package-lock \
+        @openfn/language-sftp@2.0.14 \
+        @openfn/language-http@6.4.5 \
+        @openfn/language-common@2.5.0 \
+        @openfn/language-dhis2@6.3.4
 
-# Set adaptor path for OpenFN CLI and Node module resolution
+# Set up proper module resolution for OpenFN CLI
 ENV OPENFN_MODULES_HOME=/adaptors/node_modules
 ENV NODE_PATH=/adaptors/node_modules
 ENV OPENFN_REPO_DIR=/tmp/openfn/repo
 
-# Pre-install our custom SFTP adaptor in the CLI's repo location
-# First restore the custom version tag
-RUN cd /adaptors/custom-sftp && \
-    sed -i 's/"version": "[^"]*"/"version": "2.0.14-custom"/' package.json
-
-# Then install it in the CLI's expected location
+# Pre-install packages in CLI's expected repo location with proper structure
 RUN mkdir -p /tmp/openfn/repo/node_modules/@openfn && \
-    cp -r /adaptors/custom-sftp "/tmp/openfn/repo/node_modules/@openfn/language-sftp_2.0.14-custom" && \
+    # Copy properly installed packages (not symlinks)
+    cp -r /adaptors/node_modules/@openfn/language-sftp "/tmp/openfn/repo/node_modules/@openfn/language-sftp_2.0.14" && \
+    cp -r /adaptors/node_modules/@openfn/language-common "/tmp/openfn/repo/node_modules/@openfn/language-common_2.5.0" && \
+    cp -r /adaptors/node_modules/@openfn/language-http "/tmp/openfn/repo/node_modules/@openfn/language-http_6.4.5" && \
+    # Create proper package.json for CLI
     cd /tmp/openfn/repo && \
-    echo '{"name":"openfn-repo","version":"1.0.0","dependencies":{"@openfn/language-sftp_2.0.14-custom":"npm:@openfn/language-sftp@2.0.14-custom"}}' > package.json
+    echo '{"name":"openfn-repo","version":"1.0.0","dependencies":{"@openfn/language-sftp_2.0.14":"npm:@openfn/language-sftp@2.0.14","@openfn/language-common_2.5.0":"npm:@openfn/language-common@2.5.0","@openfn/language-http_6.4.5":"npm:@openfn/language-http@6.4.5"}}' > package.json
 
-# Create symlink from default repo location to our custom repo
+# Create symlink from default repo location 
 RUN ln -sf /tmp/openfn/repo /tmp/repo
 
 # Create helper scripts
