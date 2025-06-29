@@ -1,0 +1,11 @@
+{
+  "data": {},
+  "errors": {
+    "job-1": {
+      "source": "runtime",
+      "name": "JobError",
+      "severity": "fail",
+      "message": "connect: Invalid username"
+    }
+  }
+}

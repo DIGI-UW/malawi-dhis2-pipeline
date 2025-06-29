@@ -1,0 +1,35 @@
+services:
+  # CLI Testing Environment with Custom SFTP Adaptor
+  cli-test:
+    build:
+      context: ../../../projects  # Access both openfn-workflows and openfn-adaptors
+      dockerfile: openfn-workflows/Dockerfile.cli
+    image: openfn-cli-test:latest
+    volumes:
+      - ./:/workspace
+    network_mode: host
+    environment:
+      - SFTP_HOST=localhost
+      - SFTP_PORT=2225
+      - SFTP_USER=openfn
+      - SFTP_PASS=instant101
+    command: tail -f /dev/null  # Keep container running
+
+  # Test data generator - creates test files in SFTP
+  test-data:
+    image: alpine
+    volumes:
+      - sftp_data:/data
+    command: |
+      sh -c "
+        echo 'Creating test files...'
+        mkdir -p /data/test
+        echo 'test,data' > /data/test/sample.csv
+        echo '{\"test\": \"data\"}' > /data/test/sample.json
+        ls -la /data/test/
+      "
+
+volumes:
+  sftp_data:
+    external: true
+    name: sftp-storage_sftp_data 

@@ -1,0 +1,60 @@
+# CLI Testing Environment with Official SFTP Package (Fixed Build)
+FROM node:18-alpine
+
+# Install dependencies for building and debugging
+RUN apk add --no-cache \
+    bash \
+    curl \
+    jq \
+    git \
+    openssh-client
+
+# Set working directory
+WORKDIR /workspace
+
+# Install OpenFN CLI globally
+RUN npm install -g @openfn/cli@latest
+
+# Create adaptors directory with proper structure
+RUN mkdir -p /adaptors && cd /adaptors && \
+    npm init -y
+
+# Install official packages with PROPER npm install (not broken symlinks)
+# This is the key fix - ensure clean installation
+RUN cd /adaptors && \
+    rm -rf node_modules package-lock.json && \
+    npm install --no-optional --no-package-lock \
+        @openfn/language-sftp@2.0.14 \
+        @openfn/language-http@6.4.5 \
+        @openfn/language-common@2.5.0 \
+        @openfn/language-dhis2@6.3.4
+
+# Set up proper module resolution for OpenFN CLI
+ENV OPENFN_MODULES_HOME=/adaptors/node_modules
+ENV NODE_PATH=/adaptors/node_modules
+ENV OPENFN_REPO_DIR=/tmp/openfn/repo
+
+# Pre-install packages in CLI's expected repo location with proper structure
+RUN mkdir -p /tmp/openfn/repo/node_modules/@openfn && \
+    # Copy properly installed packages (not symlinks)
+    cp -r /adaptors/node_modules/@openfn/language-sftp "/tmp/openfn/repo/node_modules/@openfn/language-sftp_2.0.14" && \
+    cp -r /adaptors/node_modules/@openfn/language-common "/tmp/openfn/repo/node_modules/@openfn/language-common_2.5.0" && \
+    cp -r /adaptors/node_modules/@openfn/language-http "/tmp/openfn/repo/node_modules/@openfn/language-http_6.4.5" && \
+    # Create proper package.json for CLI
+    cd /tmp/openfn/repo && \
+    echo '{"name":"openfn-repo","version":"1.0.0","dependencies":{"@openfn/language-sftp_2.0.14":"npm:@openfn/language-sftp@2.0.14","@openfn/language-common_2.5.0":"npm:@openfn/language-common@2.5.0","@openfn/language-http_6.4.5":"npm:@openfn/language-http@6.4.5"}}' > package.json
+
+# Create symlink from default repo location 
+RUN ln -sf /tmp/openfn/repo /tmp/repo
+
+# Create helper scripts
+RUN echo '#!/bin/bash' > /usr/local/bin/test-sftp && \
+    echo 'openfn test "$@" -l debug --no-expand-references' >> /usr/local/bin/test-sftp && \
+    chmod +x /usr/local/bin/test-sftp
+
+RUN echo '#!/bin/bash' > /usr/local/bin/run-workflow && \
+    echo 'openfn run "$@" -l debug --no-expand-references' >> /usr/local/bin/run-workflow && \
+    chmod +x /usr/local/bin/run-workflow
+
+# Default command
+CMD ["bash"] 

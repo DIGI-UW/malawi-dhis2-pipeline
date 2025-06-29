@@ -52,7 +52,13 @@ build_custom_image() {
     
     echo "🔨 Checking build configuration for project: $project_name"
     
+    # Special handling for openfn-cli-test which doesn't have its own project directory
+    if [[ "$project_name" == "openfn-cli-test" ]]; then
+        local project_dir="$PROJECT_ROOT/projects/openfn-workflows"
+    else
     local project_dir="$PROJECT_ROOT/projects/$project_name"
+    fi
+    
     if [[ ! -d "$project_dir" ]]; then
         echo "❌ Project directory not found: $project_dir"
         return 1
@@ -62,7 +68,15 @@ build_custom_image() {
     local dockerfile_path="$project_dir/Dockerfile"
     local dockerfile_arg=""
     
-    if [[ -f "$dockerfile_path" ]]; then
+    # Special handling for openfn-cli-test which uses Dockerfile.cli
+    if [[ "$project_name" == "openfn-cli-test" ]]; then
+        dockerfile_path="$project_dir/Dockerfile.cli"
+        dockerfile_arg="-f Dockerfile.cli"
+        if [[ ! -f "$dockerfile_path" ]]; then
+            echo "❌ Dockerfile.cli not found in: $dockerfile_path"
+            return 1
+        fi
+    elif [[ -f "$dockerfile_path" ]]; then
         dockerfile_arg=""  # Use default Dockerfile location
     elif [[ -f "$project_dir/docker/Dockerfile" ]]; then
         dockerfile_path="$project_dir/docker/Dockerfile"
@@ -103,11 +117,30 @@ build_custom_image() {
     echo "📄 Using Dockerfile: $dockerfile_path"
     
     cd "$project_dir"
+    
+    # Special handling for openfn project that needs access to openfn-adaptors
+    if [[ "$project_name" == "openfn" ]]; then
+        cd "$PROJECT_ROOT/projects"
+        docker build \
+            -f "openfn/Dockerfile" \
+            --build-arg "${project_name^^}_BASE_IMAGE=$base_image" \
+            -t "$local_image_tag" \
+            .
+    # Special handling for openfn-cli-test that uses a different Dockerfile
+    elif [[ "$project_name" == "openfn-cli-test" ]]; then
+        cd "$PROJECT_ROOT/projects"
+        docker build \
+            -f "openfn-workflows/Dockerfile.cli" \
+            --build-arg "OPENFN_CLI_TEST_IMAGE=$base_image" \
+            -t "$local_image_tag" \
+            .
+    else
     docker build \
         $dockerfile_arg \
         --build-arg "${project_name^^}_BASE_IMAGE=$base_image" \
         -t "$local_image_tag" \
         .
+    fi
     
     if [[ $? -eq 0 ]]; then
         echo "✅ Successfully built custom image: $local_image_tag"
@@ -153,8 +186,8 @@ if [[ $# -eq 0 ]]; then
                 "sftp")
                     build_custom_image "$project_name" "sftp-storage"
                     ;;
-                # The "openfn-workflows" project corresponds to the "openfn" package.
-                "openfn-workflows")
+                # The "openfn" project corresponds to the "openfn" package.
+                "openfn")
                     build_custom_image "$project_name" "openfn"
                     ;;
                 *)
@@ -169,16 +202,18 @@ else
         # Map project name to package name for specific known projects,
         # otherwise, attempt to build with an empty package name.
         case "$project_name" in
-            # The "dhis2" project corresponds to the "dhis2-instance" package.
             "dhis2")
                 build_custom_image "$project_name" "dhis2-instance"
                 ;;
-            # The "sftp" project corresponds to the "sftp-storage" package.
             "sftp")
                 build_custom_image "$project_name" "sftp-storage"
                 ;;
-            # The "openfn-workflows" project corresponds to the "openfn" package.
-            "openfn-workflows")
+            # The "openfn" project corresponds to the "openfn" package.
+            "openfn")
+                build_custom_image "$project_name" "openfn"
+                ;;
+            # The "openfn-cli-test" builds CLI test container from workflows directory
+            "openfn-cli-test")
                 build_custom_image "$project_name" "openfn"
                 ;;
             *)

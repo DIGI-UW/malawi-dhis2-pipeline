@@ -1,0 +1,10 @@
+{
+  "data": [],
+  "configuration": {
+    "host": "localhost",
+    "port": 2225,
+    "username": "sftp-user",
+    "password": "sftp-password",
+    "debug": true
+  }
+} 

@@ -2,7 +2,17 @@ ARG SFTP_BASE_IMAGE=atmoz/sftp:latest
 FROM ${SFTP_BASE_IMAGE}
 
 # Copy Excel files to the SFTP server's data directory
-COPY data/*.xlsx /home/openfn/data/excel-files/
+COPY data/excel-files/*.xlsx /home/openfn/data/excel-files/
+
+# Copy SSH configuration for OpenFN compatibility
+COPY sshd_config_legacy.conf /tmp/sshd_config_legacy.conf
+
+# Configure SSH to support legacy algorithms for OpenFN compatibility
+RUN echo "" >> /etc/ssh/sshd_config && \
+    echo "# OpenFN SFTP Adaptor Compatibility Settings" >> /etc/ssh/sshd_config && \
+    cat /tmp/sshd_config_legacy.conf >> /etc/ssh/sshd_config && \
+    rm /tmp/sshd_config_legacy.conf && \
+    ssh-keygen -t rsa -b 2048 -f /etc/ssh/ssh_host_rsa_key -N "" || true
 
 # Set proper ownership for the SFTP user
 RUN chown -R 1001:1001 /home/openfn/data/excel-files/ && \

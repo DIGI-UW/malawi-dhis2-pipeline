@@ -1,6 +1,6 @@
 services:
   openfn:
-    image: ${OPENFN_IMAGE}
+    image: ${LOCAL_OPENFN_IMAGE:-$OPENFN_IMAGE}
     # This command runs a shell script that performs the following actions:
     # 1. Executes the Lightning.Release.migrate() function to handle database migrations.
     # 2. Starts the Lightning application using the /app/bin/lightning start command.
@@ -32,6 +32,7 @@ services:
     networks:
       - kafka_public
       - postgres
+      - openfn_public
   worker:
     image: ${OPENFN_WORKER_IMAGE}
     deploy:

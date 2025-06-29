@@ -1,0 +1,29 @@
+{
+  "data": {
+    "downloadedFiles": [
+      {
+        "name": "DHIS2_HIV_ART_data_long_format_Q1FY25.xlsx",
+        "remotePath": "/uploads/hiv-indicators/DHIS2_HIV_ART_data_long_format_Q1FY25.xlsx",
+        "localPath": "/tmp/downloads/DHIS2_HIV_ART_data_long_format_Q1FY25.xlsx",
+        "size": 45678,
+        "downloadedAt": "2024-12-28T10:30:00Z",
+        "status": "downloaded"
+      }
+    ]
+  },
+  "newFilesFound": true,
+  "newFiles": [
+    {
+      "name": "DHIS2_HIV_ART_data_long_format_Q1FY25.xlsx",
+      "size": 45678,
+      "modifiedTime": "2024-12-15T10:30:00Z",
+      "path": "/uploads/hiv-indicators/DHIS2_HIV_ART_data_long_format_Q1FY25.xlsx"
+    }
+  ],
+  "configuration": {
+    "hostUrl": "localhost",
+    "port": 2225,
+    "username": "malawi_user",
+    "password": "malawi_password"
+  }
+} 

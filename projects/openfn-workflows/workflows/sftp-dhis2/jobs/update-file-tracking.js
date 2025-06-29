@@ -3,7 +3,8 @@
  * This job updates the tracking information for processed files to avoid reprocessing
  */
 
-import { fn } from '@openfn/language-common';
+// OpenFN functions are available directly, no imports needed
+// The runtime provides: fn from @openfn/language-common
 
 fn(state => {
   console.log('Updating file tracking state...');

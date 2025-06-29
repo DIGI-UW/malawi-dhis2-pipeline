@@ -1,173 +1,367 @@
-# Malawi DHIS2 HIV/TB Indicators Importer 
+# Malawi DHIS2 HIV/TB Indicators Pipeline
 
 ## Overview
-This project extracts key HIV/TB indicators from Google Sheets, transforms them into the DHIS2 `dataValueSets` format, and loads them into a DHIS2 instance via the DHIS2 Web API. The process is implemented as OpenFn workflows using an example Google Sheets to DHIS2 pipeline.
 
-1. **Data Extraction**: `get-googlesheets-data.js` connects to Google Sheets using the Google Sheets API to fetch HIV indicator data for specified reporting periods and organizational units.
-2. **Payload Generation**: `generate-dhis2-payload.js` maps extracted values to DHIS2 Data Element UIDs (configured in `state/generate-dhis2-payload.json`), building the `dataValueSets` payload with support for exact and partial indicator name matching.
-3. **Upload**: `upload-to-dhis2.js` posts the payload to the DHIS2 `/dataValueSets` endpoint with enhanced logging and error handling. DHIS2 Indicator Project
+This project implements a flexible, configuration-driven pipeline for importing HIV/TB health indicators from various Excel/CSV formats into DHIS2. Built on OpenFN and Instant OpenHIE v2, it supports multiple data sources including Google Sheets and SFTP-based file uploads.
 
-Configuration is managed through:
-- `state/get-googlesheets-data.json`: Google Sheets access configuration, data structure definitions, and processing options
-- `state/generate-dhis2-payload.json`: DHIS2 indicator mappings and transformation rules
+### Key Features
 
-## Running the Workflow (Docker Swarm Mode)
+- **Multi-Format Support**: Processes CSV/XLSX files with configuration-based column mapping
+- **Flexible Data Sources**: Google Sheets API and SFTP file monitoring
+- **Automated Processing**: Scheduled (cron) and event-driven (webhook) workflows
+- **Data Validation**: Built-in validation rules and transformation capabilities
+- **Time-Based Protection**: Configurable update windows to prevent accidental overwrites
+- **Docker Swarm Deployment**: Production-ready containerized deployment
 
-This project is designed to be deployed using Docker Swarm.
+## Architecture
 
-1.  **Environment Setup**:
-    *   Copy the example environment file: `cp .env.example .env`
-    *   Edit the `.env` file to update necessary variables (e.g., `YOUR_HOST_IP`, DHIS2 credentials and URLs, Google Sheets service account credentials, OpenFn settings). Ensure all variables referenced in the main `docker-compose.yml` are set.
-
-2.  **Initialize Docker Swarm** (if not already initialized):
-    ```bash
-    docker swarm init
-    ```
-
-3. **Configure OpenFN**:
-  Set the following in the `.env` file:
-        - OPENFN_ENDPOINT: The URL where OpenFn will be accessible (e.g., `http://YOUR_HOST_IP:4000`)
-        - OPENFN_API_KEY: The API key for OpenFn, which you can set in the OpenFn UI after initial deployment.
-
-        export OPENFN_ENDPOINT=http://YOUR_HOST_IP:4000 
-        export OPENFN_API_KEY=your_openfn_api_key # Use the API key set in your .env for OPENFN_API_KEY
-        ```
-4. **Bring up the packages using Instant OpenHIE**:
-    ```bash
-    ./get-cli.sh linux latest
-    ./build-image.sh
-    ./instant project init --env-file .env -dev
-    ```
-
-5.  **Access the OpenFn UI**:
-    *   URL: `http://YOUR_HOST_IP:4000` (or the appropriate address where OpenFn is exposed)
-    *   Default Email (from setup): The email you configured via `OPENFN_ADMIN_EMAIL` in your `.env` file.
-    *   Default Password (from setup): The password you configured via `OPENFN_ADMIN_PASSWORD` in your `.env` file.
-    *   After deployment, you might need to enable collections or verify trigger configurations in the OpenFn UI.
-
-6.  **Monitor and Verify**:
-    *   Check service logs: \
-        ```bash
-        docker service ls
-        docker service logs <dhis2_service_name>
-        ```
-
-
-## Extending for New Indicators
-1.  Add new indicator mappings in `packages/openfn/importer/workflows/state/generate-dhis2-payload.json` to map Google Sheets indicator names to DHIS2 Data Element UIDs.
-2.  Update Google Sheets configuration in `packages/openfn/importer/workflows/state/get-googlesheets-data.json` if new data structure or filtering is needed.
-3.  Update `packages/openfn/importer/workflows/reports-data-upload-workflow/project.yaml` if new jobs are added or existing ones modified.
-4.  Redeploy the OpenFn project:
-    ```bash
-    cd packages/openfn/importer/workflows/reports-data-upload-workflow/
-    openfn deploy -c project.yaml
-    ```
-5.  Run the workflow and verify payload in DHIS2.
-
-## Google Sheets Setup and Validation
-
-Before deploying the workflow, you need to set up Google Sheets integration:
-
-### 1. Google Sheets Configuration
-Follow the detailed setup guide in `docs/google-sheets-setup.md` to:
-- Create a Google Cloud project and enable Google Sheets API
-- Create a service account and download credentials
-- Configure environment variables in `.env`
-- Share your Google Sheets with the service account
-
-### 2. Validate Google Sheets Connection
-Before deploying, test your Google Sheets configuration:
-
-```bash
-# Install dependencies
-npm install
-
-# Run validation script
-npm run validate-sheets
 ```
-
-This script will:
-- Verify all required environment variables are set
-- Test authentication with Google Sheets API
-- Retrieve sample data to validate structure
-- Provide troubleshooting guidance if issues are found
-
-### 3. Required Google Sheets Structure
-Your spreadsheet should have columns for:
-- **Indicator Name**: Text descriptions of HIV indicators
-- **Value**: Numeric values for each indicator
-- **Period**: Reporting period (optional)
-- **Org Unit**: Organization unit identifier (optional)
-- **Age Group**: Age categorization (optional)
-- **Gender**: Gender categorization (optional)
-
-Example:
-| Indicator Name | Value | Period | Org Unit |
-|---------------|-------|---------|----------|
-| Number of adults and children currently receiving ART | 1250 | 202312 | Site001 |
-
-## Prerequisites
-
-- Docker and Docker Compose (Docker Swarm mode enabled)
-- Node.js and npm (for OpenFn CLI usage and validation scripts)
-- OpenFn CLI (`npm install -g @openfn/cli`)
-- Google Cloud Platform account with Google Sheets API access
-- Google Sheets spreadsheet with properly formatted HIV indicator data
-
-## Method 1: Using OpenFn Lightning (Web UI) 
-### This section needs to be updated to align with the Docker Swarm deployment. The primary method is now via `docker stack deploy`.
-
-## Method 2: Using OpenFn CLI Directly (for workflow execution, not initial deployment)
-
-This method can be used for local testing or direct execution of a defined workflow if the OpenFn instance is already running and configured.
-
-### 1. Ensure State and Credentials Files are Correct
-The necessary state and credential files are now located within the `packages/openfn/importer/workflows/` directory structure.
-- `packages/openfn/importer/workflows/state/generate-dhis2-payload.json`
-- `packages/openfn/importer/workflows/state/get-googlesheets-data.json`
-
-Credentials should be configured within the OpenFn instance itself during the setup phase (handled by the `openfn-setup` service in Docker Swarm). Google Sheets credentials require a service account with appropriate permissions to access the target spreadsheet.
-
-The `project.yaml` references credentials like `admin@example.org-GoogleSheets` and `admin@example.org-DHIS2`. These must exist in the target OpenFn instance.
-
-### 2. Run the Workflow via CLI (against a running OpenFn instance)
-
-If you have deployed the stack and the OpenFn project, you can trigger workflows via the UI or API.
-To run a specific workflow defined in a local JSON file (e.g., `workflow.json` from the `project.yaml` definition) directly using the CLI for testing (this bypasses the OpenFn server's scheduling/triggering but executes jobs through its adaptors if configured):
-
-```bash
-# Navigate to the workflow definition directory
-cd packages/openfn/importer/workflows/reports-data-upload-workflow/
-
-# Ensure OPENFN_ENDPOINT and OPENFN_API_KEY are set if your jobs need to communicate
-# with the OpenFn instance for things like state or logging.
-# The command below assumes workflow.json is a valid OpenFn workflow definition.
-# You might need to extract/generate this from your project.yaml or have it separately.
-# openfn /path/to/your/workflow.json -o output.json --adaptors=@openfn/language-googlesheets,@openfn/language-common,@openfn/language-dhis2
-
-# Note: The direct CLI execution of a full project.yaml is usually for deployment.
-# Individual workflow execution via CLI often points to a specific workflow.json file.
-# The project.yaml defines how to deploy the workflow TO an OpenFn server.
+┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
+│   Data Sources  │     │   OpenFN        │     │   DHIS2         │
+├─────────────────┤     ├─────────────────┤     ├─────────────────┤
+│ • Google Sheets │────▶│ • Workflows     │────▶│ • Data Import   │
+│ • SFTP Files    │     │ • Transformers  │     │ • Validation    │
+│ • Excel/CSV     │     │ • Validators    │     │ • Storage       │
+└─────────────────┘     └─────────────────┘     └─────────────────┘
+                               │
+                               ▼
+                        ┌─────────────────┐
+                        │   PostgreSQL    │
+                        │ • State Mgmt    │
+                        │ • Audit Trail   │
+                        └─────────────────┘
 ```
-The `openfn deploy` command is the standard way to get the project onto the server.
-
-## Notes
-
-- Make sure to update the UUIDs and configuration values in `packages/openfn/importer/workflows/state/` files according to your DHIS2 instance.
-- Update all necessary environment variables in your `.env` file.
-- The Google Sheets API should be accessible from the Docker containers, and proper service account credentials should be configured.
-
-## Documentation
-
-- **[Google Sheets Setup Guide](docs/google-sheets-setup.md)**: Comprehensive guide for setting up Google Sheets integration
-- **[Testing Guide](docs/testing-guide.md)**: Complete testing procedures for the Google Sheets to DHIS2 pipeline
-- **[Migration Guide](docs/migration-guide.md)**: Documentation of the migration from PostgreSQL to Google Sheets approach
 
 ## Quick Start
 
-1. **Setup Google Sheets**: Follow `docs/google-sheets-setup.md`
-2. **Configure Environment**: Update `.env` file with Google Sheets credentials
-3. **Validate Connection**: Run `npm run validate-sheets`
-4. **Deploy Stack**: `docker stack deploy -c docker-compose.yml malawi_dhis2_stack`
-5. **Deploy Workflow**: `openfn deploy -c project.yaml`
-6. **Test Pipeline**: Follow procedures in `docs/testing-guide.md`
+### Prerequisites
+
+- Docker and Docker Compose (with Swarm mode)
+- Node.js and npm
+- OpenFN CLI: `npm install -g @openfn/cli`
+
+### Deployment Steps
+
+    ```bash
+# 1. Clone and setup
+git clone <repository>
+cd malawi-dhis2-pipeline
+
+# 2. Configure environment
+cp .env.example .env
+# Edit .env with your settings
+
+# 3. Build custom images
+./build-custom-images.sh sftp        # SFTP with sample data
+./build-custom-images.sh openfn-workflows  # OpenFN with workflows
+
+# 4. Initialize project
+./instant project init --env-file .env
+
+# 5. Access services
+# OpenFN: http://localhost:4000
+# DHIS2: http://localhost:8080
+# SFTP: sftp://localhost:2225
+```
+
+### OpenFN Workflow Management
+
+The system provides comprehensive workflow management with bidirectional sync between code and UI.
+
+#### Workflow Sync System
+
+**Quick Start:**
+    ```bash
+# Check sync status
+./packages/openfn/instant-workflow-sync.sh status
+
+# Download workflows from UI
+./packages/openfn/instant-workflow-sync.sh download
+
+# Upload workflows to UI
+./packages/openfn/instant-workflow-sync.sh upload
+
+# Enable auto-sync watch mode
+./packages/openfn/instant-workflow-sync.sh watch
+```
+
+**Key Features:**
+- **Bidirectional Sync**: Download from UI or upload from code
+- **Version Management**: Track changes with lock_version support
+- **Conflict Resolution**: Automatic or manual conflict handling
+- **Snapshot System**: Automatic backups before changes
+- **Watch Mode**: Auto-sync on file changes
+
+**Configuration** (in `.env`):
+        ```bash
+OPENFN_SYNC_MODE=manual              # manual|auto-download|auto-upload
+OPENFN_CONFLICT_RESOLUTION=prompt    # prompt|local-wins|remote-wins
+OPENFN_ENABLE_AUTO_SNAPSHOT=true     # Auto-create snapshots
+```
+
+See [Workflow Sync Documentation](docs/openfn-workflow-sync.md) for full details.
+
+#### Workflow Loading Process
+
+1. **Build Workflow Image**: `./build-custom-images.sh openfn-workflows`
+   - Packages workflow files into Docker image
+   - Includes YAML configurations and job definitions
+
+2. **Deploy with Workflow Loading**: `./mk.sh`
+   - Sets `OPENFN_LOAD_WORKFLOWS_ON_STARTUP=true`
+   - Deploys workflow-loader service that reads from `/app/workflows/`
+   - Uses OpenFN CLI to deploy via provisioning API
+
+3. **Verify Deployment**: 
+    ```bash
+   # Test workflow loading
+   cd projects/indicator_workflow_testing
+   ./run-tests.sh --workflows
+   
+   # Check OpenFN UI
+   # Navigate to http://localhost:4000
+   ```
+
+#### Workflow Structure
+
+Workflows are defined in `projects/openfn-workflows/workflows/sftp-dhis2/`:
+- `project.yaml` - Project configuration with workflows, jobs, triggers
+- `jobs/` - Individual job definitions (.js files)
+- `.versions/` - Downloaded workflow versions (auto-created)
+- `.snapshots/` - Workflow snapshots (auto-created)
+- `README.md` - Workflow documentation
+
+#### Development Workflows
+
+**Option 1: UI-First Development**
+1. Make changes in OpenFN UI
+2. Test workflows in UI
+3. Download to code: `./packages/openfn/instant-workflow-sync.sh download`
+4. Commit changes to git
+
+**Option 2: Code-First Development**
+1. Edit workflow files locally
+2. Upload to test: `./packages/openfn/instant-workflow-sync.sh upload`
+3. Test in UI
+4. Commit changes to git
+
+#### Key Environment Variables
+
+- `OPENFN_LOAD_WORKFLOWS_ON_STARTUP=true` - Enables automatic loading
+- `OPENFN_WORKFLOW_MANUAL_CLI=false` - Uses packaged workflows (not external files)
+- `OPENFN_SYNC_MODE=manual` - Workflow sync mode
+- `OPENFN_CONFLICT_RESOLUTION=prompt` - How to handle conflicts
+
+#### Faster Development Iteration
+
+For workflow changes without full rebuild:
+```bash
+# Quick sync and redeploy
+./packages/openfn/instant-workflow-sync.sh upload
+./instant package up -n openfn -d
+
+# Full rebuild (if workflow structure changed)
+./mk.sh
+```
+
+## Documentation Index
+
+### 📋 Project Documentation
+
+- **[Project Overview](DHIS2-Indicator-Pipeline-Project-Page.md)** - Business overview and project benefits
+- **[Deliverables](docs/Deliverables.md)** - Project requirements and deliverables
+- **[Testing Guide](docs/Testing-Guide-CSV-XLSX.md)** - Comprehensive testing procedures
+- **[CSV/XLSX Integration Guide](docs/CSV-XLSX-Import-Integration.md)** - Configuration-based file processing
+
+### 🔧 Setup Guides
+
+- **[Google Sheets Setup](docs/google-sheets-setup.md)** - Google Sheets API configuration
+- **[SFTP Excel Integration](docs/sftp-excel-integration.md)** - SFTP-based file processing
+- **[OpenFN Workflow Sync](docs/openfn-workflow-sync.md)** - Bidirectional workflow synchronization
+- **[OpenFN State Management](docs/openfn-state-management-guide.md)** - State management best practices
+- **[OpenFN Testing Guide](docs/openfn-testing-guide.md)** - OpenFN-specific testing procedures
+
+### 🧪 Testing & Validation
+
+- **[Workflow Testing Framework](projects/indicator_workflow_testing/README.md)** - Automated testing suite for workflows
+- **[Testing Guide](docs/Testing-Guide-CSV-XLSX.md)** - Comprehensive testing procedures
+- **[API Testing](projects/indicator_workflow_testing/tests/)** - OpenFN API connectivity tests
+
+### 🔄 Migration & History
+
+- **[Migration Guide](docs/migration-guide.md)** - PostgreSQL to Google Sheets migration
+- **[Refactoring Summary](docs/refactoring-summary.md)** - Summary of major changes
+
+### 📦 Package Documentation
+
+#### Core Packages
+- **[OpenFN Package](packages/openfn/README.md)** - Workflow orchestration engine
+- **[DHIS2 Instance](packages/dhis2-instance/README.md)** - DHIS2 server configuration
+  - **[DHIS2 Database Setup](packages/dhis2-instance/importer/README.md)** - Database initialization
+- **[PostgreSQL Database](packages/database-postgres/README.md)** - Database setup
+- **[SFTP Storage](packages/sftp-storage/README.md)** - File storage and transfer
+- **[Nginx Reverse Proxy](packages/reverse-proxy-nginx/README.md)** - Load balancing and routing
+
+#### Workflow Components
+- **[SFTP-DHIS2 Workflow](projects/openfn-workflows/workflows/sftp-dhis2/README.md)** - Main data import workflow
+- **[Configuration Loader](projects/openfn-workflows/shared/config-loader.js)** - Dynamic configuration system
+
+#### Other Resources
+- **[Original OpenFN Setup](projects/original-openfn-setup/README.md)** - Legacy setup documentation
+- **[Environment Variables](environment-variables.md)** - OpenFN environment variables reference
+- **[Config Override Scripts](scripts/cmd/override-configs/README.md)** - Configuration management scripts
+
+## Supported File Formats
+
+The pipeline supports multiple file formats through configuration files:
+
+### 1. ART Data Long Format
+- **Pattern**: `*ART*data*long*.xlsx`
+- **Config**: `configs/file-types/art_data_long_format.json`
+- **Features**: Age/gender disaggregation, ART regimen tracking
+
+### 2. Data Quality (DQ) Sites
+- **Pattern**: `*Q*FY*DQ*sites*.xlsx`
+- **Config**: `configs/file-types/dq_sites.json`
+- **Features**: Quarterly reports, completeness scores, fiscal year handling
+
+### 3. MoH Direct Queries
+- **Pattern**: `*Direct*Queries*.xlsx`
+- **Config**: `configs/file-types/moh_direct_queries.json`
+- **Features**: Multi-sheet support, flexible date parsing, calculated indicators
+
+## Configuration
+
+### File Type Configuration
+
+Each file type has a JSON configuration specifying:
+- Column mappings (source → DHIS2 fields)
+- Data transformations (dates, percentages, quarters)
+- Validation rules (required fields, data types, ranges)
+- DHIS2 import settings
+
+Example structure:
+```json
+{
+  "fileType": "identifier",
+  "filePatterns": ["*.xlsx"],
+  "columnMappings": {
+    "indicator": {
+      "sourceColumns": ["Indicator", "Data Element"],
+      "targetField": "dataElement",
+      "required": true
+    }
+  }
+}
+```
+
+### Adding New File Types
+
+1. Create configuration in `packages/openfn/importer/configs/file-types/`
+2. Copy to workflows: `cp -r packages/openfn/importer/configs projects/openfn-workflows/`
+3. Rebuild image: `./build-custom-images.sh openfn-workflows`
+
+## Testing
+
+The project includes a comprehensive testing framework for validating workflows and API functionality:
+
+### Quick Testing
+```bash
+# Run all tests
+./projects/indicator_workflow_testing/run-tests.sh
+
+# Run specific test suites
+./projects/indicator_workflow_testing/run-tests.sh --api          # API connectivity tests
+./projects/indicator_workflow_testing/run-tests.sh --excel       # Excel parsing tests
+./projects/indicator_workflow_testing/run-tests.sh --sftp        # SFTP integration tests
+./projects/indicator_workflow_testing/run-tests.sh --integration # End-to-end tests
+```
+
+### Manual Testing
+- **Unit Tests**: `npm test`
+- **Integration Tests**: See [Testing Guide](docs/Testing-Guide-CSV-XLSX.md)
+- **Validation**: `npm run validate-sheets` (for Google Sheets)
+
+### Testing Framework
+- **[Automated Testing Suite](projects/indicator_workflow_testing/README.md)** - Comprehensive test framework
+- **API Tests**: Health checks, authentication, workflow validation
+- **Excel Tests**: Multi-sheet parsing and data transformation validation
+- **SFTP Tests**: File transfer and workflow integration
+- **Integration Tests**: End-to-end workflow execution with sample data
+
+## Monitoring
+
+- **OpenFN Dashboard**: Workflow execution status
+- **DHIS2 Import Summary**: Data import results
+- **Docker Service Logs**: `docker service logs <service_name>`
+
+## Troubleshooting
+
+Common issues and solutions:
+
+| Issue | Solution |
+|-------|----------|
+| File not recognized | Check filename matches patterns in config |
+| Column mapping errors | Verify Excel column names match configuration |
+| DHIS2 upload failures | Check metadata UIDs and credentials |
+| Old data not updating | Adjust time window settings (default: 3 months) |
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Add tests for new functionality
+4. Update documentation
+5. Submit a pull request
+
+## License
+
+[License information]
+
+## Support
+
+- **Issues**: GitHub Issues
+- **Documentation**: This README and linked guides
+- **Community**: [Community channels]
+
+## 🧩 Key Components
+
+### 1. **Core Workflow Engine** (OpenFN Lightning)
+- OpenFN Lightning v2.8+ with web UI and API
+- Custom Docker images with working SFTP adaptor
+- Automated workflow execution and monitoring
+
+### 2. **SFTP File Storage**
+- Secure file upload endpoint for partners
+- Pre-loaded with sample Excel files for testing
+- Automated file monitoring and processing
+
+### 3. **DHIS2 Data Warehouse**
+- DHIS2 v2.39+ configured for Malawi health programs
+- Pre-configured metadata for HIV/TB indicators
+- RESTful API for data import/export
+
+### 4. **Testing Framework**
+- Comprehensive test suite for all workflows
+- Docker-based testing environment
+- CLI and integration testing tools
+
+## 📚 Documentation
+
+### Workflow Development & Testing
+All workflow documentation has been consolidated in [`projects/openfn-workflows/docs/`](projects/openfn-workflows/docs/):
+
+1. **[Overview](projects/openfn-workflows/docs/01-overview.md)** - Project architecture and quick start
+2. **[Development Guide](projects/openfn-workflows/docs/02-development-guide.md)** - How to create and modify workflows
+3. **[Testing Strategy](projects/openfn-workflows/docs/03-testing-strategy.md)** - Comprehensive testing approach
+4. **[SFTP to DHIS2 Testing Plan](projects/openfn-workflows/docs/04-sftp-dhis2-testing-plan.md)** - Detailed testing plan
+5. **[Docker Environment](projects/openfn-workflows/docs/05-docker-environment.md)** - Docker setup and configuration
+6. **[Troubleshooting Guide](projects/openfn-workflows/docs/06-troubleshooting.md)** - Common issues and solutions
+
+### Testing Framework
+For the complete testing framework documentation, see:
+- [`projects/indicator_workflow_testing/TESTING-INDEX.md`](projects/indicator_workflow_testing/TESTING-INDEX.md)
+
+### Other Documentation
+- [`docs/Deliverables.md`](docs/Deliverables.md) - Project deliverables and milestones
+- [`docs/MCP-SERVERS.md`](docs/MCP-SERVERS.md) - MCP server integration

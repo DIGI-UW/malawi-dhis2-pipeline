@@ -1,0 +1,30 @@
+{
+  "openfn": {
+    "base": "http://localhost:4000",
+    "endpoints": {
+      "health": "/health_check",
+      "auth": "/users/log_in",
+      "users": "/api/users",
+      "projects": "/api/projects",
+      "workflows": "/api/workflows",
+      "jobs": "/api/jobs",
+      "triggers": "/api/triggers",
+      "runs": "/api/runs",
+      "webhooks": {
+        "sftp": "/webhooks/sftp-webhook",
+        "sheets": "/webhooks/sheets-webhook"
+      }
+    }
+  },
+  "dhis2": {
+    "base": "http://localhost:8080",
+    "endpoints": {
+      "auth": "/api/me",
+      "dataValueSets": "/api/dataValueSets",
+      "dataElements": "/api/dataElements",
+      "organisationUnits": "/api/organisationUnits",
+      "metadata": "/api/metadata",
+      "system": "/api/system/info"
+    }
+  }
+} 

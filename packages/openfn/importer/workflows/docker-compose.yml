@@ -1,0 +1,27 @@
+
+services:
+  workflow-loader:
+    image: ${OPENFN_WORKFLOWS_IMAGE:-openfn-workflows:local}
+    networks:
+      - openfn_public
+    environment:
+      MODE: deploy
+      WORKFLOW_NAME: sftp-dhis2
+      WORKFLOW_PATH: /app/workflows
+      OPENFN_ENDPOINT: ${OPENFN_ENDPOINT:-http://openfn:4000}
+      OPENFN_API_KEY: ${OPENFN_API_KEY}
+      OPENFN_ADMIN_USER: ${OPENFN_ADMIN_USER}
+      OPENFN_ADMIN_PASSWORD: ${OPENFN_ADMIN_PASSWORD}
+      PACKAGE_LIFECYCLE: "true"
+      DRY_RUN: "false"
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        max_attempts: 3
+        
+networks:
+  openfn_public:
+    external: true 

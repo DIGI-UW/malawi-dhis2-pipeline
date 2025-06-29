@@ -1,0 +1,11 @@
+{
+  "data": [],
+  "fileTracking": {},
+  "configuration": {
+    "host": "localhost",
+    "port": 2225,
+    "username": "openfn",
+    "password": "instant101",
+    "remoteDir": "/data/excel-files"
+  }
+}

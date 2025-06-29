@@ -17,3 +17,26 @@ projects/*/data/
 **/DHIS2_HIV*.csv
 **/*DQ_*.xlsx
 **/*malawi*.sql
+
+*.log
+
+# OpenFN workflow sync
+.openfn-sync/
+*/.versions/
+*/.snapshots/
+*/extracted/
+.last-deployed.json
+.current-state.json
+.deployed-state.json
+.state-backups/
+
+# Exclude all extracted workflow files
+projects/openfn-workflows/workflows/*/extracted/
+projects/openfn-workflows/workflows/*/.versions/
+projects/openfn-workflows/workflows/*/.snapshots/
+projects/openfn-workflows/workflows/*/.current-state.json
+projects/openfn-workflows/workflows/*/.deployed-state.json
+projects/openfn-workflows/workflows/*/.last-deployed.json
+projects/openfn-workflows/workflows/*/.state-backups/
+
+*.bkp

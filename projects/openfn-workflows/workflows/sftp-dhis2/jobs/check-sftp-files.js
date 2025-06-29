@@ -3,15 +3,17 @@
  * This job is triggered by cron to periodically check for changes
  */
 
-import { list, stat } from '@openfn/language-sftp';
-import { fn } from '@openfn/language-common';
+// OpenFN functions are available directly, no imports needed
+// The runtime provides: list, stat from @openfn/language-sftp
+// and fn from @openfn/language-common
 
-// Configuration
-const SFTP_DIRECTORY = '/uploads/hiv-indicators/';
+// Get directory from config or use default, then list files
+// Use simple syntax that works with our custom adaptor
+list('/data/excel-files', (state) => {
+    console.log('Processing files in SFTP directory: /data/excel-files');
+    
 const SUPPORTED_EXTENSIONS = ['.xlsx', '.xls'];
-
-list(SFTP_DIRECTORY, (state) => {
-  console.log('Checking SFTP directory for new files...');
+    const directory = '/data/excel-files/';
   
   // Get previous file tracking from state
   const previousFiles = state.fileTracking || {};
@@ -31,7 +33,7 @@ list(SFTP_DIRECTORY, (state) => {
           name: file.name,
           size: file.size,
           modifiedTime: file.modifiedTime,
-          path: SFTP_DIRECTORY + file.name
+            path: directory + file.name
         };
         
         currentFiles[fileKey] = fileInfo;
@@ -50,7 +52,20 @@ list(SFTP_DIRECTORY, (state) => {
     }
   });
   
-  // Update state with findings
+    // Handle workflow completion logic
+    if (!newFilesFound) {
+      console.log('No new files found. Workflow will stop here.');
+      return {
+        ...state,
+        newFilesFound: false,
+        newFiles: [],
+        currentFileList: currentFiles,
+        lastChecked: new Date().toISOString(),
+        workflowComplete: true
+      };
+    }
+    
+    console.log(`Found ${newFiles.length} new/updated files to process`);
   return {
     ...state,
     newFilesFound,
@@ -58,18 +73,5 @@ list(SFTP_DIRECTORY, (state) => {
     currentFileList: currentFiles,
     lastChecked: new Date().toISOString()
   };
-});
-
-// If no new files found, stop the workflow
-fn((state) => {
-  if (!state.newFilesFound) {
-    console.log('No new files found. Workflow will stop here.');
-    return {
-      ...state,
-      workflowComplete: true
-    };
   }
-  
-  console.log(`Found ${state.newFiles.length} new/updated files to process`);
-  return state;
-});
+);

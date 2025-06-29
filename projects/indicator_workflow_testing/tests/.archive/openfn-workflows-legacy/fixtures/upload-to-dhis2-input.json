@@ -1,0 +1,17 @@
+{
+  "data": {
+    "dataValues": [
+      {
+        "dataElement": "TEST_DE_001",
+        "period": "202401",
+        "orgUnit": "TEST_OU_001",
+        "value": "100"
+      }
+    ]
+  },
+  "configuration": {
+    "baseUrl": "https://test-dhis2.example.com/api",
+    "username": "test_user",
+    "password": "test_pass"
+  }
+}
