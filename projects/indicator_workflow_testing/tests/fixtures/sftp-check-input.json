@@ -1,0 +1,11 @@
+{
+  "data": [],
+  "fileTracking": {},
+  "configuration": {
+    "host": "host.docker.internal",
+    "port": 2225,
+    "username": "openfn",
+    "password": "instant101",
+    "remoteDir": "/data/excel-files"
+  }
+}

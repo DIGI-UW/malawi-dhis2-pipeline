@@ -4,7 +4,8 @@
  * Uses configuration-based metadata mappings
  */
 
-import { fn } from '@openfn/language-common';
+// OpenFN functions are available directly, no imports needed
+// The runtime provides: fn from @openfn/language-common
 
 function generatePayload(processedFiles, metadata, timeWindow = 3) {
   console.log('Generating DHIS2 payload from processed Excel files...');

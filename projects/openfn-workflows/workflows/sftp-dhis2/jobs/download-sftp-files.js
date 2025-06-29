@@ -3,8 +3,9 @@
  * This job is triggered either after check-sftp-files or directly by webhook
  */
 
-import { get } from '@openfn/language-sftp';
-import { fn } from '@openfn/language-common';
+// OpenFN functions are available directly, no imports needed
+// The runtime provides: get from @openfn/language-sftp
+// and fn from @openfn/language-common
 
 // Configuration
 const LOCAL_DOWNLOAD_PATH = '/tmp/openfn-downloads/';

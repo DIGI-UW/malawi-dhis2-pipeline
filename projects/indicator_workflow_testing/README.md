@@ -2,6 +2,14 @@
 
 This directory contains a comprehensive automated testing suite for the OpenFN DHIS2 pipeline workflows.
 
+## 🚀 **Working SFTP Syntax**
+
+
+- **✅ Use**: `@openfn/language-sftp@2.0.14-custom` (fixed version)
+- **✅ Use**: Simple direct syntax: `list('/path', callback)`  
+- **✅ Use**: `-s` flag for state in CLI 
+- **❌ Avoid**: Complex nested functions (causes "TypeError: fn is not a function")
+
 ## Structure
 
 ```
@@ -17,7 +25,9 @@ projects/indicator_workflow_testing/
 │   ├── integration-tests.js          # End-to-end integration validation  
 │   ├── sftp-integration-tests.sh     # SFTP workflow integration tests
 │   ├── deploy-and-test-sftp-integration.sh # Comprehensive deployment testing
-│   └── test-sftp.sh                  # Basic SFTP connectivity tests
+│   ├── test-sftp.sh                  # Basic SFTP connectivity tests
+│   ├── openfn-cli-workflow-tests.sh  # CLI-based SFTP-to-DHIS2 workflow tests
+│   └── cli-sftp-custom-adaptor-test.sh # Custom SFTP adaptor with module fix
 ├── utils/
 │   ├── common.sh                     # Common test utilities and functions
 │   ├── analyze-excel-files.js        # Excel file structure analysis
@@ -47,6 +57,8 @@ Ensure the following services are running:
    ./projects/indicator_workflow_testing/run-tests.sh --api          # API tests only
    ./projects/indicator_workflow_testing/run-tests.sh --excel        # Excel parsing tests only
    ./projects/indicator_workflow_testing/run-tests.sh --sftp         # SFTP tests only
+   ./projects/indicator_workflow_testing/run-tests.sh --cli-workflow # CLI workflow tests only
+   ./projects/indicator_workflow_testing/run-tests.sh --custom-sftp  # Custom SFTP adaptor test
    ./projects/indicator_workflow_testing/run-tests.sh --integration  # Integration tests only
    ```
 
@@ -80,8 +92,21 @@ Ensure the following services are running:
 - **Basic SFTP (`tests/test-sftp.sh`)**: Connection and file operations
 - **Integration (`tests/sftp-integration-tests.sh`)**: Workflow integration
 - **Deployment (`tests/deploy-and-test-sftp-integration.sh`)**: Full deployment testing
+- **Custom Adaptor (`tests/cli-sftp-custom-adaptor-test.sh`)**: Tests fixed SFTP adaptor v2.0.14-custom
 
-### 4. Integration Tests (`tests/integration-tests.js`)
+### 4. CLI Workflow Tests (`tests/openfn-cli-workflow-tests.sh`)
+- **Custom CLI Container**: Uses enhanced SFTP adaptor with debugging
+- **Step-by-Step Execution**: Tests each workflow step with caching
+- **Full Pipeline**: SFTP → Excel Processing → DHIS2 Payload Generation
+- **Debug Outputs**: Saves all intermediate states for troubleshooting
+
+### 5. Custom SFTP Adaptor Test (`tests/cli-sftp-custom-adaptor-test.sh`)
+- **Fixed Module Loading**: Tests the custom-built SFTP adaptor v2.0.14-custom
+- **Project Structure**: Uses proper OpenFN CLI project structure
+- **Module Resolution**: Verifies the fix for broken pnpm symlinks
+- **Connection Testing**: Validates SFTP connection with enhanced debugging
+
+### 6. Integration Tests (`tests/integration-tests.js`)
 - End-to-end workflow validation
 - File structure analysis
 - Data transformation validation
@@ -203,3 +228,8 @@ This testing framework is integrated with the main project documentation:
 ## License
 
 Part of the Malawi DHIS2 HIV/TB Indicators Pipeline project. 
+
+## Recent Fixes
+
+### SFTP Adaptor Module Loading Issue
+The npm version of `@openfn/language-sftp@2.0.14` has broken pnpm symlinks causing "Invalid username" errors. We've created a custom Docker image (`openfn-cli-test:latest`) that builds the adaptor from source. See [SFTP Custom Adaptor Integration Guide](../SFTP-CUSTOM-ADAPTOR-INTEGRATION.md) for details. 

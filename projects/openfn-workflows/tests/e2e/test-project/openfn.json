@@ -1,0 +1,7 @@
+{
+  "workflowRoot": "workflows",
+  "formats": {
+    "workflow": "json",
+    "project": "json"
+  }
+} 

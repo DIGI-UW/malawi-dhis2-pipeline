@@ -7,13 +7,13 @@ workflows:
     jobs:
       CheckSFTPFiles:
         name: Check SFTP for New or Updated Files
-        adaptor: '@openfn/language-sftp@1.0.0'
+        adaptor: '@openfn/language-sftp@2.0.14-custom'
         credential: null
         body:
           path: ./jobs/check-sftp-files.js
       DownloadSFTPFiles:
         name: Download New SFTP Files
-        adaptor: '@openfn/language-sftp@1.0.0'
+        adaptor: '@openfn/language-sftp@2.0.14-custom'
         credential: null
         body:
           path: ./jobs/download-sftp-files.js

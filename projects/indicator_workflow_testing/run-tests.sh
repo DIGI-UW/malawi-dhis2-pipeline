@@ -15,6 +15,7 @@ RUN_API_TESTS=true
 RUN_EXCEL_TESTS=true
 RUN_SFTP_TESTS=true
 RUN_INTEGRATION_TESTS=true
+RUN_CLI_WORKFLOW_TESTS=true
 SPECIFIC_TEST=""
 
 # Parse command line arguments
@@ -25,6 +26,7 @@ while [[ $# -gt 0 ]]; do
             RUN_EXCEL_TESTS=false
             RUN_SFTP_TESTS=false
             RUN_INTEGRATION_TESTS=false
+            RUN_CLI_WORKFLOW_TESTS=false
             SPECIFIC_TEST="api"
             shift
             ;;
@@ -33,6 +35,7 @@ while [[ $# -gt 0 ]]; do
             RUN_EXCEL_TESTS=true
             RUN_SFTP_TESTS=false
             RUN_INTEGRATION_TESTS=false
+            RUN_CLI_WORKFLOW_TESTS=false
             SPECIFIC_TEST="excel"
             shift
             ;;
@@ -41,6 +44,7 @@ while [[ $# -gt 0 ]]; do
             RUN_EXCEL_TESTS=false
             RUN_SFTP_TESTS=true
             RUN_INTEGRATION_TESTS=false
+            RUN_CLI_WORKFLOW_TESTS=false
             SPECIFIC_TEST="sftp"
             shift
             ;;
@@ -49,6 +53,7 @@ while [[ $# -gt 0 ]]; do
             RUN_EXCEL_TESTS=false
             RUN_SFTP_TESTS=false
             RUN_INTEGRATION_TESTS=false
+            RUN_CLI_WORKFLOW_TESTS=false
             SPECIFIC_TEST="workflows"
             shift
             ;;
@@ -57,7 +62,17 @@ while [[ $# -gt 0 ]]; do
             RUN_EXCEL_TESTS=false
             RUN_SFTP_TESTS=false
             RUN_INTEGRATION_TESTS=true
+            RUN_CLI_WORKFLOW_TESTS=false
             SPECIFIC_TEST="integration"
+            shift
+            ;;
+        --cli-workflow)
+            RUN_API_TESTS=false
+            RUN_EXCEL_TESTS=false
+            RUN_SFTP_TESTS=false
+            RUN_INTEGRATION_TESTS=false
+            RUN_CLI_WORKFLOW_TESTS=true
+            SPECIFIC_TEST="cli-workflow"
             shift
             ;;
         --verbose|-v)
@@ -76,6 +91,7 @@ while [[ $# -gt 0 ]]; do
             echo "  --excel        Run only Excel parsing tests"
             echo "  --sftp         Run only SFTP integration tests"
             echo "  --integration  Run only end-to-end integration tests"
+            echo "  --cli-workflow Run only CLI-based workflow tests"
             echo "  --verbose, -v  Enable verbose output"
             echo "  --help, -h     Show this help message"
             echo ""
@@ -242,6 +258,10 @@ main() {
     
     if [[ "$RUN_INTEGRATION_TESTS" == "true" ]]; then
         run_js_test "Integration" "$SCRIPT_DIR/tests/integration-tests.js" "End-to-end integration validation"
+    fi
+    
+    if [[ "$RUN_CLI_WORKFLOW_TESTS" == "true" ]]; then
+        run_test_suite "CLI Workflow" "$SCRIPT_DIR/tests/openfn-cli-workflow-tests.sh" "CLI-based SFTP-to-DHIS2 workflow tests"
     fi
     
     # Generate summary

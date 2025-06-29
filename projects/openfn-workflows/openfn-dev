@@ -1,0 +1,31 @@
+#!/bin/bash
+# OpenFN CLI Development Environment Helper
+# Uses custom SFTP adaptor that actually works!
+
+# Detect host IP for container-to-host communication
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    HOST_IP=$(ip addr show docker0 | grep -Po 'inet \K[\d.]+' || echo "172.17.0.1")
+elif [[ "$OSTYPE" == "darwin"* ]]; then
+    HOST_IP="host.docker.internal"
+else
+    HOST_IP="host.docker.internal"
+fi
+
+echo "🚀 OpenFN CLI Development Environment"
+echo "   Using custom SFTP adaptor (fixes 'Invalid username' error)"
+echo "   Host IP: $HOST_IP"
+echo ""
+
+# Update test configurations with correct host IP
+if [ -f "tests/e2e/sftp-check-input.json" ]; then
+    sed -i.bak "s/\"host\": \"[^\"]*\"/\"host\": \"$HOST_IP\"/" tests/e2e/sftp-check-input.json
+    echo "✅ Updated test configuration with host IP: $HOST_IP"
+fi
+
+# Run the CLI container with all the necessary mounts and settings
+docker run --rm -it \
+    -v "$(pwd):/workspace" \
+    -w /workspace \
+    -e HOST_IP="$HOST_IP" \
+    openfn-cli-test:latest \
+    "$@" 

@@ -14,8 +14,8 @@ This guide documents the configuration-driven SFTP to DHIS2 data pipeline that s
 │ • CSV Files      │     │ • Config Loader  │     │ • Validation     │
 │ • Auto-discovery │     │ • Transformers   │     │ • Storage        │
 └──────────────────┘     └──────────────────┘     └──────────────────┘
-                                │
-                                ▼
+                                                                            │
+                                                                            ▼
                          ┌──────────────────┐
                          │  Configuration   │
                          ├──────────────────┤

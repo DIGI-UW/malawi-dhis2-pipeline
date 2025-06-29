@@ -1,0 +1,39 @@
+{
+  "data": [
+    {
+      "name": "DHIS2_HIV_ART_data_long_format_Q1FY25.xlsx",
+      "type": "file",
+      "size": 45678,
+      "modifiedTime": "2024-12-15T10:30:00Z",
+      "path": "/uploads/hiv-indicators/DHIS2_HIV_ART_data_long_format_Q1FY25.xlsx"
+    },
+    {
+      "name": "MOH_Direct_Queries_December_2024.xlsx", 
+      "type": "file",
+      "size": 123456,
+      "modifiedTime": "2024-12-20T14:15:00Z",
+      "path": "/uploads/hiv-indicators/MOH_Direct_Queries_December_2024.xlsx"
+    },
+    {
+      "name": "DQ_sites_Q1_FY25_data_quality.xlsx",
+      "type": "file", 
+      "size": 67890,
+      "modifiedTime": "2024-12-18T09:45:00Z",
+      "path": "/uploads/hiv-indicators/DQ_sites_Q1_FY25_data_quality.xlsx"
+    }
+  ],
+  "fileTracking": {
+    "DHIS2_HIV_ART_data_long_format_Q4FY24.xlsx": {
+      "name": "DHIS2_HIV_ART_data_long_format_Q4FY24.xlsx",
+      "size": 43210,
+      "modifiedTime": "2024-09-15T10:30:00Z",
+      "lastProcessed": "2024-09-16T08:00:00Z"
+    }
+  },
+  "configuration": {
+    "hostUrl": "localhost",
+    "port": 2225,
+    "username": "malawi_user",
+    "password": "malawi_password"
+  }
+} 

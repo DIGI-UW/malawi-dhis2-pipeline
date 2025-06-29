@@ -1,0 +1,39 @@
+FROM node:18-alpine
+
+# Install OpenFN CLI and common tools
+RUN npm install -g @openfn/cli@latest
+
+# Install common adaptors for testing
+RUN npm install -g \
+    @openfn/language-common@latest \
+    @openfn/language-sftp@latest \
+    @openfn/language-dhis2@latest
+
+# Install testing utilities
+RUN npm install -g \
+    jest \
+    nodemon
+
+# Set working directory
+WORKDIR /app
+
+# Copy package.json if it exists, otherwise create a basic one
+COPY package.json* ./
+RUN if [ ! -f package.json ]; then \
+    echo '{"name":"openfn-workflows-test","version":"1.0.0","scripts":{"test":"jest","test:watch":"jest --watch","dev":"nodemon"}}' > package.json; \
+    fi
+
+# Install local dependencies
+RUN npm install || true
+
+# Copy workflows and tests
+COPY . .
+
+# Create test directories
+RUN mkdir -p tests/fixtures tests/outputs
+
+# Set executable permissions for scripts
+RUN chmod +x scripts/*.sh 2>/dev/null || true
+
+# Default command
+CMD ["openfn", "--help"] 

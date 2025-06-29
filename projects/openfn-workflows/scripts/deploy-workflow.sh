@@ -87,7 +87,7 @@ validate_environment() {
     
     if [[ -z "$OPENFN_API_KEY" ]]; then
         error "OPENFN_API_KEY is required"
-        exit 1
+                exit 1
     fi
     
     if [[ ! -d "$WORKFLOW_PATH" ]]; then

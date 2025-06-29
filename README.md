@@ -42,7 +42,7 @@ This project implements a flexible, configuration-driven pipeline for importing 
 
 ### Deployment Steps
 
-```bash
+    ```bash
 # 1. Clone and setup
 git clone <repository>
 cd malawi-dhis2-pipeline
@@ -71,7 +71,7 @@ The system provides comprehensive workflow management with bidirectional sync be
 #### Workflow Sync System
 
 **Quick Start:**
-```bash
+    ```bash
 # Check sync status
 ./packages/openfn/instant-workflow-sync.sh status
 
@@ -93,7 +93,7 @@ The system provides comprehensive workflow management with bidirectional sync be
 - **Watch Mode**: Auto-sync on file changes
 
 **Configuration** (in `.env`):
-```bash
+        ```bash
 OPENFN_SYNC_MODE=manual              # manual|auto-download|auto-upload
 OPENFN_CONFLICT_RESOLUTION=prompt    # prompt|local-wins|remote-wins
 OPENFN_ENABLE_AUTO_SNAPSHOT=true     # Auto-create snapshots
@@ -113,7 +113,7 @@ See [Workflow Sync Documentation](docs/openfn-workflow-sync.md) for full details
    - Uses OpenFN CLI to deploy via provisioning API
 
 3. **Verify Deployment**: 
-   ```bash
+    ```bash
    # Test workflow loading
    cd projects/indicator_workflow_testing
    ./run-tests.sh --workflows

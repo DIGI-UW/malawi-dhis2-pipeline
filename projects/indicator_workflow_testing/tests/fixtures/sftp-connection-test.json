@@ -1,0 +1,20 @@
+{
+  "workflow": {
+    "steps": [
+      {
+        "id": "sftp-test",
+        "adaptor": "@openfn/language-sftp@2.0.14",
+        "expression": "import { list } from '@openfn/language-sftp'; list('/', (state) => { console.log('✅ SFTP Connection successful!'); console.log(`Found ${state.data.length} items`); state.data.forEach(item => console.log(`- ${item.type}: ${item.name}`)); return { ...state, testResult: 'success', itemCount: state.data.length }; });"
+      }
+    ]
+  },
+  "state": {
+    "data": {},
+    "configuration": {
+      "host": "localhost",
+      "port": 2225,
+      "username": "openfn", 
+      "password": "instant101"
+    }
+  }
+} 

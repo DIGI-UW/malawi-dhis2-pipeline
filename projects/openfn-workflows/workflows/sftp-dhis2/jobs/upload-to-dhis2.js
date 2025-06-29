@@ -4,7 +4,8 @@
  * Supports both single dataValueSet and multiple dataValueSets formats
  */
 
-import { create, fn, each } from '@openfn/language-dhis2';
+// OpenFN functions are available directly, no imports needed
+// The runtime provides: create, fn, each from @openfn/language-dhis2
 
 fn(state => {
   console.log('Starting DHIS2 upload for SFTP-processed data...');
@@ -54,23 +55,23 @@ each("payload.dataValueSets", (state) => {
   }
   
   return create("dataValueSets", (state) => {
-    // Add metadata for better tracking
-    const enhancedPayload = {
+  // Add metadata for better tracking
+  const enhancedPayload = {
       ...dataValueSet,
       completeDate: dataValueSet.completeDate || new Date().toISOString(),
-      attribution: {
-        source: "SFTP Excel via OpenFn",
-        workflow: "HIV-Indicators-SFTP-to-DHIS2-Workflow",
-        timestamp: new Date().toISOString(),
+    attribution: {
+      source: "SFTP Excel via OpenFn",
+      workflow: "HIV-Indicators-SFTP-to-DHIS2-Workflow",
+      timestamp: new Date().toISOString(),
         setIndex: index,
         totalSets: state.payload.dataValueSets.length,
         processedFiles: state.payload.metadata?.processedFiles || []
-      }
-    };
-    
+    }
+  };
+  
     console.log('Sending enhanced payload to DHIS2...');
-    
-    return enhancedPayload;
+  
+  return enhancedPayload;
   })(state);
 });
 
@@ -116,19 +117,19 @@ fn(state => {
   
   // Calculate total values processed
   totalSummary.totalValues = totalSummary.imported + totalSummary.updated + totalSummary.ignored;
-  
+    
   console.log('\nAggregated Upload Summary:', totalSummary);
-  
+    
   if (totalSummary.conflicts.length > 0) {
     console.warn(`Total conflicts: ${totalSummary.conflicts.length}`);
     console.warn('First 5 conflicts:', totalSummary.conflicts.slice(0, 5));
-  }
-  
+    }
+    
   if (totalSummary.errors.length > 0) {
     console.error(`Total errors: ${totalSummary.errors.length}`);
     totalSummary.errors.forEach(err => {
       console.error(`Set ${err.setIndex + 1} error: ${err.error}`);
-    });
+      });
   }
   
   // Store upload results in state for the next job

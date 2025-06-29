@@ -134,15 +134,15 @@ test_project_workflows() {
             
             if [[ "$workflow_count" -gt 0 ]]; then
                 log_success "Found $workflow_count workflow(s) in project: $project_name"
-                
-                # Check for SFTP-DHIS2 workflow specifically
+        
+        # Check for SFTP-DHIS2 workflow specifically
                 local sftp_workflow=$(echo "$response" | jq -r '.data[0].workflows[] | select(.name | test("sftp|SFTP|dhis2|DHIS2")) | .name' 2>/dev/null || true)
                 if [[ -n "$sftp_workflow" ]]; then
                     log_success "SFTP-DHIS2 related workflow found: $sftp_workflow"
-                else
+        else
                     log_warning "SFTP-DHIS2 workflow not found by name pattern"
-                fi
-                
+        fi
+        
                 # Show workflow details
                 log_info "Workflow details:"
                 echo "$response" | jq -r '.data[0].workflows[] | "  - Name: \(.name), ID: \(.id), Jobs: \(.jobs | length), Triggers: \(.triggers | length)"' 2>/dev/null || true
@@ -206,7 +206,7 @@ test_workflow_triggers() {
             # Fallback without jq
             if echo "$response" | grep -q "triggers"; then
                 log_success "Triggers found in workflows (jq not available for detailed parsing)"
-                return 0
+        return 0
             else
                 log_error "No triggers found in workflows"
                 return 1
