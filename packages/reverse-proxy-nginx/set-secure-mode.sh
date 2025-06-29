@@ -21,7 +21,16 @@ declare DOMAIN_ARGS=()
 
 function init_vars() {
     if [[ -n "$SUBDOMAINS" ]]; then
-        DOMAIN_ARGS=(-d "${DOMAIN_NAME},${SUBDOMAINS}")
+        # Split SUBDOMAINS by comma and create individual -d arguments for each
+        IFS=',' read -ra SUBDOMAIN_ARRAY <<< "$SUBDOMAINS"
+        DOMAIN_ARGS=(-d "${DOMAIN_NAME}")
+        for subdomain in "${SUBDOMAIN_ARRAY[@]}"; do
+            # Trim whitespace and add -d argument
+            subdomain=$(echo "$subdomain" | xargs)
+            if [[ -n "$subdomain" ]]; then
+                DOMAIN_ARGS+=(-d "$subdomain")
+            fi
+        done
     else
         DOMAIN_ARGS=(-d "${DOMAIN_NAME}")
     fi
