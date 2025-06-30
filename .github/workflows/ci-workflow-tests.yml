@@ -1,0 +1,193 @@
+name: CI - Workflow Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'projects/openfn-workflows/**'
+      - 'projects/indicator_workflow_testing/**'
+      - '.github/workflows/ci-workflow-tests.yml'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'projects/openfn-workflows/**'
+      - 'projects/indicator_workflow_testing/**'
+      - '.github/workflows/ci-workflow-tests.yml'
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["CI - Environment Setup"]
+    types:
+      - completed
+
+env:
+  # Docker settings
+  DOCKER_BUILDKIT: 1
+  COMPOSE_DOCKER_CLI_BUILD: 1
+  
+  # Test settings
+  VERBOSE: false
+  NODE_VERSION: 18
+
+jobs:
+  cli-workflow-tests:
+    name: CLI Workflow Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    
+    # Only run if manually triggered or if environment setup succeeded
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      github.event_name == 'push' ||
+      github.event_name == 'pull_request' ||
+      (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          
+      - name: Setup environment variables
+        run: |
+          cp .env.example .env
+          
+          # CI-specific settings
+          echo "INSECURE=true" >> .env
+          echo "MODE=dev" >> .env
+          echo "CLUSTERED_MODE=false" >> .env
+          echo "VERBOSE=true" >> .env
+          
+          # Service endpoints for CLI tests
+          echo "SFTP_HOST=172.17.0.1" >> .env
+          echo "DHIS2_HOST=127.0.0.1" >> .env
+          echo "OPENFN_HOST=127.0.0.1" >> .env
+          
+      - name: Install test dependencies
+        run: |
+          cd projects/indicator_workflow_testing
+          npm install xlsx csv-parser
+          
+      - name: Quick environment setup
+        run: |
+          # Initialize Docker Swarm
+          docker swarm init || true
+          
+          # Create required networks
+          docker network create openfn_public --driver overlay --attachable || true
+          docker network create postgres_public --driver overlay --attachable || true
+          docker network create dhis2_public --driver overlay --attachable || true
+          
+          # Download instant CLI if not present
+          if [ ! -f ./instant ]; then
+            ./get-cli.sh linux
+            chmod +x ./instant
+          fi
+          
+      - name: Build CLI test image
+        run: |
+          # Build only the CLI test image needed for workflow tests
+          ./build-custom-images.sh openfn-cli-test
+          
+          # Verify image was built
+          docker images | grep openfn-cli-test
+          
+      - name: Deploy minimal test environment
+        run: |
+          # Deploy PostgreSQL (required by services)
+          ./instant package init -n database-postgres --env-file=.env -d
+          timeout 60s bash -c 'until docker service ls | grep -q "postgres_postgres-1.*1/1"; do sleep 5; done'
+          
+          # Deploy SFTP with test data
+          ./instant package init -n sftp-storage --env-file=.env -d
+          timeout 60s bash -c 'until docker service ls | grep -q "sftp-storage_sftp-server.*1/1"; do sleep 5; done'
+          
+          # Deploy DHIS2 (minimal for API tests)
+          ./instant package init -n dhis2-instance --env-file=.env -d
+          
+          # Give services time to fully initialize
+          echo "Waiting for services to be fully ready..."
+          sleep 30
+          
+      - name: Verify test files exist
+        run: |
+          echo "=== Checking test framework ==="
+          ls -la projects/indicator_workflow_testing/
+          ls -la projects/indicator_workflow_testing/tests/cli/
+          
+          echo -e "\n=== Checking workflow files ==="
+          ls -la projects/openfn-workflows/workflows/
+          ls -la projects/openfn-workflows/workflows/sftp-dhis2/jobs/ || true
+          
+      - name: Run CLI workflow tests
+        run: |
+          cd projects/indicator_workflow_testing
+          
+          echo "=== Running CLI-based workflow tests ==="
+          ./run-tests.sh --cli-workflow --verbose
+          
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cli-test-results-${{ github.run_id }}
+          path: |
+            projects/indicator_workflow_testing/test-results.log
+            projects/indicator_workflow_testing/tests/cli/outputs/
+            projects/indicator_workflow_testing/tests/outputs/
+          retention-days: 7
+          
+      - name: Check SFTP files (debug)
+        if: always()
+        run: |
+          echo "=== SFTP File Check ==="
+          docker run --rm --network host alpine/curl:latest sh -c "
+            apk add --no-cache openssh-client sshpass >/dev/null 2>&1 && \
+            sshpass -p 'instant101' sftp -o StrictHostKeyChecking=no \
+            -o UserKnownHostsFile=/dev/null -P 2225 openfn@localhost <<< 'ls data/excel-files/'" || \
+          echo "Could not list SFTP files"
+          
+      - name: Service status check
+        if: always()
+        run: |
+          echo "=== Service Status ==="
+          docker service ls
+          
+          echo -e "\n=== Container Status ==="
+          docker ps -a
+          
+      - name: Collect logs on failure
+        if: failure()
+        run: |
+          echo "=== SFTP Logs ==="
+          docker service logs sftp-storage_sftp-server --tail 100 || true
+          
+          echo -e "\n=== Test Container Logs ==="
+          docker logs $(docker ps -aq -f ancestor=openfn-cli-test:latest | head -1) 2>&1 || true
+          
+          echo -e "\n=== Test Output Files ==="
+          find projects/indicator_workflow_testing/tests -name "*.json" -o -name "*.log" | \
+            head -20 | xargs -I {} sh -c 'echo "=== {} ==="; head -50 "{}"'
+          
+  integration-test-summary:
+    name: Test Summary
+    runs-on: ubuntu-latest
+    needs: [cli-workflow-tests]
+    if: always()
+    
+    steps:
+      - name: Check test results
+        run: |
+          if [ "${{ needs.cli-workflow-tests.result }}" == "success" ]; then
+            echo "✅ All CLI workflow tests passed!"
+            exit 0
+          else
+            echo "❌ CLI workflow tests failed or were skipped"
+            echo "Result: ${{ needs.cli-workflow-tests.result }}"
+            exit 1
+          fi 

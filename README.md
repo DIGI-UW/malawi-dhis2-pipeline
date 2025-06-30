@@ -2,32 +2,48 @@
 
 ## Overview
 
-This project implements a flexible, configuration-driven pipeline for importing HIV/TB health indicators from various Excel/CSV formats into DHIS2. Built on OpenFN and Instant OpenHIE v2, it supports multiple data sources SFTP-based file uploads.
+This project implements a flexible, configuration-driven pipeline for importing HIV/TB health indicators from various Excel/CSV formats into DHIS2. Built on OpenFN and Instant OpenHIE v2, it supports multiple data sources and SFTP-based file uploads.
 
 ### Key Features
 
 - **Multi-Format Support**: Processes CSV/XLSX files with configuration-based column mapping
-- **Automated Processing**: Scheduled and event-driven initialization
+- **Flexible Data Sources**: Google Sheets API and SFTP file monitoring
+- **Automated Processing**: Scheduled (cron) and event-driven (webhook) workflows
 - **Data Validation**: Built-in validation rules and transformation capabilities
 - **Time-Based Protection**: Configurable update windows to prevent accidental overwrites
-- **Docker Swarm Deployment**: Production-ready containerized deployment
+- **Docker Swarm Deployment**: Production-ready containerized architecture
 
-## Architecture
+## CI/CD
 
+The project includes automated CI testing via GitHub Actions:
+
+- **Environment Setup CI**: Tests the complete instant OpenHIE deployment
+- **Workflow Tests CI**: Validates OpenFN workflows using CLI testing framework
+
+View [CI Documentation](.github/workflows/README.md) for details.
+
+### Running CI Tests Locally
+
+Uses [act](https://github.com/nektos/act) to run GitHub Actions locally:
+
+```bash
+# Install act first (see docs/environment-setup.md)
+./scripts/run-ci-locally.sh              # Run all CI workflows
+./scripts/run-ci-locally.sh --env-setup  # Environment setup only
+./scripts/run-ci-locally.sh --workflow-tests  # Workflow tests only
+./scripts/run-ci-locally.sh --list       # List available workflows
 ```
-┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
-│   Data Sources  │     │   OpenFN        │     │   DHIS2         │
-├─────────────────┤     ├─────────────────┤     ├─────────────────┤
-│ • Excel/CSV     │     │ • Transformers  │     │ • Validation    │
-│                 │     │ • Validators    │     │ • Storage       │
-└─────────────────┘     └─────────────────┘     └─────────────────┘
-                               │
-                               ▼
-                        ┌─────────────────┐
-                        │   PostgreSQL    │
-                        │ • State Mgmt    │
-                        │ • Audit Trail   │
-                        └─────────────────┘
+
+### Pre-push Hook (Optional)
+
+To run basic checks before pushing:
+
+```bash
+# Enable the pre-push hook
+git config core.hooksPath .githooks
+
+# To disable it later
+git config --unset core.hooksPath
 ```
 
 ## Quick Start

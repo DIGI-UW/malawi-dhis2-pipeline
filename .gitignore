@@ -3,6 +3,9 @@
 node_modules
 output.json
 
+# Act configuration (local)
+.actrc
+
 # Data directories - prevent committing sensitive data
 data/
 */data/

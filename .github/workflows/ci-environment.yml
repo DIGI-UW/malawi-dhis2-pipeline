@@ -1,0 +1,209 @@
+name: CI - Environment Setup
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'packages/**'
+      - 'projects/**'
+      - 'build-*.sh'
+      - 'get-cli.sh'
+      - 'mk.sh'
+      - '.env.example'
+      - '.github/workflows/ci-environment.yml'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'packages/**'
+      - 'projects/**'
+      - 'build-*.sh'
+      - 'get-cli.sh'
+      - 'mk.sh'
+      - '.env.example'
+      - '.github/workflows/ci-environment.yml'
+  workflow_dispatch:
+
+env:
+  # Docker settings
+  DOCKER_BUILDKIT: 1
+  COMPOSE_DOCKER_CLI_BUILD: 1
+  
+  # instant CLI settings
+  INSTANT_VERSION: v2
+  
+  # Service versions
+  OPENFN_VERSION: v2.13.3
+  DHIS2_VERSION: 2.40.2.1
+  POSTGRES_VERSION: 15-alpine
+  
+  # Dev mode settings
+  MODE: dev
+  CLUSTERED_MODE: false
+
+jobs:
+  environment-setup:
+    name: Environment Setup and Health Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        
+      - name: Setup environment variables
+        run: |
+          cp .env.example .env
+          
+          # Override for CI environment
+          echo "INSECURE=true" >> .env
+          echo "MODE=dev" >> .env
+          echo "CLUSTERED_MODE=false" >> .env
+          echo "OPENFN_LOAD_WORKFLOWS_ON_STARTUP=true" >> .env
+          echo "OPENFN_WORKFLOW_MANUAL_CLI=false" >> .env
+          
+          # Expose ports for dev mode
+          echo "OPENFN_PORT=4000" >> .env
+          echo "DHIS2_PORT=8080" >> .env
+          echo "SFTP_PORT=2225" >> .env
+          echo "POSTGRES_PORT=5432" >> .env
+          
+          # Set CI-specific credentials
+          echo "OPENFN_ADMIN_USER=root@openhim.org" >> .env
+          echo "OPENFN_ADMIN_PASSWORD=instant101" >> .env
+          echo "DHIS2_ADMIN_PASSWORD=district" >> .env
+          
+      - name: Download instant CLI
+        run: |
+          ./get-cli.sh linux
+          chmod +x ./instant
+          ./instant --version
+          
+      - name: Initialize Docker Swarm
+        run: |
+          docker swarm init
+          docker network create openfn_public --driver overlay --attachable || true
+          docker network create postgres_public --driver overlay --attachable || true
+          docker network create dhis2_public --driver overlay --attachable || true
+          docker network create reverse-proxy_public --driver overlay --attachable || true
+          
+      - name: Build custom images
+        run: |
+          # Build all custom images
+          ./build-custom-images.sh all
+          
+          # Verify images were built
+          docker images | grep -E "(openfn-custom|openfn-cli-test|dhis2|sftp-with-data)"
+          
+      - name: Build platform image
+        run: |
+          ./build-image.sh
+          docker images | grep malawi-dhis2
+          
+      - name: Deploy PostgreSQL
+        run: |
+          ./instant package init -n database-postgres --env-file=.env -d
+          
+          # Wait for PostgreSQL to be ready
+          echo "Waiting for PostgreSQL..."
+          timeout 120s bash -c 'until docker service ls | grep -q "postgres_postgres-1.*1/1"; do sleep 5; done'
+          sleep 10
+          
+      - name: Deploy SFTP Storage
+        run: |
+          ./instant package init -n sftp-storage --env-file=.env -d
+          
+          # Wait for SFTP to be ready
+          echo "Waiting for SFTP server..."
+          timeout 60s bash -c 'until docker service ls | grep -q "sftp-storage_sftp-server.*1/1"; do sleep 5; done'
+          
+      - name: Deploy DHIS2
+        run: |
+          ./instant package init -n dhis2-instance --env-file=.env -d
+          
+          # Wait for DHIS2 to be ready (this takes longer)
+          echo "Waiting for DHIS2..."
+          timeout 300s bash -c 'until docker service ls | grep -q "dhis2-instance_dhis2.*1/1"; do sleep 10; done'
+          
+      - name: Deploy OpenFN
+        run: |
+          ./instant package init -n openfn --env-file=.env -d
+          
+          # Wait for OpenFN to be ready
+          echo "Waiting for OpenFN..."
+          timeout 120s bash -c 'until docker service ls | grep -q "openfn_openfn.*1/1"; do sleep 5; done'
+          timeout 120s bash -c 'until docker service ls | grep -q "openfn_worker.*1/1"; do sleep 5; done'
+          
+      - name: Service Health Checks
+        run: |
+          # Function to check service health
+          check_service() {
+            local name=$1
+            local url=$2
+            local expected=$3
+            local max_attempts=30
+            local attempt=0
+            
+            echo "Checking $name at $url..."
+            while [ $attempt -lt $max_attempts ]; do
+              if curl -s -f -m 10 "$url" | grep -q "$expected" 2>/dev/null || \
+                 curl -s -f -m 10 -o /dev/null "$url" 2>/dev/null; then
+                echo "✅ $name is healthy"
+                return 0
+              fi
+              attempt=$((attempt + 1))
+              echo "  Attempt $attempt/$max_attempts failed, retrying..."
+              sleep 5
+            done
+            
+            echo "❌ $name health check failed after $max_attempts attempts"
+            return 1
+          }
+          
+          # Check PostgreSQL
+          docker run --rm --network postgres_public postgres:15-alpine \
+            pg_isready -h postgres-1 -p 5432 -U postgres
+          
+          # Check SFTP
+          docker run --rm --network host alpine/curl:latest sh -c "
+            apk add --no-cache openssh-client >/dev/null 2>&1 && \
+            timeout 10 ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
+            -o ConnectTimeout=5 -p 2225 openfn@localhost exit 0 2>&1 | grep -q 'password' && \
+            echo '✅ SFTP is accepting connections'"
+          
+          # Check DHIS2
+          check_service "DHIS2" "http://localhost:8080/dhis-web-commons/security/login.action" "login"
+          
+          # Check OpenFN
+          check_service "OpenFN" "http://localhost:4000/health_check" "ok"
+          
+      - name: List running services
+        if: always()
+        run: |
+          echo "=== Docker Services ==="
+          docker service ls
+          
+          echo -e "\n=== Service Details ==="
+          docker service ps postgres_postgres-1 --no-trunc || true
+          docker service ps sftp-storage_sftp-server --no-trunc || true
+          docker service ps dhis2-instance_dhis2 --no-trunc || true
+          docker service ps openfn_openfn --no-trunc || true
+          docker service ps openfn_worker --no-trunc || true
+          
+      - name: Collect logs on failure
+        if: failure()
+        run: |
+          echo "=== PostgreSQL Logs ==="
+          docker service logs postgres_postgres-1 --tail 50 || true
+          
+          echo -e "\n=== SFTP Logs ==="
+          docker service logs sftp-storage_sftp-server --tail 50 || true
+          
+          echo -e "\n=== DHIS2 Logs ==="
+          docker service logs dhis2-instance_dhis2 --tail 50 || true
+          
+          echo -e "\n=== OpenFN Logs ==="
+          docker service logs openfn_openfn --tail 50 || true
+          docker service logs openfn_worker --tail 50 || true 

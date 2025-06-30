@@ -472,3 +472,62 @@ See the upcoming Production Deployment Guide for detailed instructions.
 - **OpenFN Documentation**: https://docs.openfn.org/
 - **DHIS2 Documentation**: https://docs.dhis2.org/
 - **Project Issues**: GitHub Issues page 
+
+## Future Development
+
+- **Production Deployment**: Using Docker Swarm with secrets management
+- **Monitoring**: Prometheus and Grafana integration
+- **Backup Strategy**: Automated database backups
+- **High Availability**: Multi-node cluster configuration
+
+## CI/CD Integration
+
+The project includes GitHub Actions workflows for automated testing:
+
+### 1. Environment Setup CI
+Tests the complete instant OpenHIE deployment:
+```yaml
+# Runs on infrastructure changes
+.github/workflows/ci-environment.yml
+```
+
+### 2. Workflow Tests CI
+Tests OpenFN workflows using the CLI framework:
+```yaml
+# Runs on workflow changes
+.github/workflows/ci-workflow-tests.yml
+```
+
+### Running CI Tests Locally
+
+To run the same tests that GitHub Actions runs:
+
+```bash
+# Install 'act' (required for running GitHub workflows locally)
+# macOS:
+brew install act
+
+# Linux:
+curl -s https://raw.githubusercontent.com/nektos/act/master/install.sh | sudo bash
+
+# Run all CI tests
+./scripts/run-ci-locally.sh
+
+# Only environment setup
+./scripts/run-ci-locally.sh --env-setup
+
+# Only workflow tests
+./scripts/run-ci-locally.sh --workflow-tests
+
+# List available workflows
+./scripts/run-ci-locally.sh --list
+```
+
+The script uses [act](https://github.com/nektos/act) to run the actual GitHub Actions workflows locally, ensuring consistency between local and CI environments.
+
+This is useful for:
+- Debugging CI failures locally
+- Pre-commit testing
+- Ensuring changes work before pushing
+
+For more details, see [CI Documentation](../.github/workflows/README.md). 
