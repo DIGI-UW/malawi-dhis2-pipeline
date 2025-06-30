@@ -137,6 +137,14 @@ jobs:
           docker network create dhis2_public --driver overlay --attachable || true
           docker network create reverse-proxy_public --driver overlay --attachable || true
           
+      - name: Setup test data for SFTP
+        run: |
+          # Copy test Excel files to SFTP data directory for CI builds
+          mkdir -p projects/sftp/data/excel-files
+          cp .github/test-data/excel-files/* projects/sftp/data/excel-files/
+          echo "✅ Test data copied to SFTP data directory"
+          ls -la projects/sftp/data/excel-files/
+          
       - name: Build custom images with cache
         run: |
           # Function to build with cache
@@ -255,14 +263,6 @@ jobs:
           echo "Waiting for PostgreSQL..."
           timeout 120s bash -c 'until docker service ls | grep -q "postgres_postgres-1.*1/1"; do sleep 5; done'
           sleep 10
-          
-      - name: Setup test data for SFTP
-        run: |
-          # Copy test Excel files to SFTP data directory for CI builds
-          mkdir -p projects/sftp/data/excel-files
-          cp .github/test-data/excel-files/* projects/sftp/data/excel-files/
-          echo "✅ Test data copied to SFTP data directory"
-          ls -la projects/sftp/data/excel-files/
           
       - name: Deploy SFTP Storage
         run: |
