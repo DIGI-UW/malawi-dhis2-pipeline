@@ -14,7 +14,7 @@
     "DOMAIN_NAME": "mwdhis2.info",
     "SUBDOMAINS": "openfn.mwdhis2.info,sftp.mwdhis2.info,dhis2.mwdhis2.info",
     "RENEWAL_EMAIL": "admin@mwdhis2.info",
-    "STAGING": "true",
+    "STAGING": "false",
     "INSECURE": "false",
     "INSECURE_PORTS": ""
   }

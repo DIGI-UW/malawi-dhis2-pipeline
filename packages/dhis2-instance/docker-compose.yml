@@ -74,3 +74,6 @@ networks:
   postgres:
     name: postgres_public
     external: true
+  reverse_proxy_public:
+    name: reverse-proxy_public
+    external: true
