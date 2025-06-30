@@ -4,9 +4,6 @@ services:
   # Proxies requests to internal services
   reverse-proxy-nginx:
     image: nginx:stable
-    ports:
-      - "80:80"
-      - "443:443"
     networks:
       public:
     deploy:
