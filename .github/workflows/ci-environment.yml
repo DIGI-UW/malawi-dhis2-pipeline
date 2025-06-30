@@ -28,6 +28,10 @@ env:
   DOCKER_BUILDKIT: 1
   COMPOSE_DOCKER_CLI_BUILD: 1
   
+  # Docker registry for caching
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+  
   # instant CLI settings
   INSTANT_VERSION: v2
   
@@ -46,12 +50,56 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     
+    permissions:
+      contents: read
+      packages: write
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
+        with:
+          driver-opts: |
+            image=moby/buildkit:master
+            network=host
+            
+      - name: Log in to Container Registry
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=sha,prefix={{branch}}-
+            
+      - name: Cache Docker layers
+        uses: actions/cache@v4
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+            
+      - name: Pre-pull base images
+        run: |
+          echo "Pre-pulling commonly used base images..."
+          docker pull postgres:15-alpine &
+          docker pull catthehacker/ubuntu:act-latest &
+          docker pull alpine:latest &
+          docker pull node:18-alpine &
+          wait
+          echo "Base images pre-pulled"
         
       - name: Setup environment variables
         run: |
@@ -89,18 +137,115 @@ jobs:
           docker network create dhis2_public --driver overlay --attachable || true
           docker network create reverse-proxy_public --driver overlay --attachable || true
           
-      - name: Build custom images
+      - name: Build custom images with cache
         run: |
-          # Build all custom images
-          ./build-custom-images.sh
+          # Function to build with cache
+          build_with_cache() {
+            local project_name="$1"
+            local package_name="$2"
+            
+            echo "🔨 Building $project_name with caching..."
+            
+            # Skip openfn-workflows as it's used for CLI testing only
+            if [[ "$project_name" == "openfn-workflows" ]]; then
+              echo "⏭️  Skipping openfn-workflows - used for CLI testing only"
+              return 0
+            fi
+            
+            # Special handling for openfn-cli-test
+            if [[ "$project_name" == "openfn-cli-test" ]]; then
+              cd projects
+              docker buildx build \
+                --cache-from type=local,src=/tmp/.buildx-cache \
+                --cache-to type=local,dest=/tmp/.buildx-cache-new,mode=max \
+                --load \
+                -f openfn-workflows/Dockerfile.cli \
+                --build-arg OPENFN_CLI_TEST_IMAGE=node:18-alpine \
+                -t openfn-cli-test \
+                .
+              cd ..
+              return 0
+            fi
+            
+            # Get project directory
+            if [[ ! -d "projects/$project_name" ]]; then
+              echo "❌ Project directory not found: projects/$project_name"
+              return 1
+            fi
+            
+            # Determine Dockerfile location
+            local dockerfile_arg=""
+            if [[ -f "projects/$project_name/Dockerfile" ]]; then
+              dockerfile_arg="-f projects/$project_name/Dockerfile"
+            elif [[ -f "projects/$project_name/docker/Dockerfile" ]]; then
+              dockerfile_arg="-f projects/$project_name/docker/Dockerfile"
+            else
+              echo "❌ No Dockerfile found for $project_name"
+              return 1
+            fi
+            
+            # Build based on project type
+            case "$project_name" in
+              "dhis2")
+                docker buildx build \
+                  --cache-from type=local,src=/tmp/.buildx-cache \
+                  --cache-to type=local,dest=/tmp/.buildx-cache-new,mode=max \
+                  --load \
+                  $dockerfile_arg \
+                  --build-arg DHIS2_BASE_IMAGE=dhis2/core:2.40.2.1 \
+                  -t dhis2-custom:latest \
+                  projects/dhis2
+                ;;
+              "sftp")
+                docker buildx build \
+                  --cache-from type=local,src=/tmp/.buildx-cache \
+                  --cache-to type=local,dest=/tmp/.buildx-cache-new,mode=max \
+                  --load \
+                  $dockerfile_arg \
+                  --build-arg SFTP_BASE_IMAGE=atmoz/sftp:latest \
+                  -t sftp-with-data:latest \
+                  projects/sftp
+                ;;
+              "openfn")
+                cd projects
+                docker buildx build \
+                  --cache-from type=local,src=/tmp/.buildx-cache \
+                  --cache-to type=local,dest=/tmp/.buildx-cache-new,mode=max \
+                  --load \
+                  -f openfn/Dockerfile \
+                  --build-arg OPENFN_BASE_IMAGE=openfn/lightning:v2.12.1 \
+                  -t openfn-custom:latest \
+                  .
+                cd ..
+                ;;
+            esac
+          }
+          
+          # Build each custom image with caching
+          build_with_cache "openfn" "openfn"
+          build_with_cache "dhis2" "dhis2-instance"
+          build_with_cache "sftp" "sftp-storage"
+          build_with_cache "openfn-cli-test" "openfn"
           
           # Verify images were built
           docker images | grep -E "(openfn-custom|openfn-cli-test|dhis2|sftp-with-data)"
           
-      - name: Build platform image
+      - name: Build platform image with cache
         run: |
-          ./build-image.sh
+          # Build platform image with caching
+          docker buildx build \
+            --cache-from type=local,src=/tmp/.buildx-cache \
+            --cache-to type=local,dest=/tmp/.buildx-cache-new,mode=max \
+            --load \
+            -t malawi-dhis2-indicators:latest \
+            .
+          
           docker images | grep malawi-dhis2
+          
+      - name: Move cache
+        run: |
+          rm -rf /tmp/.buildx-cache
+          mv /tmp/.buildx-cache-new /tmp/.buildx-cache || true
           
       - name: Deploy PostgreSQL
         run: |

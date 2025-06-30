@@ -167,13 +167,19 @@ if ! command -v jq &> /dev/null; then
 fi
 
 # Build custom images for each project
-if [[ $# -eq 0 ]]; then
-    # Build all projects if no arguments provided
+if [[ $# -eq 0 ]] || [[ "$1" == "all" ]]; then
+    # Build all projects if no arguments provided or "all" is specified
     echo "🔍 Scanning for projects to build..."
     
     for project_dir in "$PROJECT_ROOT/projects"/*; do
         if [[ -d "$project_dir" && ( -f "$project_dir/Dockerfile" || -f "$project_dir/docker/Dockerfile" ) ]]; then
             project_name=$(basename "$project_dir")
+            
+            # Skip openfn-workflows as it's used for CLI testing only, not as a deployable service
+            if [[ "$project_name" == "openfn-workflows" ]]; then
+                echo "⏭️  Skipping openfn-workflows - used for CLI testing only"
+                continue
+            fi
             
             # Map project name to package name for specific known projects,
             # otherwise, attempt to build with an empty package name.

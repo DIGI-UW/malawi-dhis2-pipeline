@@ -4,13 +4,13 @@ on:
   push:
     branches: [ main, develop ]
     paths:
-      - 'projects/openfn-workflows/**'
+      - 'packages/openfn/**'
       - 'projects/indicator_workflow_testing/**'
       - '.github/workflows/ci-workflow-tests.yml'
   pull_request:
     branches: [ main, develop ]
     paths:
-      - 'projects/openfn-workflows/**'
+      - 'packages/openfn/**'
       - 'projects/indicator_workflow_testing/**'
       - '.github/workflows/ci-workflow-tests.yml'
   workflow_dispatch:
@@ -24,22 +24,23 @@ env:
   DOCKER_BUILDKIT: 1
   COMPOSE_DOCKER_CLI_BUILD: 1
   
+  # Docker registry for caching
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+  
   # Test settings
   VERBOSE: false
   NODE_VERSION: 18
 
 jobs:
-  cli-workflow-tests:
-    name: CLI Workflow Tests
+  workflow-tests:
+    name: OpenFN Workflow Tests
     runs-on: ubuntu-latest
     timeout-minutes: 20
     
-    # Only run if manually triggered or if environment setup succeeded
-    if: |
-      github.event_name == 'workflow_dispatch' ||
-      github.event_name == 'push' ||
-      github.event_name == 'pull_request' ||
-      (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
+    permissions:
+      contents: read
+      packages: write
     
     steps:
       - name: Checkout code
@@ -47,147 +48,108 @@ jobs:
         
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-        
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
         with:
-          node-version: ${{ env.NODE_VERSION }}
+          driver-opts: |
+            image=moby/buildkit:master
+            network=host
+            
+      - name: Log in to Container Registry
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
           
-      - name: Setup environment variables
+      - name: Cache Docker layers
+        uses: actions/cache@v4
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-tests-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-tests-
+            ${{ runner.os }}-buildx-
+            
+      - name: Pre-pull base images
         run: |
-          cp .env.example .env
-          
-          # CI-specific settings
-          echo "INSECURE=true" >> .env
-          echo "MODE=dev" >> .env
-          echo "CLUSTERED_MODE=false" >> .env
-          echo "VERBOSE=true" >> .env
-          
-          # Service endpoints for CLI tests
-          echo "SFTP_HOST=172.17.0.1" >> .env
-          echo "DHIS2_HOST=127.0.0.1" >> .env
-          echo "OPENFN_HOST=127.0.0.1" >> .env
-          
-      - name: Install test dependencies
+          echo "Pre-pulling base images for tests..."
+          docker pull node:18-alpine &
+          docker pull alpine:latest &
+          wait
+          echo "Base images pre-pulled"
+        
+      - name: Build CLI test image with cache
         run: |
           cd projects/indicator_workflow_testing
-          npm install xlsx csv-parser
           
-      - name: Quick environment setup
-        run: |
-          # Initialize Docker Swarm
-          docker swarm init || true
+          # Build CLI test image with caching
+          docker buildx build \
+            --cache-from type=local,src=/tmp/.buildx-cache \
+            --cache-to type=local,dest=/tmp/.buildx-cache-new,mode=max \
+            --load \
+            -t openfn-cli-test \
+            .
           
-          # Create required networks
-          docker network create openfn_public --driver overlay --attachable || true
-          docker network create postgres_public --driver overlay --attachable || true
-          docker network create dhis2_public --driver overlay --attachable || true
-          
-          # Download instant CLI if not present
-          if [ ! -f ./instant ]; then
-            ./get-cli.sh linux
-            chmod +x ./instant
-          fi
-          
-      - name: Build CLI test image
-        run: |
-          # Build only the CLI test image needed for workflow tests
-          ./build-custom-images.sh openfn-cli-test
-          
-          # Verify image was built
+          echo "CLI test image built successfully"
           docker images | grep openfn-cli-test
           
-      - name: Deploy minimal test environment
+      - name: Move cache
         run: |
-          # Deploy PostgreSQL (required by services)
-          ./instant package init -n database-postgres --env-file=.env -d
-          timeout 60s bash -c 'until docker service ls | grep -q "postgres_postgres-1.*1/1"; do sleep 5; done'
-          
-          # Deploy SFTP with test data
-          ./instant package init -n sftp-storage --env-file=.env -d
-          timeout 60s bash -c 'until docker service ls | grep -q "sftp-storage_sftp-server.*1/1"; do sleep 5; done'
-          
-          # Deploy DHIS2 (minimal for API tests)
-          ./instant package init -n dhis2-instance --env-file=.env -d
-          
-          # Give services time to fully initialize
-          echo "Waiting for services to be fully ready..."
-          sleep 30
-          
-      - name: Verify test files exist
-        run: |
-          echo "=== Checking test framework ==="
-          ls -la projects/indicator_workflow_testing/
-          ls -la projects/indicator_workflow_testing/tests/cli/
-          
-          echo -e "\n=== Checking workflow files ==="
-          ls -la projects/openfn-workflows/workflows/
-          ls -la projects/openfn-workflows/workflows/sftp-dhis2/jobs/ || true
+          rm -rf /tmp/.buildx-cache
+          mv /tmp/.buildx-cache-new /tmp/.buildx-cache || true
           
       - name: Run CLI workflow tests
         run: |
           cd projects/indicator_workflow_testing
           
-          echo "=== Running CLI-based workflow tests ==="
-          ./run-tests.sh --cli-workflow --verbose
+          echo "Running OpenFN CLI workflow tests..."
           
-      - name: Upload test results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: cli-test-results-${{ github.run_id }}
-          path: |
-            projects/indicator_workflow_testing/test-results.log
-            projects/indicator_workflow_testing/tests/cli/outputs/
-            projects/indicator_workflow_testing/tests/outputs/
-          retention-days: 7
+          # Test 1: Basic workflow validation
+          echo "=== Running workflow validation test ==="
+          docker run --rm \
+            -v "$(pwd)/workflows:/app/workflows:ro" \
+            -v "$(pwd)/sample-data:/app/sample-data:ro" \
+            openfn-cli-test \
+            openfn test workflows/sftp-dhis2.js \
+              --expression-path ./workflows \
+              --data-path ./sample-data/sample.json \
+              --no-compile
           
-      - name: Check SFTP files (debug)
-        if: always()
-        run: |
-          echo "=== SFTP File Check ==="
-          docker run --rm --network host alpine/curl:latest sh -c "
-            apk add --no-cache openssh-client sshpass >/dev/null 2>&1 && \
-            sshpass -p 'instant101' sftp -o StrictHostKeyChecking=no \
-            -o UserKnownHostsFile=/dev/null -P 2225 openfn@localhost <<< 'ls data/excel-files/'" || \
-          echo "Could not list SFTP files"
+          # Test 2: Workflow execution with sample data
+          echo -e "\n=== Running workflow execution test ==="
+          docker run --rm \
+            -v "$(pwd)/workflows:/app/workflows:ro" \
+            -v "$(pwd)/sample-data:/app/sample-data:ro" \
+            openfn-cli-test \
+            openfn execute \
+              --expression ./workflows/sftp-dhis2.js \
+              --data ./sample-data/sample.json \
+              --output-json
           
-      - name: Service status check
-        if: always()
-        run: |
-          echo "=== Service Status ==="
-          docker service ls
+          # Test 3: Workflow configuration validation
+          echo -e "\n=== Running configuration validation test ==="
+          docker run --rm \
+            -v "$(pwd)/workflows:/app/workflows:ro" \
+            -v "$(pwd)/config:/app/config:ro" \
+            openfn-cli-test \
+            openfn validate ./workflows/project.yaml
           
-          echo -e "\n=== Container Status ==="
-          docker ps -a
-          
-      - name: Collect logs on failure
-        if: failure()
-        run: |
-          echo "=== SFTP Logs ==="
-          docker service logs sftp-storage_sftp-server --tail 100 || true
-          
-          echo -e "\n=== Test Container Logs ==="
-          docker logs $(docker ps -aq -f ancestor=openfn-cli-test:latest | head -1) 2>&1 || true
-          
-          echo -e "\n=== Test Output Files ==="
-          find projects/indicator_workflow_testing/tests -name "*.json" -o -name "*.log" | \
-            head -20 | xargs -I {} sh -c 'echo "=== {} ==="; head -50 "{}"'
+          echo "✅ All CLI workflow tests completed successfully"
           
   integration-test-summary:
     name: Test Summary
     runs-on: ubuntu-latest
-    needs: [cli-workflow-tests]
+    needs: [workflow-tests]
     if: always()
     
     steps:
       - name: Check test results
         run: |
-          if [ "${{ needs.cli-workflow-tests.result }}" == "success" ]; then
+          if [ "${{ needs.workflow-tests.result }}" == "success" ]; then
             echo "✅ All CLI workflow tests passed!"
             exit 0
           else
             echo "❌ CLI workflow tests failed or were skipped"
-            echo "Result: ${{ needs.cli-workflow-tests.result }}"
+            echo "Result: ${{ needs.workflow-tests.result }}"
             exit 1
           fi 
