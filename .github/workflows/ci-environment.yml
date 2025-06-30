@@ -79,7 +79,7 @@ jobs:
         run: |
           ./get-cli.sh linux
           chmod +x ./instant
-          ./instant --version
+          ./instant version
           
       - name: Initialize Docker Swarm
         run: |
