@@ -24,15 +24,19 @@ View [CI Documentation](.github/workflows/README.md) for details.
 
 ### Running CI Tests Locally
 
-Uses [act](https://github.com/nektos/act) to run GitHub Actions locally:
+Uses Docker to run GitHub Actions locally (no installation required):
 
 ```bash
-# Install act first (see docs/environment-setup.md)
+# Prerequisites: Docker must be running
 ./scripts/run-ci-locally.sh              # Run all CI workflows
 ./scripts/run-ci-locally.sh --env-setup  # Environment setup only
 ./scripts/run-ci-locally.sh --workflow-tests  # Workflow tests only
 ./scripts/run-ci-locally.sh --list       # List available workflows
+./scripts/run-ci-locally.sh --verbose    # Enable verbose output
+./scripts/run-ci-locally.sh --help       # Show all options
 ```
+
+**Note**: The script automatically builds a Docker image with `act` on first run. This may take a minute initially but subsequent runs are fast.
 
 ### Pre-push Hook (Optional)
 

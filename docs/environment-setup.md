@@ -503,27 +503,27 @@ Tests OpenFN workflows using the CLI framework:
 To run the same tests that GitHub Actions runs:
 
 ```bash
-# Install 'act' (required for running GitHub workflows locally)
-# macOS:
-brew install act
-
-# Linux:
-curl -s https://raw.githubusercontent.com/nektos/act/master/install.sh | sudo bash
-
-# Run all CI tests
-./scripts/run-ci-locally.sh
-
-# Only environment setup
-./scripts/run-ci-locally.sh --env-setup
-
-# Only workflow tests
-./scripts/run-ci-locally.sh --workflow-tests
-
-# List available workflows
-./scripts/run-ci-locally.sh --list
+# No installation needed - uses Docker to run 'act'
+./scripts/run-ci-locally.sh              # Run all CI workflows
+./scripts/run-ci-locally.sh --env-setup  # Environment setup only
+./scripts/run-ci-locally.sh --workflow-tests  # Workflow tests only
+./scripts/run-ci-locally.sh --list       # List available workflows
+./scripts/run-ci-locally.sh --verbose    # Enable verbose output
+./scripts/run-ci-locally.sh --help       # Show all options and examples
 ```
 
-The script uses [act](https://github.com/nektos/act) to run the actual GitHub Actions workflows locally, ensuring consistency between local and CI environments.
+The script uses Docker to run [act](https://github.com/nektos/act), ensuring consistency between local and CI environments without requiring local installation.
+
+**Prerequisites**: Only Docker needs to be installed and running.
+
+**First Run**: The script automatically builds a Docker image containing `act` on first run. This takes about 30-60 seconds but subsequent runs are much faster.
+
+**Environment**: The script automatically creates `.env` from `.env.example` if no `.env` file exists.
+
+**Troubleshooting**:
+- If Docker build fails, ensure Docker is running and has internet access
+- Use `--verbose` flag for detailed output during workflow execution
+- The script mounts `/var/run/docker.sock` to allow workflows to start containers
 
 This is useful for:
 - Debugging CI failures locally

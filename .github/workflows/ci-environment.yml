@@ -92,7 +92,7 @@ jobs:
       - name: Build custom images
         run: |
           # Build all custom images
-          ./build-custom-images.sh all
+          ./build-custom-images.sh
           
           # Verify images were built
           docker images | grep -E "(openfn-custom|openfn-cli-test|dhis2|sftp-with-data)"

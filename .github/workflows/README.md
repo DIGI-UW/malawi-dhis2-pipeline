@@ -82,40 +82,41 @@ When a workflow fails:
 
 To run these tests locally using the same workflow definitions:
 
-### Using the provided script
+### Using the provided script (recommended)
 
 ```bash
-# Install act (required)
-# macOS: brew install act
-# Linux: curl -s https://raw.githubusercontent.com/nektos/act/master/install.sh | sudo bash
-
-# Run workflows
+# Prerequisites: Docker must be running
 ./scripts/run-ci-locally.sh              # All workflows
 ./scripts/run-ci-locally.sh --env-setup  # Environment setup only
 ./scripts/run-ci-locally.sh --workflow-tests  # Workflow tests only
+./scripts/run-ci-locally.sh --list       # List available workflows
+./scripts/run-ci-locally.sh --verbose    # Enable verbose output
+./scripts/run-ci-locally.sh --help       # Show all options
 ```
 
-### Using act directly
+### Using Docker + act directly
 
 ```bash
 # List all workflows and jobs
-act -l
+docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
+  -v "$PWD:/workspace" -w /workspace nektos/act:latest -l
 
 # Run specific workflow
-act -W .github/workflows/ci-environment.yml
-act -W .github/workflows/ci-workflow-tests.yml
-
-# Run with environment variables
-act -W .github/workflows/ci-environment.yml --env-file .env
+docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
+  -v "$PWD:/workspace" -w /workspace --env-file .env \
+  nektos/act:latest -W .github/workflows/ci-environment.yml
 
 # Dry run (see what would execute)
-act -n
-
-# Run specific job
-act -j build-images -W .github/workflows/ci-environment.yml
+docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
+  -v "$PWD:/workspace" -w /workspace \
+  nektos/act:latest -n
 ```
 
-The advantage of using `act` is that it runs the exact same workflow definitions as GitHub Actions, eliminating discrepancies between local and CI environments.
+The advantage of this approach is:
+- **No local installation required** - only needs Docker
+- **Runs the exact same workflow definitions** as GitHub Actions
+- **Consistent environment** across different machines
+- **Easy to share** with team members
 
 ## Environment Variables
 

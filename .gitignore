@@ -5,6 +5,7 @@ output.json
 
 # Act configuration (local)
 .actrc
+Dockerfile.act
 
 # Data directories - prevent committing sensitive data
 data/
@@ -43,3 +44,4 @@ projects/openfn-workflows/workflows/*/.last-deployed.json
 projects/openfn-workflows/workflows/*/.state-backups/
 
 *.bkp
+bin/*
