@@ -7,7 +7,7 @@
     "@openfn/language-sftp": "^1.0.0",
     "@openfn/language-common": "^2.4.0",
     "@openfn/language-dhis2": "^6.3.4",
-    "xlsx": "^0.18.5"
+    "xlsx": "^0.20.2"
   },
   "scripts": {
     "deploy": "openfn deploy",
