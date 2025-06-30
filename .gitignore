@@ -14,13 +14,17 @@ packages/*/data/
 projects/*/data/
 
 # Additional data file patterns
-*.xlsx
 *.csv
 *.xls
 **/DHIS2_HIV*.xlsx
 **/DHIS2_HIV*.csv
 **/*DQ_*.xlsx
 **/*malawi*.sql
+
+# Allow test data for CI builds
+!.github/test-data/**/*.xlsx
+!.github/test-data/**/*.csv
+!.github/test-data/**/*.xls
 
 *.log
 
