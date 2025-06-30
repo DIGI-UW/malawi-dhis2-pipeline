@@ -1,4 +1,4 @@
-name: CI - Workflow Tests
+name: CI - CLI Workflow Tests
 
 on:
   push:
@@ -14,10 +14,8 @@ on:
       - 'projects/indicator_workflow_testing/**'
       - '.github/workflows/ci-workflow-tests.yml'
   workflow_dispatch:
-  workflow_run:
-    workflows: ["CI - Environment Setup"]
-    types:
-      - completed
+  # Lightweight tests that don't require running services
+  # For integration tests against live services, see ci-environment.yml
 
 env:
   # Docker settings
@@ -33,10 +31,10 @@ env:
   NODE_VERSION: 18
 
 jobs:
-  workflow-tests:
-    name: OpenFN Workflow Tests
+  cli-workflow-tests:
+    name: CLI Workflow Tests
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 15
     
     permissions:
       contents: read
@@ -100,48 +98,37 @@ jobs:
           rm -rf /tmp/.buildx-cache
           mv /tmp/.buildx-cache-new /tmp/.buildx-cache || true
           
-      - name: Run CLI workflow tests
+      - name: Run CLI workflow tests using testing framework
         run: |
-          echo "Running OpenFN CLI workflow tests..."
+          echo "🧪 Running CLI workflow tests using indicator_workflow_testing framework"
+          echo "ℹ️  This uses the proven testing framework from projects/indicator_workflow_testing"
+          echo "ℹ️  Testing workflows from projects/openfn-workflows using CLI package only"
+          echo ""
           
-          # Test 1: Basic workflow validation
-          echo "=== Running workflow validation test ==="
-          docker run --rm \
-            -v "$(pwd)/projects/openfn-workflows/workflows:/app/workflows:ro" \
-            -v "$(pwd)/projects/indicator_workflow_testing:/app/test-data:ro" \
-            openfn-cli-test \
-            openfn --version
+          # Change to the testing framework directory
+          cd projects/indicator_workflow_testing
           
-          # Test 2: Simple CLI validation test
-          echo -e "\n=== Running CLI validation test ==="
-          docker run --rm \
-            -v "$(pwd)/projects/openfn-workflows:/app/openfn-workflows:ro" \
-            openfn-cli-test \
-            ls -la /app/openfn-workflows
+          # Run the existing CLI workflow tests
+          ./run-tests.sh --cli-workflow
           
-          # Test 3: Check if workflows directory exists
-          echo -e "\n=== Checking workflow structure ==="
-          docker run --rm \
-            -v "$(pwd)/projects/openfn-workflows/workflows:/app/workflows:ro" \
-            openfn-cli-test \
-            find /app/workflows -name "*.js" -o -name "*.json" -o -name "*.yaml" | head -10
+          echo ""
+          echo "✅ CLI workflow tests completed successfully using testing framework"
+          echo "ℹ️  For full integration tests against live services, see ci-environment.yml"
           
-          echo "✅ All CLI workflow tests completed successfully"
-          
-  integration-test-summary:
+  test-summary:
     name: Test Summary
     runs-on: ubuntu-latest
-    needs: [workflow-tests]
+    needs: [cli-workflow-tests]
     if: always()
     
     steps:
       - name: Check test results
         run: |
-          if [ "${{ needs.workflow-tests.result }}" == "success" ]; then
+          if [ "${{ needs.cli-workflow-tests.result }}" == "success" ]; then
             echo "✅ All CLI workflow tests passed!"
             exit 0
           else
             echo "❌ CLI workflow tests failed or were skipped"
-            echo "Result: ${{ needs.workflow-tests.result }}"
+            echo "Result: ${{ needs.cli-workflow-tests.result }}"
             exit 1
           fi 

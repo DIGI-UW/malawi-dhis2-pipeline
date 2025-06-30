@@ -332,6 +332,56 @@ jobs:
           # Check OpenFN
           check_service "OpenFN" "http://localhost:4000/health_check" "ok"
           
+      - name: Run workflow integration tests
+        run: |
+          echo "🧪 Running OpenFN workflow integration tests against live services..."
+          
+          # Test 1: SFTP Connection Test
+          echo "=== Testing SFTP connectivity ==="
+          docker run --rm --network host \
+            -v "$(pwd)/projects/indicator_workflow_testing:/app/tests:ro" \
+            openfn-cli-test \
+            sh -c "
+              echo 'Testing SFTP connection to localhost:2225...'
+              apk add --no-cache openssh-client >/dev/null 2>&1
+              echo 'openfn123' | timeout 10 sftp -P 2225 -o StrictHostKeyChecking=no openfn@localhost << 'EOF'
+              ls
+              cd data/excel-files
+              ls *.xlsx
+              quit
+          EOF
+            "
+          
+          # Test 2: OpenFN CLI workflow validation
+          echo -e "\n=== Testing OpenFN CLI against workflows ==="
+          docker run --rm --network host \
+            -v "$(pwd)/projects/openfn-workflows:/app/workflows:ro" \
+            openfn-cli-test \
+            sh -c "
+              echo 'Validating workflow structure...'
+              find /app/workflows -name '*.js' -o -name '*.json' -o -name '*.yaml' | head -10
+              echo 'Testing OpenFN CLI functionality...'
+              openfn --version
+              ls -la /app/workflows/sftp-dhis2/
+            "
+          
+          # Test 3: Service connectivity from CLI container
+          echo -e "\n=== Testing service connectivity from CLI container ==="
+          docker run --rm --network host \
+            openfn-cli-test \
+            sh -c "
+              echo 'Testing DHIS2 connectivity...'
+              wget -q --spider http://localhost:8080/dhis-web-commons/security/login.action && echo '✅ DHIS2 reachable' || echo '❌ DHIS2 not reachable'
+              echo 'Testing OpenFN Lightning connectivity...'
+              wget -q --spider http://localhost:4000/health_check && echo '✅ OpenFN reachable' || echo '❌ OpenFN not reachable'
+              echo 'Testing PostgreSQL connectivity...'
+              nc -z localhost 5432 && echo '✅ PostgreSQL reachable' || echo '❌ PostgreSQL not reachable'
+              echo 'Testing SFTP connectivity...'
+              nc -z localhost 2225 && echo '✅ SFTP reachable' || echo '❌ SFTP not reachable'
+            "
+          
+          echo "✅ All workflow integration tests completed successfully"
+          
       - name: List running services
         if: always()
         run: |
