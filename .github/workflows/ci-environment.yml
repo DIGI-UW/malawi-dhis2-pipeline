@@ -133,6 +133,10 @@ jobs:
           # Use the documented build script that users follow
           ./build-custom-images.sh all
           
+          # Also build the CLI test image specifically for testing framework
+          echo "🧪 Building CLI test image for testing framework..."
+          ./build-custom-images.sh openfn-cli-test
+          
           # Verify images were built
           echo "📦 Verifying built images:"
           docker images --format "table {{.Repository}}:{{.Tag}}\t{{.CreatedAt}}\t{{.Size}}" | grep -E "(dhis2/core|openfn-custom|sftp-with-data|openfn-workflows|openfn-cli-test)" || echo "Some expected images may not have been built"
@@ -212,83 +216,18 @@ jobs:
           npm install -g @openfn/cli@latest
           openfn --version
           
-      - name: Test SFTP connectivity
+      - name: Run SFTP Tests Using Existing Framework
         run: |
-          echo "🔍 Testing SFTP connectivity..."
-          timeout 30s bash -c 'until nc -zv localhost 2225; do sleep 2; done'
-          echo "✅ SFTP server is accessible on port 2225"
+          echo "🚀 Running SFTP tests using indicator_workflow_testing framework"
+          echo "==============================================================="
           
-      - name: Run SFTP CLI Test
-        run: |
-          echo "🚀 Running SFTP CLI Test against live services"
-          echo "=============================================="
+          # Navigate to the testing framework
+          cd projects/indicator_workflow_testing
           
-          # Create a minimal test project
-          mkdir -p /tmp/sftp-test
-          cd /tmp/sftp-test
+          # Run just the SFTP tests using the existing framework
+          ./run-tests.sh --sftp
           
-          # Initialize OpenFN project
-          cat > openfn.json << 'EOF'
-          {
-            "workflowRoot": "workflows",
-            "formats": {
-              "workflow": "json"
-            }
-          }
-          EOF
-          
-          mkdir -p workflows/sftp-test
-          
-          # Create simple SFTP workflow to list files
-          cat > workflows/sftp-test/workflow.json << 'EOF'
-          {
-            "id": "sftp-test",
-            "name": "SFTP File List Test",
-            "steps": [
-              {
-                "id": "list-files",
-                "adaptor": "@openfn/language-sftp@2.0.14",
-                "expression": "list('/data/excel-files', (state) => { console.log('📁 SFTP Files found:', state.data.length); state.data.forEach(f => console.log('  📄', f.name, `(${f.size} bytes)`)); return {...state, testResult: 'success', fileCount: state.data.length}; });"
-              }
-            ]
-          }
-          EOF
-          
-          # Create test input with SFTP credentials
-          cat > input.json << 'EOF'
-          {
-            "data": {},
-            "configuration": {
-              "host": "localhost",
-              "port": 2225,
-              "username": "openfn",
-              "password": "instant101"
-            }
-          }
-          EOF
-          
-          # Run the test
-          echo "🎯 Executing SFTP workflow against live services..."
-          openfn sftp-test -s input.json -o output.json
-          
-          echo ""
-          echo "📊 Test Results:"
-          cat output.json | jq '.' 2>/dev/null || cat output.json
-          
-          # Verify test passed
-          if cat output.json | jq -e '.testResult == "success"' > /dev/null 2>&1; then
-            echo ""
-            echo "✅ SFTP CLI test PASSED!"
-            FILE_COUNT=$(cat output.json | jq -r '.fileCount // 0')
-            echo "📁 Found $FILE_COUNT files in SFTP server"
-            echo ""
-            echo "🎉 All tests completed successfully!"
-          else
-            echo ""
-            echo "❌ SFTP CLI test FAILED!"
-            echo "📋 Check the output above for details"
-            exit 1
-          fi
+          echo "✅ SFTP tests completed!"
           
       - name: Collect logs on failure
         if: failure()
