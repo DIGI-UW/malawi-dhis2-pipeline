@@ -90,19 +90,26 @@ jobs:
           chmod +x ./instant
           ./instant version
           
-      - name: Initialize Docker Swarm
+      - name: Clean Docker Environment
         run: |
+          echo "🧹 Cleaning Docker environment to ensure fresh builds..."
+          
+          # Only clean up OpenFN-related services and networks
+          docker service rm $(docker service ls --filter name=openfn --format "{{.Name}}") 2>/dev/null || true
+          docker service rm $(docker service ls --filter name=dhis2 --format "{{.Name}}") 2>/dev/null || true
+          docker service rm $(docker service ls --filter name=postgres --format "{{.Name}}") 2>/dev/null || true
+          docker service rm $(docker service ls --filter name=sftp --format "{{.Name}}") 2>/dev/null || true
+          
           # Initialize swarm if not already initialized
           docker swarm init || echo "Swarm already initialized"
           
-          # Clean up any existing services when running locally
-          if [ "${{ github.actor }}" = "nektos/act" ]; then
-            echo "Running locally - cleaning up existing services"
-            docker service ls --format "{{.Name}}" | xargs -r docker service rm || true
-            sleep 5
-          fi
+          # Clean up custom images to ensure fresh builds
+          docker rmi openfn-workflows:local 2>/dev/null || true
+          docker rmi openfn-custom:latest 2>/dev/null || true
+          docker rmi dhis2/core:local 2>/dev/null || true
+          docker rmi sftp-with-data:latest 2>/dev/null || true
           
-          # Create networks
+          # Create required networks
           docker network create openfn_public --driver overlay --attachable || true
           docker network create postgres_public --driver overlay --attachable || true
           docker network create dhis2_public --driver overlay --attachable || true
@@ -125,15 +132,14 @@ jobs:
           
           # Verify images were built
           echo "📦 Verifying built images:"
-          docker images --format "table {{.Repository}}:{{.Tag}}\t{{.CreatedAt}}\t{{.Size}}" | grep -E "(dhis2/core|openfn-custom|sftp-with-data|openfn-cli-test)" || echo "Some expected images may not have been built - this is normal depending on available packages"
+          docker images --format "table {{.Repository}}:{{.Tag}}\t{{.CreatedAt}}\t{{.Size}}" | grep -E "(dhis2/core|openfn-custom|sftp-with-data|openfn-workflows|openfn-cli-test)" || echo "Some expected images may not have been built"
           
           echo -e "\n📋 All custom images:"
-          docker images --format "table {{.Repository}}:{{.Tag}}\t{{.CreatedAt}}\t{{.Size}}" | grep -v "REPOSITORY" | head -10
+          docker images --format "table {{.Repository}}:{{.Tag}}\t{{.CreatedAt}}\t{{.Size}}" | grep -v "REPOSITORY" | head -15
           
       - name: Build platform image with cache
         run: |
-          ./build-image.sh         
-
+          ./build-image.sh
           
       - name: Deploy PostgreSQL
         run: |
@@ -168,7 +174,6 @@ jobs:
           echo "Waiting for OpenFN..."
           timeout 120s bash -c 'until docker service ls | grep -q "openfn_openfn.*1/1"; do sleep 5; done'
           timeout 120s bash -c 'until docker service ls | grep -q "openfn_worker.*1/1"; do sleep 5; done'
-        
           
       - name: List running services
         if: always()
