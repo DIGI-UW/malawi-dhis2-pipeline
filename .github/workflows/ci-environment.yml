@@ -123,6 +123,9 @@ jobs:
           echo "OPENFN_ADMIN_PASSWORD=instant101" >> .env
           echo "DHIS2_ADMIN_PASSWORD=district" >> .env
           
+          # Use standard DHIS2 image in CI (don't build custom)
+          echo "LOCAL_DHIS2_IMAGE=" >> .env
+          
       - name: Download instant CLI
         run: |
           ./get-cli.sh linux
@@ -195,14 +198,8 @@ jobs:
             # Build based on project type
             case "$project_name" in
               "dhis2")
-                docker buildx build \
-                  --cache-from type=local,src=/tmp/.buildx-cache \
-                  --cache-to type=local,dest=/tmp/.buildx-cache-new,mode=max \
-                  --load \
-                  $dockerfile_arg \
-                  --build-arg DHIS2_BASE_IMAGE=dhis2/core:2.40.2.1 \
-                  -t dhis2-custom:latest \
-                  projects/dhis2
+                echo "⏭️  Skipping DHIS2 custom build in CI - using standard image"
+                return 0
                 ;;
               "sftp")
                 docker buildx build \
@@ -236,7 +233,7 @@ jobs:
           build_with_cache "openfn-cli-test" "openfn"
           
           # Verify images were built
-          docker images | grep -E "(openfn-custom|openfn-cli-test|dhis2|sftp-with-data)"
+          docker images | grep -E "(openfn-custom|openfn-cli-test|sftp-with-data)"
           
       - name: Build platform image with cache
         run: |
