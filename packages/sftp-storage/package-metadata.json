@@ -11,6 +11,7 @@
     "SFTP_USER": "openfn",
     "SFTP_PASSWORD": "instant101",
     "SFTP_PORT": "2225",
+    "SFTP_WEB_PORT": "8090",
     "SFTP_PLACEMENT": "node-1",
     "SFTP_CPU_LIMIT": "0",
     "SFTP_CPU_RESERVE": "0",

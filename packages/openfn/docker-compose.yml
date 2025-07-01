@@ -33,6 +33,7 @@ services:
       - kafka_public
       - postgres
       - openfn_public
+      - reverse_proxy_public
   worker:
     image: ${OPENFN_WORKER_IMAGE}
     deploy:

@@ -1,13 +1,14 @@
 # SFTP Storage Package
 
-This package provides an SFTP server for storing and accessing Excel data files in the OpenFN workflow.
+This package provides an SFTP server with a web-based UI for storing and accessing Excel data files in the OpenFN workflow.
 
 ## Overview
 
-The SFTP storage package deploys an SFTP server that:
-- Hosts Excel files for OpenFN workflow consumption
-- Provides secure file access via SFTP protocol
-- **Uses Docker configs to import Excel files automatically on initialization**
+The SFTP storage package deploys:
+- **SFTP Server**: Secure file access via SFTP protocol  
+- **Web UI (Filebrowser)**: Browse and download files via web interface
+- **Automatic Data Import**: Uses Docker configs to import Excel files on initialization
+- **Demo-friendly**: Web UI makes it easy to view files during demonstrations
 - Supports both development and production deployment modes
 - Follows OpenHIE Instant v2 importer patterns for data seeding
 
@@ -37,6 +38,7 @@ The following Excel files are automatically imported on `./swarm.sh init`:
 | `SFTP_USER` | `openfn` | SFTP username |
 | `SFTP_PASSWORD` | `instant101` | SFTP password |
 | `SFTP_PORT` | `2222` | External SFTP port |
+| `SFTP_WEB_PORT` | `8090` | External web UI port (Filebrowser) |
 | `SFTP_PLACEMENT` | `node-1` | Node placement constraint |
 
 ### Resource Limits
@@ -55,11 +57,27 @@ The SFTP server exposes files at:
 
 ## Integration with OpenFN
 
-Once deployed, OpenFN workflows can access files via:
+### SFTP Access
+OpenFN workflows can access files via:
 - Host: `sftp-server` (internal network) or `localhost:2222` (external)
 - Username: `openfn`
 - Password: `instant101`
 - Path: `/data/excel-files/`
+
+### Web UI Access (FileGator)
+A modern, feature-rich file manager is available for easy file viewing and management:
+- URL: `http://localhost:8090` (configurable via `SFTP_WEB_PORT`)
+- **Guest Access**: Enabled with read/download permissions
+- **Admin Access**: Login with `admin/admin123` for full management
+- Features:
+  - Modern single-page application built with Vue.js
+  - Multi-user support with roles and permissions
+  - Browse and download SFTP files through web interface
+  - Search functionality across files and folders
+  - File preview for images and documents
+  - Chunked uploads for large files (if write enabled)
+  - Mobile-friendly responsive design
+  - Dark mode support
 
 ## Files Available
 

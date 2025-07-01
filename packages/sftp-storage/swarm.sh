@@ -59,6 +59,32 @@ function initialize_package() {
     log info "SFTP server is ready at localhost:${SFTP_PORT}"
     log info "Excel files available at: sftp://${SFTP_USER}@localhost:${SFTP_PORT}/data/excel-files/"
     log info "Use password: ${SFTP_PASSWORD}"
+    
+    # Deploy the FileGator service using separate compose file
+    log info "Deploying FileGator Web UI..."
+    if docker::deploy_service "${STACK}" "$COMPOSE_FILE_PATH" "docker-compose.sftpui.yml"; then
+      # Wait for FileGator to be ready before configuring users
+      docker::await_container_startup $STACK "sftpui"
+      
+      # Create FileGator admin user with SFTP credentials
+      log info "Configuring FileGator users...adding ${SFTP_USER}"
+
+      # shellcheck disable=SC1091
+      source "${COMPOSE_FILE_PATH}/create-filegator-users.sh"
+      if ! configure_filegator_users "${SFTP_USER}" "${SFTP_PASSWORD}"; then
+        log error "Failed to configure FileGator users"
+        exit 1
+      fi
+      
+      log info "FileGator Web UI is ready at http://localhost:${SFTP_WEB_PORT:-8090}"
+      log info "🌐 A modern file manager with guest access enabled"
+      log info "📂 Excel files are accessible through the web interface"
+      log info "🔐 Admin login options:"
+      log info "   • admin / admin123 (default)"
+      log info "   • ${SFTP_USER} / ${SFTP_PASSWORD} (SFTP credentials)"
+    else
+      log warn "Failed to deploy FileGator Web UI, but SFTP server is still running"
+    fi
   ) || {
     log error "Failed to deploy package"
     exit 1
