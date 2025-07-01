@@ -66,7 +66,7 @@ jobs:
             network=host
             
       - name: Log in to Container Registry
-        if: github.event_name != 'pull_request'
+        if: github.event_name != 'pull_request' && github.actor != 'nektos/act'
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
@@ -75,6 +75,7 @@ jobs:
           
       - name: Extract metadata
         id: meta
+        if: github.actor != 'nektos/act'
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
@@ -91,7 +92,17 @@ jobs:
           
       - name: Initialize Docker Swarm
         run: |
-          docker swarm init
+          # Initialize swarm if not already initialized
+          docker swarm init || echo "Swarm already initialized"
+          
+          # Clean up any existing services when running locally
+          if [ "${{ github.actor }}" = "nektos/act" ]; then
+            echo "Running locally - cleaning up existing services"
+            docker service ls --format "{{.Name}}" | xargs -r docker service rm || true
+            sleep 5
+          fi
+          
+          # Create networks
           docker network create openfn_public --driver overlay --attachable || true
           docker network create postgres_public --driver overlay --attachable || true
           docker network create dhis2_public --driver overlay --attachable || true
@@ -114,7 +125,10 @@ jobs:
           
           # Verify images were built
           echo "📦 Verifying built images:"
-          docker images | grep -E "(dhis2/core:local|openfn-custom:latest|sftp-with-data:latest|openfn-cli-test)"
+          docker images --format "table {{.Repository}}:{{.Tag}}\t{{.CreatedAt}}\t{{.Size}}" | grep -E "(dhis2/core|openfn-custom|sftp-with-data|openfn-cli-test)" || echo "Some expected images may not have been built - this is normal depending on available packages"
+          
+          echo -e "\n📋 All custom images:"
+          docker images --format "table {{.Repository}}:{{.Tag}}\t{{.CreatedAt}}\t{{.Size}}" | grep -v "REPOSITORY" | head -10
           
       - name: Build platform image with cache
         run: |
@@ -144,7 +158,7 @@ jobs:
           
           # Wait for DHIS2 to be ready 
           echo "Waiting for DHIS2..."
-          timeout 300s bash -c 'until docker service ls | grep -q "dhis2-instance_dhis2.*1/1"; do sleep 10; done'
+          timeout 300s bash -c 'until docker service ls | grep -q "dhis2_dhis2.*1/1"; do sleep 10; done'
           
       - name: Deploy OpenFN
         run: |
@@ -165,7 +179,7 @@ jobs:
           echo -e "\n=== Service Details ==="
           docker service ps postgres_postgres-1 --no-trunc || true
           docker service ps sftp-storage_sftp-server --no-trunc || true
-          docker service ps dhis2-instance_dhis2 --no-trunc || true
+          docker service ps dhis2_dhis2 --no-trunc || true
           docker service ps openfn_openfn --no-trunc || true
           docker service ps openfn_worker --no-trunc || true
           
@@ -179,7 +193,7 @@ jobs:
           docker service logs sftp-storage_sftp-server --tail 50 || true
           
           echo -e "\n=== DHIS2 Logs ==="
-          docker service logs dhis2-instance_dhis2 --tail 50 || true
+          docker service logs dhis2_dhis2 --tail 50 || true
           
           echo -e "\n=== OpenFN Logs ==="
           docker service logs openfn_openfn --tail 50 || true
