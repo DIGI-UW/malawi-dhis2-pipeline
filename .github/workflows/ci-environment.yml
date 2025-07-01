@@ -124,7 +124,8 @@ jobs:
           echo "DHIS2_ADMIN_PASSWORD=district" >> .env
           
           # Use standard DHIS2 image in CI (don't build custom)
-          echo "LOCAL_DHIS2_IMAGE=" >> .env
+          echo "DHIS2_IMAGE=dhis2/core:2.40.2.1" >> .env
+          echo "LOCAL_DHIS2_IMAGE=dhis2/core:2.40.2.1" >> .env
           
       - name: Download instant CLI
         run: |
