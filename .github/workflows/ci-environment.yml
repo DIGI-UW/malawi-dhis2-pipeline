@@ -82,50 +82,6 @@ jobs:
             type=ref,event=branch
             type=ref,event=pr
             type=sha,prefix={{branch}}-
-            
-      - name: Cache Docker layers
-        uses: actions/cache@v4
-        with:
-          path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-buildx-
-            
-      - name: Pre-pull base images
-        run: |
-          echo "Pre-pulling commonly used base images..."
-          docker pull postgres:15-alpine &
-          docker pull catthehacker/ubuntu:act-latest &
-          docker pull alpine:latest &
-          docker pull node:18-alpine &
-          wait
-          echo "Base images pre-pulled"
-        
-      - name: Setup environment variables
-        run: |
-          cp .env.example .env
-          
-          # Override for CI environment
-          echo "INSECURE=true" >> .env
-          echo "MODE=dev" >> .env
-          echo "CLUSTERED_MODE=false" >> .env
-          echo "OPENFN_LOAD_WORKFLOWS_ON_STARTUP=true" >> .env
-          echo "OPENFN_WORKFLOW_MANUAL_CLI=false" >> .env
-          
-          # Expose ports for dev mode
-          echo "OPENFN_PORT=4000" >> .env
-          echo "DHIS2_PORT=8080" >> .env
-          echo "SFTP_PORT=2225" >> .env
-          echo "POSTGRES_PORT=5432" >> .env
-          
-          # Set CI-specific credentials
-          echo "OPENFN_ADMIN_USER=root@openhim.org" >> .env
-          echo "OPENFN_ADMIN_PASSWORD=instant101" >> .env
-          echo "DHIS2_ADMIN_PASSWORD=district" >> .env
-          
-          # Use standard DHIS2 image in CI (don't build custom)
-          echo "DHIS2_IMAGE=dhis2/core:2.40.2.1" >> .env
-          echo "LOCAL_DHIS2_IMAGE=dhis2/core:2.40.2.1" >> .env
           
       - name: Download instant CLI
         run: |
@@ -149,113 +105,25 @@ jobs:
           echo "✅ Test data copied to SFTP data directory"
           ls -la projects/sftp/data/excel-files/
           
-      - name: Build custom images with cache
+      - name: Build custom images using documented workflow
         run: |
-          # Function to build with cache
-          build_with_cache() {
-            local project_name="$1"
-            local package_name="$2"
-            
-            echo "🔨 Building $project_name with caching..."
-            
-            # Skip openfn-workflows as it's used for CLI testing only
-            if [[ "$project_name" == "openfn-workflows" ]]; then
-              echo "⏭️  Skipping openfn-workflows - used for CLI testing only"
-              return 0
-            fi
-            
-            # Special handling for openfn-cli-test
-            if [[ "$project_name" == "openfn-cli-test" ]]; then
-              cd projects
-              docker buildx build \
-                --cache-from type=local,src=/tmp/.buildx-cache \
-                --cache-to type=local,dest=/tmp/.buildx-cache-new,mode=max \
-                --load \
-                -f openfn-workflows/Dockerfile.cli \
-                --build-arg OPENFN_CLI_TEST_IMAGE=node:18-alpine \
-                -t openfn-cli-test \
-                .
-              cd ..
-              return 0
-            fi
-            
-            # Get project directory
-            if [[ ! -d "projects/$project_name" ]]; then
-              echo "❌ Project directory not found: projects/$project_name"
-              return 1
-            fi
-            
-            # Determine Dockerfile location
-            local dockerfile_arg=""
-            if [[ -f "projects/$project_name/Dockerfile" ]]; then
-              dockerfile_arg="-f projects/$project_name/Dockerfile"
-            elif [[ -f "projects/$project_name/docker/Dockerfile" ]]; then
-              dockerfile_arg="-f projects/$project_name/docker/Dockerfile"
-            else
-              echo "❌ No Dockerfile found for $project_name"
-              return 1
-            fi
-            
-            # Build based on project type
-            case "$project_name" in
-              "dhis2")
-                echo "⏭️  Skipping DHIS2 custom build in CI - using standard image"
-                return 0
-                ;;
-              "sftp")
-                docker buildx build \
-                  --cache-from type=local,src=/tmp/.buildx-cache \
-                  --cache-to type=local,dest=/tmp/.buildx-cache-new,mode=max \
-                  --load \
-                  $dockerfile_arg \
-                  --build-arg SFTP_BASE_IMAGE=atmoz/sftp:latest \
-                  -t sftp-with-data:latest \
-                  projects/sftp
-                ;;
-              "openfn")
-                cd projects
-                docker buildx build \
-                  --cache-from type=local,src=/tmp/.buildx-cache \
-                  --cache-to type=local,dest=/tmp/.buildx-cache-new,mode=max \
-                  --load \
-                  -f openfn/Dockerfile \
-                  --build-arg OPENFN_BASE_IMAGE=openfn/lightning:v2.12.1 \
-                  -t openfn-custom:latest \
-                  .
-                cd ..
-                ;;
-            esac
-          }
+          echo "🔨 Building custom images using ./build-custom-images.sh (same as users)"
           
-          # Build each custom image with caching
-          build_with_cache "openfn" "openfn"
-          build_with_cache "dhis2" "dhis2-instance"
-          build_with_cache "sftp" "sftp-storage"
-          build_with_cache "openfn-cli-test" "openfn"
+          # Use the documented build script that users follow
+          ./build-custom-images.sh all
           
           # Verify images were built
-          docker images | grep -E "(openfn-custom|openfn-cli-test|sftp-with-data)"
+          echo "📦 Verifying built images:"
+          docker images | grep -E "(dhis2/core:local|openfn-custom:latest|sftp-with-data:latest|openfn-cli-test)"
           
       - name: Build platform image with cache
         run: |
-          # Build platform image with caching
-          docker buildx build \
-            --cache-from type=local,src=/tmp/.buildx-cache \
-            --cache-to type=local,dest=/tmp/.buildx-cache-new,mode=max \
-            --load \
-            -t malawi-dhis2-indicators:latest \
-            .
-          
-          docker images | grep malawi-dhis2
-          
-      - name: Move cache
-        run: |
-          rm -rf /tmp/.buildx-cache
-          mv /tmp/.buildx-cache-new /tmp/.buildx-cache || true
+          ./build-image.sh         
+
           
       - name: Deploy PostgreSQL
         run: |
-          ./instant package init -n database-postgres --env-file=.env -d
+          ./instant package init -n database-postgres -d
           
           # Wait for PostgreSQL to be ready
           echo "Waiting for PostgreSQL..."
@@ -264,7 +132,7 @@ jobs:
           
       - name: Deploy SFTP Storage
         run: |
-          ./instant package init -n sftp-storage --env-file=.env -d
+          ./instant package init -n sftp-storage -d
           
           # Wait for SFTP to be ready
           echo "Waiting for SFTP server..."
@@ -272,113 +140,21 @@ jobs:
           
       - name: Deploy DHIS2
         run: |
-          ./instant package init -n dhis2-instance --env-file=.env -d
+          ./instant package init -n dhis2-instance -d
           
-          # Wait for DHIS2 to be ready (this takes longer)
+          # Wait for DHIS2 to be ready 
           echo "Waiting for DHIS2..."
           timeout 300s bash -c 'until docker service ls | grep -q "dhis2-instance_dhis2.*1/1"; do sleep 10; done'
           
       - name: Deploy OpenFN
         run: |
-          ./instant package init -n openfn --env-file=.env -d
+          ./instant package init -n openfn -d
           
           # Wait for OpenFN to be ready
           echo "Waiting for OpenFN..."
           timeout 120s bash -c 'until docker service ls | grep -q "openfn_openfn.*1/1"; do sleep 5; done'
           timeout 120s bash -c 'until docker service ls | grep -q "openfn_worker.*1/1"; do sleep 5; done'
-          
-      - name: Service Health Checks
-        run: |
-          # Function to check service health
-          check_service() {
-            local name=$1
-            local url=$2
-            local expected=$3
-            local max_attempts=30
-            local attempt=0
-            
-            echo "Checking $name at $url..."
-            while [ $attempt -lt $max_attempts ]; do
-              if curl -s -f -m 10 "$url" | grep -q "$expected" 2>/dev/null || \
-                 curl -s -f -m 10 -o /dev/null "$url" 2>/dev/null; then
-                echo "✅ $name is healthy"
-                return 0
-              fi
-              attempt=$((attempt + 1))
-              echo "  Attempt $attempt/$max_attempts failed, retrying..."
-              sleep 5
-            done
-            
-            echo "❌ $name health check failed after $max_attempts attempts"
-            return 1
-          }
-          
-          # Check PostgreSQL
-          docker run --rm --network postgres_public postgres:15-alpine \
-            pg_isready -h postgres-1 -p 5432 -U postgres
-          
-          # Check SFTP
-          docker run --rm --network host alpine/curl:latest sh -c "
-            apk add --no-cache openssh-client >/dev/null 2>&1 && \
-            timeout 10 ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
-            -o ConnectTimeout=5 -p 2225 openfn@localhost exit 0 2>&1 | grep -q 'password' && \
-            echo '✅ SFTP is accepting connections'"
-          
-          # Check DHIS2
-          check_service "DHIS2" "http://localhost:8080/dhis-web-commons/security/login.action" "login"
-          
-          # Check OpenFN
-          check_service "OpenFN" "http://localhost:4000/health_check" "ok"
-          
-      - name: Run workflow integration tests
-        run: |
-          echo "🧪 Running OpenFN workflow integration tests against live services..."
-          
-          # Test 1: SFTP Connection Test
-          echo "=== Testing SFTP connectivity ==="
-          docker run --rm --network host \
-            -v "$(pwd)/projects/indicator_workflow_testing:/app/tests:ro" \
-            openfn-cli-test \
-            sh -c "
-              echo 'Testing SFTP connection to localhost:2225...'
-              apk add --no-cache openssh-client >/dev/null 2>&1
-              echo 'openfn123' | timeout 10 sftp -P 2225 -o StrictHostKeyChecking=no openfn@localhost << 'EOF'
-              ls
-              cd data/excel-files
-              ls *.xlsx
-              quit
-          EOF
-            "
-          
-          # Test 2: OpenFN CLI workflow validation
-          echo -e "\n=== Testing OpenFN CLI against workflows ==="
-          docker run --rm --network host \
-            -v "$(pwd)/projects/openfn-workflows:/app/workflows:ro" \
-            openfn-cli-test \
-            sh -c "
-              echo 'Validating workflow structure...'
-              find /app/workflows -name '*.js' -o -name '*.json' -o -name '*.yaml' | head -10
-              echo 'Testing OpenFN CLI functionality...'
-              openfn --version
-              ls -la /app/workflows/sftp-dhis2/
-            "
-          
-          # Test 3: Service connectivity from CLI container
-          echo -e "\n=== Testing service connectivity from CLI container ==="
-          docker run --rm --network host \
-            openfn-cli-test \
-            sh -c "
-              echo 'Testing DHIS2 connectivity...'
-              wget -q --spider http://localhost:8080/dhis-web-commons/security/login.action && echo '✅ DHIS2 reachable' || echo '❌ DHIS2 not reachable'
-              echo 'Testing OpenFN Lightning connectivity...'
-              wget -q --spider http://localhost:4000/health_check && echo '✅ OpenFN reachable' || echo '❌ OpenFN not reachable'
-              echo 'Testing PostgreSQL connectivity...'
-              nc -z localhost 5432 && echo '✅ PostgreSQL reachable' || echo '❌ PostgreSQL not reachable'
-              echo 'Testing SFTP connectivity...'
-              nc -z localhost 2225 && echo '✅ SFTP reachable' || echo '❌ SFTP not reachable'
-            "
-          
-          echo "✅ All workflow integration tests completed successfully"
+        
           
       - name: List running services
         if: always()

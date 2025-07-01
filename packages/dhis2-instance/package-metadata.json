@@ -7,7 +7,7 @@
   "dependencies": [],
   "environmentVariables": {
     "DHIS2_IMAGE": "dhis2/core:2.40.2.1",
-    "LOCAL_DHIS2_IMAGE": "dhis2/core:2.40.2.1",
+    "LOCAL_DHIS2_IMAGE": "dhis2/core:local",
     "DHIS2_PORT": "8080",
     "DHIS2_REPLICAS": "1",
     "DHIS2_PLACEMENT": "node-1",
