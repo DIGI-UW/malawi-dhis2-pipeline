@@ -1,4 +1,4 @@
-name: CI - Environment Setup
+name: CI - Environment Setup and SFTP Test
 
 on:
   push:
@@ -45,16 +45,19 @@ env:
   CLUSTERED_MODE: false
 
 jobs:
-  environment-setup:
-    name: Environment Setup and Health Check
+  environment-setup-and-test:
+    name: Environment Setup and SFTP CLI Test
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 35
     
     permissions:
       contents: read
       packages: write
     
     steps:
+      # =================================================================
+      # ENVIRONMENT SETUP PHASE
+      # =================================================================
       - name: Checkout code
         uses: actions/checkout@v4
         
@@ -176,8 +179,11 @@ jobs:
           timeout 120s bash -c 'until docker service ls | grep -q "openfn_worker.*1/1"; do sleep 5; done'
           
       - name: List running services
-        if: always()
         run: |
+          echo "==================================================================="
+          echo "🎉 ENVIRONMENT SETUP COMPLETE - All services deployed"
+          echo "==================================================================="
+          echo ""
           echo "=== Docker Services ==="
           docker service ls
           
@@ -188,9 +194,107 @@ jobs:
           docker service ps openfn_openfn --no-trunc || true
           docker service ps openfn_worker --no-trunc || true
           
+          echo -e "\n🔗 Service Endpoints:"
+          echo "   - PostgreSQL: localhost:5532"
+          echo "   - SFTP Server: localhost:2225 (user: openfn, pass: instant101)"
+          echo "   - DHIS2: localhost:8080"
+          echo "   - OpenFN: localhost:4000"
+          echo ""
+          
+      # =================================================================
+      # CLI TESTING PHASE - SFTP TEST ONLY
+      # =================================================================
+      - name: Install OpenFN CLI for testing
+        run: |
+          echo "==================================================================="
+          echo "🧪 CLI TESTING PHASE - SFTP Test"
+          echo "==================================================================="
+          npm install -g @openfn/cli@latest
+          openfn --version
+          
+      - name: Test SFTP connectivity
+        run: |
+          echo "🔍 Testing SFTP connectivity..."
+          timeout 30s bash -c 'until nc -zv localhost 2225; do sleep 2; done'
+          echo "✅ SFTP server is accessible on port 2225"
+          
+      - name: Run SFTP CLI Test
+        run: |
+          echo "🚀 Running SFTP CLI Test against live services"
+          echo "=============================================="
+          
+          # Create a minimal test project
+          mkdir -p /tmp/sftp-test
+          cd /tmp/sftp-test
+          
+          # Initialize OpenFN project
+          cat > openfn.json << 'EOF'
+          {
+            "workflowRoot": "workflows",
+            "formats": {
+              "workflow": "json"
+            }
+          }
+          EOF
+          
+          mkdir -p workflows/sftp-test
+          
+          # Create simple SFTP workflow to list files
+          cat > workflows/sftp-test/workflow.json << 'EOF'
+          {
+            "id": "sftp-test",
+            "name": "SFTP File List Test",
+            "steps": [
+              {
+                "id": "list-files",
+                "adaptor": "@openfn/language-sftp@2.0.14",
+                "expression": "list('/data/excel-files', (state) => { console.log('📁 SFTP Files found:', state.data.length); state.data.forEach(f => console.log('  📄', f.name, `(${f.size} bytes)`)); return {...state, testResult: 'success', fileCount: state.data.length}; });"
+              }
+            ]
+          }
+          EOF
+          
+          # Create test input with SFTP credentials
+          cat > input.json << 'EOF'
+          {
+            "data": {},
+            "configuration": {
+              "host": "localhost",
+              "port": 2225,
+              "username": "openfn",
+              "password": "instant101"
+            }
+          }
+          EOF
+          
+          # Run the test
+          echo "🎯 Executing SFTP workflow against live services..."
+          openfn sftp-test -s input.json -o output.json
+          
+          echo ""
+          echo "📊 Test Results:"
+          cat output.json | jq '.' 2>/dev/null || cat output.json
+          
+          # Verify test passed
+          if cat output.json | jq -e '.testResult == "success"' > /dev/null 2>&1; then
+            echo ""
+            echo "✅ SFTP CLI test PASSED!"
+            FILE_COUNT=$(cat output.json | jq -r '.fileCount // 0')
+            echo "📁 Found $FILE_COUNT files in SFTP server"
+            echo ""
+            echo "🎉 All tests completed successfully!"
+          else
+            echo ""
+            echo "❌ SFTP CLI test FAILED!"
+            echo "📋 Check the output above for details"
+            exit 1
+          fi
+          
       - name: Collect logs on failure
         if: failure()
         run: |
+          echo "=== Collecting service logs for debugging ==="
+          echo ""
           echo "=== PostgreSQL Logs ==="
           docker service logs postgres_postgres-1 --tail 50 || true
           
@@ -202,4 +306,7 @@ jobs:
           
           echo -e "\n=== OpenFN Logs ==="
           docker service logs openfn_openfn --tail 50 || true
-          docker service logs openfn_worker --tail 50 || true 
+          docker service logs openfn_worker --tail 50 || true
+          
+          echo -e "\n=== Docker Services Status ==="
+          docker service ls
