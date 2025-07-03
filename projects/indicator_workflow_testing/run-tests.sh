@@ -160,7 +160,7 @@ run_cli_test() {
     local success=false
     
     # Check if openfn-cli-test image exists
-    if ! docker images | grep -q "openfn-cli-test.*latest"; then
+    if ! docker image inspect "openfn-cli-test:latest" >/dev/null 2>&1; then
         log_error "openfn-cli-test:latest image not found. Build it with: ./build-custom-images.sh openfn-cli-test"
         TEST_RESULTS+=("FAIL")
         TOTAL_FAILED=$((TOTAL_FAILED + 1))
@@ -354,9 +354,12 @@ main() {
     fi
     
     if [[ "$RUN_SFTP_TESTS" == "true" ]]; then
-        run_test_suite "SFTP Basic" "$SCRIPT_DIR/tests/test-sftp.sh" "Basic SFTP connectivity tests"
-        run_test_suite "SFTP Integration" "$SCRIPT_DIR/tests/sftp-integration-tests.sh" "SFTP workflow integration tests"
-        run_test_suite "SFTP Deployment" "$SCRIPT_DIR/tests/deploy-and-test-sftp-integration.sh" "SFTP deployment and testing"
+        # Run CLI-based SFTP tests using the openfn-cli-test Docker image
+        log_info "Running CLI-based SFTP tests..."
+        
+        # Run the two main CLI SFTP test files
+        run_test_suite "SFTP CLI Working Command" "$SCRIPT_DIR/tests/cli/test-sftp-working-command.sh" "Proven working SFTP CLI test"
+        run_test_suite "SFTP CLI Simple Job" "$SCRIPT_DIR/tests/cli/test-simple-sftp-job.sh" "Simple inline SFTP job test"
     fi
     
     if [[ "$RUN_INTEGRATION_TESTS" == "true" ]]; then

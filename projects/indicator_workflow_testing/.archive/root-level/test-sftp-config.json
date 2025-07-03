@@ -1,8 +1,0 @@
-{
-  "configuration": {
-    "host": "172.17.0.1",
-    "port": 2225,
-    "username": "openfn",
-    "password": "instant101"
-  }
-} 

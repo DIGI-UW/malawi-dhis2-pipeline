@@ -4,6 +4,8 @@ services:
     environment:
       - SFTP_USERS=${SFTP_USER}:${SFTP_PASSWORD}:1001:1001:data
     volumes:
+      # Volume for sharing data with other services (like filebrowser)
+      # Pre-baked data from image will be available here
       - sftp-data:/home/${SFTP_USER}/data
     ports:
       - "${SFTP_PORT}:22"
@@ -24,7 +26,6 @@ services:
 
 volumes:
   sftp-data:
-
     
 networks:
   openfn_public:

@@ -42,6 +42,7 @@ services:
       default:
       postgres:
       dhis2:
+      reverse_proxy_public:
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/dhis-web-commons/security/login.action"]
       interval: 30s
@@ -73,4 +74,7 @@ networks:
     external: true
   postgres:
     name: postgres_public
+    external: true
+  reverse_proxy_public:
+    name: reverse-proxy_public
     external: true

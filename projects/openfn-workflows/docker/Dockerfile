@@ -1,20 +1,4 @@
-# Stage 1: Build custom OpenFN SFTP adaptor with enhanced debugging
-FROM node:18-alpine AS adaptor-builder
-
-# Install pnpm for building OpenFN adaptors
-RUN npm install -g pnpm
-
-# Set working directory for adaptor build
-WORKDIR /build
-
-# Copy our custom adaptors project (relative to openfn-workflows directory)
-COPY ../openfn-adaptors/ ./
-
-# Install dependencies and build only the SFTP adaptor
-RUN pnpm install
-RUN cd packages/sftp && pnpm build
-
-# Stage 2: Main OpenFN container with custom adaptor
+# OpenFN Workflows Container with Fixed SFTP Adaptor
 FROM node:18-alpine
 
 # Install OpenFN CLI and necessary tools
@@ -23,14 +7,32 @@ RUN npm install -g @openfn/cli@latest
 # Install utilities
 RUN apk add --no-cache curl bash jq
 
-# Create directory for custom SFTP adaptor and copy our enhanced version
-RUN mkdir -p /usr/local/lib/node_modules/@openfn/language-sftp/dist
-COPY --from=adaptor-builder /build/packages/sftp/dist/ /usr/local/lib/node_modules/@openfn/language-sftp/dist/
-COPY --from=adaptor-builder /build/packages/sftp/package.json /usr/local/lib/node_modules/@openfn/language-sftp/
-COPY --from=adaptor-builder /build/packages/sftp/configuration-schema.json /usr/local/lib/node_modules/@openfn/language-sftp/
+# Fix SFTP adaptor installation (same fix as main openfn container)
+# Create directory for proper SFTP adaptor installation  
+RUN mkdir -p /usr/local/lib/node_modules/@openfn/language-sftp
 
-# Install our custom adaptor's dependencies
-RUN cd /usr/local/lib/node_modules/@openfn/language-sftp && npm install
+WORKDIR /usr/local/lib/node_modules/@openfn/language-sftp
+
+# Install the official SFTP package with PROPER npm install (not broken symlinks)
+# This ensures the workflow loader can validate SFTP workflows properly
+RUN echo '{"name":"@openfn/language-sftp","version":"2.0.14","main":"dist/index.js"}' > package.json && \
+    npm init -y && \
+    rm -rf node_modules package-lock.json && \
+    npm install --no-optional --no-package-lock @openfn/language-sftp@2.0.14 && \
+    # Copy the properly installed package to the correct location
+    cp -r node_modules/@openfn/language-sftp/* . && \
+    # Clean up temporary installation
+    rm -rf node_modules package-lock.json && \
+    # Install final dependencies properly
+    npm install --omit=dev
+
+# Verify SFTP adaptor installation worked
+RUN ls -la /usr/local/lib/node_modules/@openfn/language-sftp/ && \
+    if [ -f "/usr/local/lib/node_modules/@openfn/language-sftp/dist/index.js" ]; then \
+        echo "✅ SFTP adaptor properly installed in workflows container"; \
+    else \
+        echo "❌ SFTP adaptor installation failed" && exit 1; \
+    fi
 
 # Create app directory structure
 WORKDIR /app
@@ -55,6 +57,10 @@ ENV WORKFLOW_PATH="/app/workflows"
 ENV CONFIG_PATH="/app/configs"
 ENV MODE="deploy"
 ENV DRY_RUN="false"
+
+# Add environment variable to identify this as having the official package fix
+ENV OFFICIAL_SFTP_ADAPTOR=true
+ENV SFTP_ADAPTOR_VERSION=2.0.14-official-fixed
 
 # Simple healthcheck - just check if the process is running
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \

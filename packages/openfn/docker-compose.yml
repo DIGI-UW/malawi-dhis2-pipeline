@@ -33,6 +33,7 @@ services:
       - kafka_public
       - postgres
       - openfn_public
+      - reverse_proxy_public
   worker:
     image: ${OPENFN_WORKER_IMAGE}
     deploy:
@@ -60,3 +61,8 @@ networks:
   postgres:
     name: postgres_public
     external: true
+  reverse_proxy_public:
+    name: reverse-proxy_public
+    external: true
+  
+

@@ -1,0 +1,251 @@
+name: CI - Environment Setup and SFTP Test
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'packages/**'
+      - 'projects/**'
+      - 'build-*.sh'
+      - 'get-cli.sh'
+      - 'mk.sh'
+      - '.env.example'
+      - '.github/workflows/ci-environment.yml'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'packages/**'
+      - 'projects/**'
+      - 'build-*.sh'
+      - 'get-cli.sh'
+      - 'mk.sh'
+      - '.env.example'
+      - '.github/workflows/ci-environment.yml'
+  workflow_dispatch:
+
+env:
+  # Docker settings
+  DOCKER_BUILDKIT: 1
+  COMPOSE_DOCKER_CLI_BUILD: 1
+  
+  # Docker registry for caching
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+  
+  # instant CLI settings
+  INSTANT_VERSION: v2
+  
+  # Service versions
+  OPENFN_VERSION: v2.13.3
+  DHIS2_VERSION: 2.40.2.1
+  POSTGRES_VERSION: 15-alpine
+  
+  # Dev mode settings
+  MODE: dev
+  CLUSTERED_MODE: false
+
+jobs:
+  environment-setup-and-test:
+    name: Environment Setup and SFTP CLI Test
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    
+    permissions:
+      contents: read
+      packages: write
+    
+    steps:
+      # =================================================================
+      # ENVIRONMENT SETUP PHASE
+      # =================================================================
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          driver-opts: |
+            image=moby/buildkit:master
+            network=host
+            
+      - name: Log in to Container Registry
+        if: github.event_name != 'pull_request' && github.actor != 'nektos/act'
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Extract metadata
+        id: meta
+        if: github.actor != 'nektos/act'
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=sha,prefix={{branch}}-
+          
+      - name: Download instant CLI
+        run: |
+          ./get-cli.sh linux
+          chmod +x ./instant
+          ./instant version
+          
+      - name: Clean Docker Environment
+        run: |
+          echo "🧹 Cleaning Docker environment to ensure fresh builds..."
+          
+          # Only clean up OpenFN-related services and networks
+          docker service rm $(docker service ls --filter name=openfn --format "{{.Name}}") 2>/dev/null || true
+          docker service rm $(docker service ls --filter name=dhis2 --format "{{.Name}}") 2>/dev/null || true
+          docker service rm $(docker service ls --filter name=postgres --format "{{.Name}}") 2>/dev/null || true
+          docker service rm $(docker service ls --filter name=sftp --format "{{.Name}}") 2>/dev/null || true
+          
+          # Initialize swarm if not already initialized
+          docker swarm init || echo "Swarm already initialized"
+          
+          # Clean up custom images to ensure fresh builds
+          docker rmi openfn-workflows:local 2>/dev/null || true
+          docker rmi openfn-custom:latest 2>/dev/null || true
+          docker rmi dhis2/core:local 2>/dev/null || true
+          docker rmi sftp-with-data:latest 2>/dev/null || true
+          
+          # Create required networks
+          docker network create openfn_public --driver overlay --attachable || true
+          docker network create postgres_public --driver overlay --attachable || true
+          docker network create dhis2_public --driver overlay --attachable || true
+          docker network create reverse-proxy_public --driver overlay --attachable || true
+          
+      - name: Setup test data for SFTP
+        run: |
+          # Copy test Excel files to SFTP data directory for CI builds
+          mkdir -p projects/sftp/data/excel-files
+          cp .github/test-data/excel-files/* projects/sftp/data/excel-files/
+          echo "✅ Test data copied to SFTP data directory"
+          ls -la projects/sftp/data/excel-files/
+          
+      - name: Build custom images using documented workflow
+        run: |
+          echo "🔨 Building custom images using ./build-custom-images.sh (same as users)"
+          
+          # Use the documented build script that users follow
+          ./build-custom-images.sh all
+          
+          # Also build the CLI test image specifically for testing framework
+          echo "🧪 Building CLI test image for testing framework..."
+          ./build-custom-images.sh openfn-cli-test
+          
+          # Verify images were built
+          echo "📦 Verifying built images:"
+          docker images --format "table {{.Repository}}:{{.Tag}}\t{{.CreatedAt}}\t{{.Size}}" | grep -E "(dhis2/core|openfn-custom|sftp-with-data|openfn-workflows|openfn-cli-test)" || echo "Some expected images may not have been built"
+          
+          echo -e "\n📋 All custom images:"
+          docker images --format "table {{.Repository}}:{{.Tag}}\t{{.CreatedAt}}\t{{.Size}}" | grep -v "REPOSITORY" | head -15
+          
+      - name: Build platform image with cache
+        run: |
+          ./build-image.sh
+          
+      - name: Deploy PostgreSQL
+        run: |
+          ./instant package init -n database-postgres -d
+          
+          # Wait for PostgreSQL to be ready
+          echo "Waiting for PostgreSQL..."
+          timeout 120s bash -c 'until docker service ls | grep -q "postgres_postgres-1.*1/1"; do sleep 5; done'
+          sleep 10
+          
+      - name: Deploy SFTP Storage
+        run: |
+          ./instant package init -n sftp-storage -d
+          
+          # Wait for SFTP to be ready
+          echo "Waiting for SFTP server..."
+          timeout 60s bash -c 'until docker service ls | grep -q "sftp-storage_sftp-server.*1/1"; do sleep 5; done'
+          
+      - name: Deploy DHIS2
+        run: |
+          ./instant package init -n dhis2-instance -d
+          
+          # Wait for DHIS2 to be ready 
+          echo "Waiting for DHIS2..."
+          timeout 300s bash -c 'until docker service ls | grep -q "dhis2_dhis2.*1/1"; do sleep 10; done'
+          
+      - name: Deploy OpenFN
+        run: |
+          ./instant package init -n openfn -d
+          
+          # Wait for OpenFN to be ready
+          echo "Waiting for OpenFN..."
+          timeout 120s bash -c 'until docker service ls | grep -q "openfn_openfn.*1/1"; do sleep 5; done'
+          timeout 120s bash -c 'until docker service ls | grep -q "openfn_worker.*1/1"; do sleep 5; done'
+          
+      - name: List running services
+        run: |
+          echo "==================================================================="
+          echo "🎉 ENVIRONMENT SETUP COMPLETE - All services deployed"
+          echo "==================================================================="
+          echo ""
+          echo "=== Docker Services ==="
+          docker service ls
+          
+          echo -e "\n=== Service Details ==="
+          docker service ps postgres_postgres-1 --no-trunc || true
+          docker service ps sftp-storage_sftp-server --no-trunc || true
+          docker service ps dhis2_dhis2 --no-trunc || true
+          docker service ps openfn_openfn --no-trunc || true
+          docker service ps openfn_worker --no-trunc || true
+          
+          echo -e "\n🔗 Service Endpoints:"
+          echo "   - PostgreSQL: localhost:5532"
+          echo "   - SFTP Server: localhost:2225 (user: openfn, pass: instant101)"
+          echo "   - DHIS2: localhost:8080"
+          echo "   - OpenFN: localhost:4000"
+          echo ""
+          
+      # =================================================================
+      # CLI TESTING PHASE - SFTP TEST ONLY
+      # =================================================================
+      - name: Install OpenFN CLI for testing
+        run: |
+          echo "==================================================================="
+          echo "🧪 CLI TESTING PHASE - SFTP Test"
+          echo "==================================================================="
+          npm install -g @openfn/cli@latest
+          openfn --version
+          
+      - name: Run SFTP Tests Using Existing Framework
+        run: |
+          echo "🚀 Running SFTP tests using indicator_workflow_testing framework"
+          echo "==============================================================="
+          
+          # Navigate to the testing framework
+          cd projects/indicator_workflow_testing
+          
+          # Run just the SFTP tests using the existing framework
+          ./run-tests.sh --sftp
+          
+          echo "✅ SFTP tests completed!"
+          
+      - name: Collect logs on failure
+        if: failure()
+        run: |
+          echo "=== Collecting service logs for debugging ==="
+          echo ""
+          echo "=== PostgreSQL Logs ==="
+          docker service logs postgres_postgres-1 --tail 50 || true
+          
+          echo -e "\n=== SFTP Logs ==="
+          docker service logs sftp-storage_sftp-server --tail 50 || true
+          
+          echo -e "\n=== DHIS2 Logs ==="
+          docker service logs dhis2_dhis2 --tail 50 || true
+          
+          echo -e "\n=== OpenFN Logs ==="
+          docker service logs openfn_openfn --tail 50 || true
+          docker service logs openfn_worker --tail 50 || true
+          
+          echo -e "\n=== Docker Services Status ==="
+          docker service ls

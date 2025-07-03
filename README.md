@@ -2,7 +2,7 @@
 
 ## Overview
 
-This project implements a flexible, configuration-driven pipeline for importing HIV/TB health indicators from various Excel/CSV formats into DHIS2. Built on OpenFN and Instant OpenHIE v2, it supports multiple data sources including Google Sheets and SFTP-based file uploads.
+This project implements a flexible, configuration-driven pipeline for importing HIV/TB health indicators from various Excel/CSV formats into DHIS2. Built on OpenFN and Instant OpenHIE v2, it supports multiple data sources and SFTP-based file uploads.
 
 ### Key Features
 
@@ -11,67 +11,136 @@ This project implements a flexible, configuration-driven pipeline for importing 
 - **Automated Processing**: Scheduled (cron) and event-driven (webhook) workflows
 - **Data Validation**: Built-in validation rules and transformation capabilities
 - **Time-Based Protection**: Configurable update windows to prevent accidental overwrites
-- **Docker Swarm Deployment**: Production-ready containerized deployment
+- **Docker Swarm Deployment**: Production-ready containerized architecture
 
-## Architecture
+## CI/CD
 
+The project includes automated CI testing via GitHub Actions:
+
+- **Environment Setup CI**: Tests the complete instant OpenHIE deployment
+- **Workflow Tests CI**: Validates OpenFN workflows using CLI testing framework
+
+View [CI Documentation](.github/workflows/README.md) for details.
+
+### Running CI Tests Locally
+
+Uses Docker to run GitHub Actions locally (no installation required):
+
+```bash
+# Prerequisites: Docker must be running
+./scripts/run-ci-locally.sh              # Run all CI workflows
+./scripts/run-ci-locally.sh --env-setup  # Environment setup only
+./scripts/run-ci-locally.sh --workflow-tests  # Workflow tests only
+./scripts/run-ci-locally.sh --list       # List available workflows
+./scripts/run-ci-locally.sh --verbose    # Enable verbose output
+./scripts/run-ci-locally.sh --help       # Show all options
 ```
-┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
-│   Data Sources  │     │   OpenFN        │     │   DHIS2         │
-├─────────────────┤     ├─────────────────┤     ├─────────────────┤
-│ • Google Sheets │────▶│ • Workflows     │────▶│ • Data Import   │
-│ • SFTP Files    │     │ • Transformers  │     │ • Validation    │
-│ • Excel/CSV     │     │ • Validators    │     │ • Storage       │
-└─────────────────┘     └─────────────────┘     └─────────────────┘
-                               │
-                               ▼
-                        ┌─────────────────┐
-                        │   PostgreSQL    │
-                        │ • State Mgmt    │
-                        │ • Audit Trail   │
-                        └─────────────────┘
+
+**Note**: The script automatically builds a Docker image with `act` on first run. This may take a minute initially but subsequent runs are fast.
+
+### Pre-push Hook (Optional)
+
+To run basic checks before pushing:
+
+```bash
+# Enable the pre-push hook
+git config core.hooksPath .githooks
+
+# To disable it later
+git config --unset core.hooksPath
 ```
 
 ## Quick Start
 
+> **📖 For detailed setup instructions, see the [Environment Setup Guide](docs/environment-setup.md)**
+
 ### Prerequisites
 
-- Docker and Docker Compose (with Swarm mode)
-- Node.js and npm
-- OpenFN CLI: `npm install -g @openfn/cli`
+- Docker 20.10+ with Swarm mode
+- Node.js 18+ and npm
+- Git 2.25+
+- Ubuntu 20.04+ or similar Linux
+- 4GB RAM, 20GB disk space
 
-### Deployment Steps
+### 1. Clone and Setup
 
-    ```bash
-# 1. Clone and setup
-git clone <repository>
+```bash
+git clone https://github.com/your-org/malawi-dhis2-pipeline.git
 cd malawi-dhis2-pipeline
-
-# 2. Configure environment
 cp .env.example .env
 # Edit .env with your settings
-
-# 3. Build custom images
-./build-custom-images.sh sftp        # SFTP with sample data
-./build-custom-images.sh openfn-workflows  # OpenFN with workflows
-
-# 4. Initialize project
-./instant project init --env-file .env
-
-# 5. Access services
-# OpenFN: http://localhost:4000
-# DHIS2: http://localhost:8080
-# SFTP: sftp://localhost:2225
 ```
 
-### OpenFN Workflow Management
+### 2. Install instant CLI
 
-The system provides comprehensive workflow management with bidirectional sync between code and UI.
+```bash
+./get-cli.sh linux
+# Verify: ./instant --version
+```
 
-#### Workflow Sync System
+### 3. Build and Deploy
 
-**Quick Start:**
-    ```bash
+```bash
+# Build custom Docker images
+./build-custom-images.sh all
+
+# Initialize and start all services
+./build-image.sh
+
+./instant project up --env-file .env
+```
+
+*Note: See `mk.sh` for examples of other useful instant cli commands*
+
+### 4. Access Services
+
+After ~5 minutes for initialization:
+
+- **OpenFN**: http://localhost:4000 (root@openhim.org / instant101)
+- **DHIS2**: http://localhost:8080 (admin / district)
+- **SFTP**: sftp://localhost:2225 (openfn / instant101)
+
+## Documentation
+
+### 📚 Essential Guides
+
+- **[Environment Setup Guide](docs/environment-setup.md)** - Detailed installation and configuration
+- **[Quick Start Tutorial](docs/quick-start-tutorial.md)** - Get running in 15 minutes
+- **[Testing Guide](docs/Testing-Guide-CSV-XLSX.md)** - Comprehensive testing procedures
+- **[Troubleshooting Guide](projects/openfn-workflows/docs/06-troubleshooting.md)** - Common issues and solutions
+
+### 🔧 Configuration & Development
+
+- **[CSV/XLSX Integration Guide](docs/CSV-XLSX-Import-Integration.md)** - File format configuration
+- **[OpenFN Workflow Sync](docs/openfn-workflow-sync.md)** - Workflow development and sync
+- **[Google Sheets Setup](docs/google-sheets-setup.md)** - Google Sheets API configuration
+- **[SFTP Excel Integration](docs/sftp-excel-integration.md)** - SFTP file processing
+
+### 📦 Component Documentation
+
+- **[OpenFN Workflows](projects/openfn-workflows/README.md)** - Workflow definitions and testing
+- **[Testing Framework](projects/indicator_workflow_testing/README.md)** - Automated test suite
+- **[Package Documentation](packages/)** - Individual service documentation
+
+### 📋 Project Information
+
+- **[Deliverables](docs/Deliverables.md)** - Project requirements and milestones
+- **[Migration Guide](docs/migration-guide.md)** - PostgreSQL to Google Sheets migration
+
+## Supported File Formats
+
+The pipeline automatically detects and processes these file types:
+
+- **ART Data**: `*ART*data*long*.xlsx` - ART supervision with age/gender disaggregation
+- **DQ Sites**: `*Q*FY*DQ*sites*.xlsx` - Data quality reports with completeness scores
+- **Direct Queries**: `*Direct*Queries*.xlsx` - MoH quarterly reports with multi-sheet support
+
+Configuration files in `projects/openfn-workflows/configs/file-types/` define the mapping rules.
+
+### Workflow Sync System
+
+#### Quick Start:
+```bash
 # Check sync status
 ./packages/openfn/instant-workflow-sync.sh status
 
@@ -85,15 +154,15 @@ The system provides comprehensive workflow management with bidirectional sync be
 ./packages/openfn/instant-workflow-sync.sh watch
 ```
 
-**Key Features:**
+#### Key Features:
 - **Bidirectional Sync**: Download from UI or upload from code
 - **Version Management**: Track changes with lock_version support
 - **Conflict Resolution**: Automatic or manual conflict handling
 - **Snapshot System**: Automatic backups before changes
 - **Watch Mode**: Auto-sync on file changes
 
-**Configuration** (in `.env`):
-        ```bash
+#### Configuration (in `.env`):
+```bash
 OPENFN_SYNC_MODE=manual              # manual|auto-download|auto-upload
 OPENFN_CONFLICT_RESOLUTION=prompt    # prompt|local-wins|remote-wins
 OPENFN_ENABLE_AUTO_SNAPSHOT=true     # Auto-create snapshots
@@ -297,14 +366,16 @@ The project includes a comprehensive testing framework for validating workflows 
 
 ## Troubleshooting
 
-Common issues and solutions:
+For detailed troubleshooting, see the [Environment Setup Guide](docs/environment-setup.md#troubleshooting) or the [Troubleshooting Guide](projects/openfn-workflows/docs/06-troubleshooting.md).
 
-| Issue | Solution |
-|-------|----------|
-| File not recognized | Check filename matches patterns in config |
-| Column mapping errors | Verify Excel column names match configuration |
-| DHIS2 upload failures | Check metadata UIDs and credentials |
-| Old data not updating | Adjust time window settings (default: 3 months) |
+Common quick fixes:
+
+| Issue | Quick Solution |
+|-------|----------------|
+| Services not starting | Check logs: `docker service logs <service_name>` |
+| Workflows not loading | Run: `docker service update --force openfn-workflows_workflow-loader` |
+| DHIS2 not accessible | Wait 2-5 minutes for initialization |
+| Port conflicts | Change ports in `.env` file |
 
 ## Contributing
 
@@ -321,8 +392,9 @@ Common issues and solutions:
 ## Support
 
 - **Issues**: GitHub Issues
-- **Documentation**: This README and linked guides
-- **Community**: [Community channels]
+- **Documentation**: See [Documentation](#documentation) section above
+- **instant v2**: https://github.com/openhie/instant-v2
+- **OpenFN Community**: https://community.openfn.org/
 
 ## 🧩 Key Components
 
@@ -365,3 +437,66 @@ For the complete testing framework documentation, see:
 ### Other Documentation
 - [`docs/Deliverables.md`](docs/Deliverables.md) - Project deliverables and milestones
 - [`docs/MCP-SERVERS.md`](docs/MCP-SERVERS.md) - MCP server integration
+
+## Supporting Documentation
+
+- **[instant v2 Documentation](https://github.com/openhie/instant-v2)** - Infrastructure orchestration platform
+- **[Docker Swarm Guide](https://docs.docker.com/engine/swarm/)** - Container orchestration
+- **[OpenFN Platform Docs](https://docs.openfn.org/)** - Workflow automation platform
+- **[DHIS2 Documentation](https://docs.dhis2.org/)** - Health information system
+
+## Troubleshooting Setup
+
+### Common Setup Issues
+
+| Issue | Solution |
+|-------|----------|
+| Docker permission denied | Run `sudo usermod -aG docker $USER` and logout/login |
+| instant CLI not found | Ensure `/usr/local/bin` is in your PATH or use `./instant` |
+| Services failing to start | Check logs: `docker service logs <service_name>` |
+| Port already in use | Change port mappings in `.env` file |
+| Out of disk space | Run `docker system prune -a` to clean up |
+
+### Service-Specific Issues
+
+#### OpenFN Not Loading Workflows
+```bash
+# Check workflow loader logs
+docker service logs openfn-workflows_workflow-loader
+
+# Manually trigger workflow loading
+cd packages/openfn/importer/workflows
+docker service update --force openfn-workflows_workflow-loader
+```
+
+#### DHIS2 Not Accessible
+```bash
+# Check if service is running
+docker service ps dhis2-instance_dhis2
+
+# Wait for initialization (can take 2-5 minutes)
+docker service logs -f dhis2-instance_dhis2 | grep "Server startup"
+```
+
+#### SFTP Files Not Visible
+```bash
+# Verify SFTP service has bundled files
+docker exec $(docker ps -q -f name=sftp-server) ls -la /data/excel-files/
+
+# Should see:
+# - ART_data_long_format.xlsx
+# - Direct Queries - Q1 2025 MoH Reports.xlsx
+# - Q2FY25_DQ_253_sites.xlsx
+```
+
+## Production Deployment
+
+> **Note**: Production deployment guide coming soon. The current setup is optimized for development and testing environments.
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Add tests for new functionality
+4. Update documentation
+5. Submit a pull request

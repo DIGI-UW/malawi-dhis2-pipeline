@@ -7,7 +7,7 @@ echo "=============================================="
 echo ""
 
 # Run the working Docker command with proper CLI flags from project root
-docker run --rm -it -v "$(pwd)/../fixtures:/e2e" openfn-cli-test:latest /bin/sh -c "
+docker run --rm -i -v "$(pwd)/../fixtures:/e2e" openfn-cli-test:latest /bin/sh -c "
 # Create proper OpenFN project structure
 mkdir -p /tmp/myproject/workflows/test-workflow
 

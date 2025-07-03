@@ -30,7 +30,7 @@ JOB_EXPRESSION="list('/data/excel-files', state => { console.log('Files:', state
 
 # Run the job directly using CLI
 echo "🚀 Running simple SFTP job..."
-docker run --rm -it \
+docker run --rm -i \
     -v "$(pwd)/fixtures:/fixtures" \
     -v "$(pwd)/outputs:/outputs" \
     "$DOCKER_IMAGE" /bin/sh -c "

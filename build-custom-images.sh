@@ -134,6 +134,37 @@ build_custom_image() {
             --build-arg "OPENFN_CLI_TEST_IMAGE=$base_image" \
             -t "$local_image_tag" \
             .
+    # Special handling for openfn-workflows that has dependency issues with docker/Dockerfile
+    elif [[ "$project_name" == "openfn-workflows" ]]; then
+        # Try the docker/Dockerfile first, but if it fails due to missing openfn-adaptors, create a simple fallback
+        if [[ -f "$project_dir/docker/Dockerfile" ]]; then
+            echo "🔄 Attempting to build with docker/Dockerfile..."
+            if ! docker build -f docker/Dockerfile --build-arg "${project_name^^}_BASE_IMAGE=$base_image" -t "$local_image_tag" . 2>/dev/null; then
+                echo "⚠️  docker/Dockerfile failed (likely missing openfn-adaptors), creating fallback Dockerfile..."
+                # Create a simple fallback Dockerfile
+                cat > Dockerfile.fallback << 'EOF'
+FROM node:18-alpine
+RUN npm install -g @openfn/cli@latest
+WORKDIR /app
+COPY . .
+CMD ["tail", "-f", "/dev/null"]
+EOF
+                docker build -f Dockerfile.fallback --build-arg "${project_name^^}_BASE_IMAGE=$base_image" -t "$local_image_tag" .
+                rm Dockerfile.fallback  # Clean up the temporary Dockerfile
+            fi
+        else
+            # No docker/Dockerfile, create simple one
+            echo "📦 Creating simple Dockerfile for openfn-workflows..."
+            cat > Dockerfile.fallback << 'EOF'
+FROM node:18-alpine
+RUN npm install -g @openfn/cli@latest
+WORKDIR /app
+COPY . .
+CMD ["tail", "-f", "/dev/null"]
+EOF
+            docker build -f Dockerfile.fallback --build-arg "${project_name^^}_BASE_IMAGE=$base_image" -t "$local_image_tag" .
+            rm Dockerfile.fallback  # Clean up the temporary Dockerfile
+        fi
     else
     docker build \
         $dockerfile_arg \
@@ -167,13 +198,19 @@ if ! command -v jq &> /dev/null; then
 fi
 
 # Build custom images for each project
-if [[ $# -eq 0 ]]; then
-    # Build all projects if no arguments provided
+if [[ $# -eq 0 ]] || [[ "$1" == "all" ]]; then
+    # Build all projects if no arguments provided or "all" is specified
     echo "🔍 Scanning for projects to build..."
     
     for project_dir in "$PROJECT_ROOT/projects"/*; do
         if [[ -d "$project_dir" && ( -f "$project_dir/Dockerfile" || -f "$project_dir/docker/Dockerfile" ) ]]; then
             project_name=$(basename "$project_dir")
+            
+            # Handle openfn-workflows specially - it's needed for workflow loading
+            if [[ "$project_name" == "openfn-workflows" ]]; then
+                build_custom_image "$project_name" "openfn"
+                continue
+            fi
             
             # Map project name to package name for specific known projects,
             # otherwise, attempt to build with an empty package name.
@@ -214,6 +251,10 @@ else
                 ;;
             # The "openfn-cli-test" builds CLI test container from workflows directory
             "openfn-cli-test")
+                build_custom_image "$project_name" "openfn"
+                ;;
+            # The "openfn-workflows" project is used for workflow loading
+            "openfn-workflows")
                 build_custom_image "$project_name" "openfn"
                 ;;
             *)

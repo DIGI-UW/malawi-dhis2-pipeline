@@ -1,0 +1,48 @@
+services:
+  sftpui:
+    image: filegator/filegator:latest
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - FG_AUTH_TYPE=guest  # Allow guest access for demo
+      - FG_GUEST_PERMISSIONS=read|download  # Read-only guest access
+      - FG_ALLOW_SIGNUP=false
+      - FG_USE_DATABASE=false
+    volumes:
+      # Reference the sftp-data volume from sftp-storage package
+      - sftp-data:/var/www/filegator/repository:ro  # Read-only access to SFTP data
+      - filegator-config:/config
+      - filegator-private:/private
+    ports:
+      - "${SFTP_WEB_PORT:-8090}:8080"
+    networks:
+      - openfn_public
+      - reverse_proxy_public
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+
+volumes:
+  # Reference external volume created by sftp-storage package
+  sftp-data:
+    external: true
+    name: sftp-storage_sftp-data
+  filegator-config:
+    # FileGator configuration storage
+  filegator-private:
+    # FileGator private data (users, etc)
+
+networks:
+  openfn_public:
+    name: openfn_public
+    external: true
+  reverse_proxy_public:
+    name: reverse-proxy_public
+    external: true
+  

@@ -3,6 +3,10 @@
 node_modules
 output.json
 
+# Act configuration (local)
+.actrc
+Dockerfile.act
+
 # Data directories - prevent committing sensitive data
 data/
 */data/
@@ -10,13 +14,17 @@ packages/*/data/
 projects/*/data/
 
 # Additional data file patterns
-*.xlsx
 *.csv
 *.xls
 **/DHIS2_HIV*.xlsx
 **/DHIS2_HIV*.csv
 **/*DQ_*.xlsx
 **/*malawi*.sql
+
+# Allow test data for CI builds
+!.github/test-data/**/*.xlsx
+!.github/test-data/**/*.csv
+!.github/test-data/**/*.xls
 
 *.log
 
@@ -40,3 +48,4 @@ projects/openfn-workflows/workflows/*/.last-deployed.json
 projects/openfn-workflows/workflows/*/.state-backups/
 
 *.bkp
+bin/*

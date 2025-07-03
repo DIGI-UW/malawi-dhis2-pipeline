@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# Git pre-push hook
+# Runs basic checks before pushing to remote
+
+# Get the repository root directory
+REPO_ROOT=$(git rev-parse --show-toplevel)
+
+# Run the pre-push check script
+if [ -f "$REPO_ROOT/scripts/pre-push-check.sh" ]; then
+    exec "$REPO_ROOT/scripts/pre-push-check.sh"
+else
+    echo "Warning: pre-push-check.sh not found"
+    exit 0
+fi 
