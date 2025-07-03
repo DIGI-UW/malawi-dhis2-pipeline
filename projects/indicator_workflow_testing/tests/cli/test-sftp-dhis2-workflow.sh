@@ -32,7 +32,7 @@ echo ""
 
 # Run the workflow with manually created JSON structure
 echo "🔄 Creating and running workflow..."
-docker run --rm -it \
+docker run --rm -i \
     -v "$PROJECT_ROOT:/workspace" \
     -v "$(pwd)/fixtures:/fixtures" \
     -v "$(pwd)/outputs:/outputs" \

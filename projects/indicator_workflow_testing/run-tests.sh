@@ -160,7 +160,7 @@ run_cli_test() {
     local success=false
     
     # Check if openfn-cli-test image exists
-    if ! docker images | grep -q "openfn-cli-test.*latest"; then
+    if ! docker image inspect "openfn-cli-test:latest" >/dev/null 2>&1; then
         log_error "openfn-cli-test:latest image not found. Build it with: ./build-custom-images.sh openfn-cli-test"
         TEST_RESULTS+=("FAIL")
         TOTAL_FAILED=$((TOTAL_FAILED + 1))

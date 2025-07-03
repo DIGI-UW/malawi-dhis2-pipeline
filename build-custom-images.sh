@@ -142,28 +142,28 @@ build_custom_image() {
             if ! docker build -f docker/Dockerfile --build-arg "${project_name^^}_BASE_IMAGE=$base_image" -t "$local_image_tag" . 2>/dev/null; then
                 echo "⚠️  docker/Dockerfile failed (likely missing openfn-adaptors), creating fallback Dockerfile..."
                 # Create a simple fallback Dockerfile
-                cat > Dockerfile << 'EOF'
+                cat > Dockerfile.fallback << 'EOF'
 FROM node:18-alpine
 RUN npm install -g @openfn/cli@latest
 WORKDIR /app
 COPY . .
 CMD ["tail", "-f", "/dev/null"]
 EOF
-                docker build --build-arg "${project_name^^}_BASE_IMAGE=$base_image" -t "$local_image_tag" .
-                rm Dockerfile  # Clean up the temporary Dockerfile
+                docker build -f Dockerfile.fallback --build-arg "${project_name^^}_BASE_IMAGE=$base_image" -t "$local_image_tag" .
+                rm Dockerfile.fallback  # Clean up the temporary Dockerfile
             fi
         else
             # No docker/Dockerfile, create simple one
             echo "📦 Creating simple Dockerfile for openfn-workflows..."
-            cat > Dockerfile << 'EOF'
+            cat > Dockerfile.fallback << 'EOF'
 FROM node:18-alpine
 RUN npm install -g @openfn/cli@latest
 WORKDIR /app
 COPY . .
 CMD ["tail", "-f", "/dev/null"]
 EOF
-            docker build --build-arg "${project_name^^}_BASE_IMAGE=$base_image" -t "$local_image_tag" .
-            rm Dockerfile  # Clean up the temporary Dockerfile
+            docker build -f Dockerfile.fallback --build-arg "${project_name^^}_BASE_IMAGE=$base_image" -t "$local_image_tag" .
+            rm Dockerfile.fallback  # Clean up the temporary Dockerfile
         fi
     else
     docker build \

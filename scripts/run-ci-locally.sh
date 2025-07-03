@@ -87,7 +87,7 @@ if ! docker info &> /dev/null; then
 fi
 
 # Build act image if it doesn't exist
-if ! docker images | grep -q "$ACT_IMAGE"; then
+if ! docker image inspect "$ACT_IMAGE" >/dev/null 2>&1; then
     log_info "Building act Docker image..."
     docker build -f Dockerfile.act -t "$ACT_IMAGE" .
 fi
