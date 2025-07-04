@@ -3,7 +3,7 @@
 **Last Updated**: 2024-12-29  
 **Status**: ✅ **Production Ready** - Docker-based testing framework with working SFTP integration
 
-## � **Recent Updates**
+## 📢 **Recent Updates**
 
 ### **Test Consolidation (July 2024)**
 All testing functionality has been consolidated from `openfn-workflows/scripts` into this project:
@@ -13,7 +13,7 @@ All testing functionality has been consolidated from `openfn-workflows/scripts` 
 - ✅ Removed redundant test scripts from `openfn-workflows/scripts`
 - ✅ Preserved deployment scripts (`deploy-workflow.sh`, `validate-workflow.sh`, `list-workflows.sh`)
 
-## �🚀 **Quick Start Guide**
+## 🚀 **Quick Start Guide**
 
 ### **30-Second Test**
 ```bash
