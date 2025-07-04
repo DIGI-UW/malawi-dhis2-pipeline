@@ -34,7 +34,19 @@ check_services() {
     
     # Check DHIS2
     log_info "Testing DHIS2 connection to $DHIS2_URL"
-    if timeout 10s bash -c "echo > /dev/tcp/localhost/8080" 2>/dev/null; then
+    # Extract host and port from DHIS2_URL
+    DHIS2_HOST=$(echo "$DHIS2_URL" | sed -E 's|^https?://||' | cut -d':' -f1)
+    DHIS2_PORT=$(echo "$DHIS2_URL" | sed -E 's|^https?://||' | cut -d':' -f2 | cut -d'/' -f1)
+    # Default to port 80 for http or 443 for https if no port specified
+    if [[ "$DHIS2_PORT" == "$DHIS2_HOST" ]]; then
+        if [[ "$DHIS2_URL" =~ ^https:// ]]; then
+            DHIS2_PORT=443
+        else
+            DHIS2_PORT=80
+        fi
+    fi
+    
+    if timeout 10s bash -c "echo > /dev/tcp/$DHIS2_HOST/$DHIS2_PORT" 2>/dev/null; then
         log_success "✅ DHIS2 service is accessible"
     else
         log_warning "⚠️  DHIS2 service not accessible at $DHIS2_URL"

@@ -32,18 +32,12 @@ cd /home/ubuntu/code/malawi-dhis2-pipeline
 
 ### 3. Test Workflows
 
-All testing functionality has been consolidated in the `indicator_workflow_testing` project:
-
 ```bash
 cd projects/indicator_workflow_testing
-
-# Run all tests
-./run-tests.sh
-
-# Run specific test suites
-./run-tests.sh --cli-workflow              # CLI-based workflow tests
-./run-tests.sh --env-file .env --integration  # Integration tests with custom environment
+./run-tests.sh --cli-workflow
 ```
+
+For more testing options, see the [Testing](#-testing) section below.
 
 ## 📁 Project Structure
 
