@@ -17,10 +17,15 @@ RUN_SFTP_TESTS=true
 RUN_INTEGRATION_TESTS=true
 RUN_CLI_WORKFLOW_TESTS=true
 SPECIFIC_TEST=""
+ENV_FILE=""
 
 # Parse command line arguments
 while [[ $# -gt 0 ]]; do
     case $1 in
+        --env-file)
+            ENV_FILE="$2"
+            shift 2
+            ;;
         --api)
             RUN_API_TESTS=true
             RUN_EXCEL_TESTS=false
@@ -86,25 +91,31 @@ while [[ $# -gt 0 ]]; do
             echo "Usage: $0 [OPTIONS]"
             echo ""
             echo "Options:"
-            echo "  --api          Run only API connectivity tests"
-            echo "  --workflows    Run only workflow validation tests"
-            echo "  --excel        Run only Excel parsing tests"
-            echo "  --sftp         Run only SFTP integration tests"
-            echo "  --integration  Run only end-to-end integration tests"
-            echo "  --cli-workflow Run CLI-based workflow tests (3 working tests)"
-            echo "  --verbose, -v  Enable verbose output"
-            echo "  --help, -h     Show this help message"
+            echo "  --env-file FILE    Source environment variables from specified file"
+            echo "  --api              Run only API connectivity tests"
+            echo "  --workflows        Run only workflow validation tests"
+            echo "  --excel            Run only Excel parsing tests"
+            echo "  --sftp             Run only SFTP integration tests"
+            echo "  --integration      Run only end-to-end integration tests"
+            echo "  --cli-workflow     Run CLI-based workflow tests (3 working tests)"
+            echo "  --verbose, -v      Enable verbose output"
+            echo "  --help, -h         Show this help message"
             echo ""
             echo "Examples:"
-            echo "  $0                     # Run all tests"
-            echo "  $0 --cli-workflow      # Run 3 CLI tests (SFTP basic, simple job, full workflow)"
-            echo "  $0 --api --verbose     # Run API tests with verbose output"
-            echo "  $0 --integration       # Run only integration tests"
+            echo "  $0                               # Run all tests"
+            echo "  $0 --cli-workflow                # Run 3 CLI tests (SFTP basic, simple job, full workflow)"
+            echo "  $0 --api --verbose               # Run API tests with verbose output"
+            echo "  $0 --env-file .env --integration # Run integration tests with custom environment"
             echo ""
             echo "CLI Tests Available:"
             echo "  • test-sftp-working-command.sh   - ⭐ PROVEN WORKING (30s)"
             echo "  • test-simple-sftp-job.sh        - Simple inline test"
             echo "  • test-sftp-dhis2-workflow.sh    - Complete workflow"
+            echo ""
+            echo "Environment Variables (can be set via --env-file or package metadata):"
+            echo "  SFTP_HOST, SFTP_PORT, SFTP_USER, SFTP_PASSWORD"
+            echo "  DHIS2_URL, DHIS2_USER, DHIS2_PASS"
+            echo "  OPENFN_URL, OPENFN_API_KEY"
             exit 0
             ;;
         *)
@@ -114,6 +125,22 @@ while [[ $# -gt 0 ]]; do
             ;;
     esac
 done
+
+# Source environment file if specified
+if [[ -n "$ENV_FILE" && -f "$ENV_FILE" ]]; then
+    log_info "Sourcing environment from: $ENV_FILE"
+    source "$ENV_FILE"
+fi
+
+# Set environment variables using get_env_value function
+export SFTP_HOST=$(get_env_value "SFTP_HOST" "sftp-storage" "localhost")
+export SFTP_PORT=$(get_env_value "SFTP_PORT" "sftp-storage" "2225")
+export SFTP_USER=$(get_env_value "SFTP_USER" "sftp-storage" "openfn")
+export SFTP_PASSWORD=$(get_env_value "SFTP_PASSWORD" "sftp-storage" "instant101")
+export DHIS2_URL=$(get_env_value "DHIS2_URL" "dhis2-instance" "http://localhost:8080")
+export DHIS2_USER=$(get_env_value "DHIS2_USER" "dhis2-instance" "admin")
+export DHIS2_PASS=$(get_env_value "DHIS2_PASS" "dhis2-instance" "district")
+export OPENFN_URL=$(get_env_value "OPENFN_URL" "openfn" "http://localhost:4000")
 
 # Test results tracking
 declare -a TEST_RESULTS
@@ -188,6 +215,13 @@ run_cli_test() {
             # Run simple inline job test
             log_info "Running simple inline SFTP job test..."
             if cd "$SCRIPT_DIR/tests/cli" && bash test-simple-sftp-job.sh; then
+                success=true
+            fi
+            ;;
+        "CLI Comprehensive E2E")
+            # Run comprehensive end-to-end test
+            log_info "Running comprehensive end-to-end test (includes service checks)..."
+            if cd "$SCRIPT_DIR/tests/cli" && bash test-end-to-end-comprehensive.sh; then
                 success=true
             fi
             ;;

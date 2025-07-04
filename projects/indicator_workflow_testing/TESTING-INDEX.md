@@ -3,6 +3,16 @@
 **Last Updated**: 2024-12-29  
 **Status**: ✅ **Production Ready** - Docker-based testing framework with working SFTP integration
 
+## 📢 **Recent Updates**
+
+### **Test Consolidation (July 2024)**
+All testing functionality has been consolidated from `openfn-workflows/scripts` into this project:
+- ✅ Migrated environment file support (`--env-file` option)
+- ✅ Added package metadata integration for environment variables
+- ✅ Created comprehensive end-to-end test combining all features
+- ✅ Removed redundant test scripts from `openfn-workflows/scripts`
+- ✅ Preserved deployment scripts (`deploy-workflow.sh`, `validate-workflow.sh`, `list-workflows.sh`)
+
 ## 🚀 **Quick Start Guide**
 
 ### **30-Second Test**
@@ -24,6 +34,9 @@ cd projects/indicator_workflow_testing
 ./run-tests.sh --api             # API only (~30s)
 ./run-tests.sh --excel           # Excel only (~1min)
 ./run-tests.sh --integration     # Integration only (~2min)
+
+# NEW: Comprehensive end-to-end test with service checks
+./run-tests.sh --env-file .env --integration
 ```
 
 ### **Quick Debugging**
@@ -85,9 +98,35 @@ cd projects/indicator_workflow_testing
 ./tests/cli/test-simple-sftp-job.sh        # Simple inline job
 ./tests/cli/test-sftp-dhis2-workflow.sh    # Complete workflow test
 
-# 3. Test with custom state file
+# 3. NEW: Comprehensive end-to-end test
+./tests/cli/test-end-to-end-comprehensive.sh # All features combined
+
+# 4. Test with custom state file
 # Edit fixtures/sftp-test-input.json with your test data
 # Then run any of the above tests
+```
+
+### **New Features**
+
+#### **Environment File Support**
+```bash
+# Use custom environment variables
+./run-tests.sh --env-file custom.env
+
+# Example custom.env file:
+export SFTP_HOST=my-sftp-server.com
+export SFTP_PORT=2222
+export SFTP_USER=myuser
+export SFTP_PASSWORD=mypass
+export DHIS2_URL=https://my-dhis2.org
+```
+
+#### **Package Metadata Integration**
+The framework now automatically reads environment variables from package metadata files:
+```bash
+# Variables are read from:
+# packages/[package-name]/package-metadata.json
+# Falls back to environment variables, then defaults
 ```
 
 ---
