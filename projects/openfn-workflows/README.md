@@ -32,9 +32,17 @@ cd /home/ubuntu/code/malawi-dhis2-pipeline
 
 ### 3. Test Workflows
 
+All testing functionality has been consolidated in the `indicator_workflow_testing` project:
+
 ```bash
 cd projects/indicator_workflow_testing
-./run-tests.sh --cli-workflow
+
+# Run all tests
+./run-tests.sh
+
+# Run specific test suites
+./run-tests.sh --cli-workflow              # CLI-based workflow tests
+./run-tests.sh --env-file .env --integration  # Integration tests with custom environment
 ```
 
 ## 📁 Project Structure
@@ -49,8 +57,10 @@ openfn-workflows/
 ├── configs/              # Configuration files
 │   ├── file-types/       # Excel file type configs
 │   └── metadata/         # DHIS2 metadata mappings
-├── scripts/              # Utility scripts
-└── docker/               # Docker configurations
+└── scripts/              # Deployment and validation scripts
+    ├── deploy-workflow.sh    # Deploy workflows to OpenFN
+    ├── validate-workflow.sh  # Validate workflow syntax
+    └── list-workflows.sh     # List available workflows
 ```
 
 ## 🔧 Key Features
@@ -63,10 +73,44 @@ openfn-workflows/
 
 ## 🧪 Testing
 
-For comprehensive testing information, see:
-- [Testing Strategy](docs/03-testing-strategy.md) - Overall testing approach
-- [SFTP Testing Plan](docs/04-sftp-dhis2-testing-plan.md) - Specific workflow testing
-- [Testing Index](../indicator_workflow_testing/TESTING-INDEX.md) - Complete testing framework
+All test scripts have been consolidated into the `indicator_workflow_testing` project for better organization:
+
+- **Location**: `../indicator_workflow_testing/`
+- **Main Runner**: `run-tests.sh`
+- **Documentation**: [Testing Index](../indicator_workflow_testing/TESTING-INDEX.md)
+
+### Available Test Options
+
+```bash
+cd ../indicator_workflow_testing
+
+# Test everything
+./run-tests.sh
+
+# CLI workflow tests (recommended for quick validation)
+./run-tests.sh --cli-workflow
+
+# Comprehensive end-to-end test
+./run-tests.sh --env-file custom.env --integration
+
+# View all options
+./run-tests.sh --help
+```
+
+### Key Test Features
+
+- **Environment File Support**: Use `--env-file` to specify custom configurations
+- **Package Metadata Integration**: Automatically reads environment variables from package metadata
+- **Docker-Based Testing**: No local dependencies required
+- **Comprehensive Coverage**: SFTP connectivity, Excel parsing, DHIS2 integration
+
+## 🚀 Deployment Scripts
+
+The `scripts/` directory now contains only deployment and operational scripts:
+
+- **`deploy-workflow.sh`** - Deploy workflows to OpenFN Lightning instance
+- **`validate-workflow.sh`** - Validate workflow configuration before deployment
+- **`list-workflows.sh`** - List available workflows
 
 ## 🐛 Troubleshooting
 
@@ -74,7 +118,7 @@ See the [Troubleshooting Guide](docs/06-troubleshooting.md) for solutions to com
 
 ## 📦 Related Projects
 
-- **indicator_workflow_testing**: Testing framework and utilities
+- **indicator_workflow_testing**: Comprehensive testing framework for all workflows
 - **sftp-storage**: SFTP server with pre-loaded Excel files
 - **dhis2-instance**: DHIS2 test instance
 - **openfn**: OpenFN Lightning platform 
