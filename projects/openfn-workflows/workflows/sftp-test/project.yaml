@@ -1,0 +1,94 @@
+name: sftp-test
+description: Simple SFTP test project to verify connection and list files
+
+# Single source of truth for workflow configuration
+# This file is used by both CLI testing and OpenFN platform deployment
+
+credentials:
+  sftp-test-credential:
+    owner: sftp-test@openfn.org
+    name: SFTP Test Server
+    # Note: In OpenFN platform, credentials are managed separately
+    # In CLI testing, credentials are included in state configuration
+
+workflows:
+  sftp-test-workflow:
+    name: SFTP Test Workflow
+    
+    jobs:
+      ListFiles:
+        name: List SFTP Files
+        adaptor: '@openfn/language-sftp@2.0.14'
+        enabled: true
+        credential: sftp-test-credential  # References the credential defined above
+        body:
+          path: ./jobs/list-files.js
+    
+    triggers:
+      manual:
+        type: webhook
+        enabled: true
+      
+      test-cron:
+        type: cron
+        cron_expression: "*/2 * * * *"  # Every 2 minutes for testing
+        enabled: true  # Enabled for testing
+    
+    edges:
+      - source_trigger: manual
+        target_job: ListFiles
+        condition_type: always
+        enabled: true
+      
+      - source_trigger: test-cron
+        target_job: ListFiles
+        condition_type: always
+        enabled: true  # Enabled for testing
+
+# CLI Testing Configuration
+# This section provides the configuration needed for CLI testing
+cli_test:
+  # Default state configuration for CLI testing
+  default_state:
+    data: []
+    configuration:
+      host: "172.17.0.1"
+      port: 2225
+      username: "openfn"
+      password: "instant101"
+      remoteDir: "/data/excel-files"
+  
+  # Test scenarios for CLI testing
+  test_scenarios:
+    - name: "basic-connection"
+      description: "Test basic SFTP connection and file listing"
+      state:
+        data: []
+        configuration:
+          host: "172.17.0.1"
+          port: 2225
+          username: "openfn"
+          password: "instant101"
+          remoteDir: "/data/excel-files"
+    
+    - name: "custom-config"
+      description: "Test with custom configuration"
+      state:
+        data: []
+        configuration:
+          host: "172.17.0.1"
+          port: 2225
+          username: "openfn"
+          password: "instant101"
+          remoteDir: "/custom/path"
+  
+  # Expected outcomes for validation
+  expected_outcomes:
+    success_criteria:
+      - "SFTP connection established"
+      - "Files listed successfully"
+      - "No authentication errors"
+    failure_criteria:
+      - "Invalid username"
+      - "Connection refused"
+      - "Authentication failed" 

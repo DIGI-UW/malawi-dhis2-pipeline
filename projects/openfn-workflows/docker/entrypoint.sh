@@ -59,11 +59,8 @@ validate_environment() {
         ((errors++))
     fi
     
-    if [[ "$MODE" == "deploy" && -z "$WORKFLOW_NAME" ]]; then
-        log "ERROR: WORKFLOW_NAME is required for deploy mode"
-        ((errors++))
-    fi
-    
+    # For deploy mode, empty WORKFLOW_NAME means deploy all workflows
+    # For pull mode, WORKFLOW_NAME is still required
     if [[ "$MODE" == "pull" && -z "$WORKFLOW_NAME" ]]; then
         log "ERROR: WORKFLOW_NAME is required for pull mode"
         ((errors++))
@@ -74,7 +71,7 @@ validate_environment() {
         ((errors++))
     fi
     
-    # For deploy mode, the specific workflow directory must exist
+    # For deploy mode, if specific workflow name is given, check that directory exists
     if [[ "$MODE" == "deploy" && -n "$WORKFLOW_NAME" && ! -d "$WORKFLOW_PATH/$WORKFLOW_NAME" ]]; then
         log "ERROR: Workflow directory does not exist: $WORKFLOW_PATH/$WORKFLOW_NAME"
         ((errors++))
@@ -147,18 +144,37 @@ deploy_workflow() {
     local workflow_path="$WORKFLOW_PATH/$workflow_name"
     
     log "Deploying workflow: $workflow_name from $workflow_path"
+    log "Current working directory before change: $(pwd)"
     
-    # Validate workflow first
-    if ! validate_workflow "$workflow_name"; then
-        log "ERROR: Workflow validation failed"
+    # Check if workflow directory exists
+    if [[ ! -d "$workflow_path" ]]; then
+        log "ERROR: Workflow directory does not exist: $workflow_path"
         return 1
     fi
     
+    # Validate workflow first
+    log "Validating workflow: $workflow_name"
+    if ! validate_workflow "$workflow_name"; then
+        log "ERROR: Workflow validation failed for $workflow_name"
+        return 1
+    fi
+    log "Workflow validation passed for: $workflow_name"
+    
     # Change to workflow directory
-    cd "$workflow_path"
+    log "Changing to workflow directory: $workflow_path"
+    cd "$workflow_path" || {
+        log "ERROR: Failed to change to directory: $workflow_path"
+        return 1
+    }
+    log "Current working directory after change: $(pwd)"
+    log "Contents of workflow directory:"
+    ls -la 2>&1 | while read line; do log "  $line"; done
     
     # Update config.json with current endpoint and API key for this workflow
     log "Updating workflow config.json with current settings..."
+    log "OPENFN_ENDPOINT: $OPENFN_ENDPOINT"
+    log "OPENFN_API_KEY: ${OPENFN_API_KEY:0:8}***"
+    
     cat > config.json << EOF
 {
   "endpoint": "$OPENFN_ENDPOINT",
@@ -178,8 +194,21 @@ EOF
     fi
     
     # Wait for OpenFN to be ready
+    log "Checking if OpenFN is ready..."
     if ! wait_for_openfn_ready; then
+        log "ERROR: OpenFN is not ready for deployment"
         return 1
+    fi
+    log "OpenFN is ready for deployment"
+    
+    # Note: Credentials are now defined in project.yaml and will be created by OpenFN deploy
+    # However, we need to ensure the credential body (username/password) exists in the platform
+    if [[ "$workflow_name" == "sftp-test" ]]; then
+        log "Note: sftp-test workflow requires credential 'sftp-test-credential' to be configured"
+        log "The credential should have the following body:"
+        log "  username: openfn"
+        log "  password: instant101"
+        log "This can be configured in the OpenFN UI after deployment"
     fi
     
     # Deploy the workflow using config.json
@@ -187,12 +216,85 @@ EOF
     log "Config file content:"
     cat config.json
     
-    if openfn deploy --no-confirm --log info; then
+    log "Running: openfn deploy --no-confirm --log info"
+    # Capture both stdout and stderr for better debugging
+    if openfn deploy --no-confirm --log info 2>&1 | while read line; do log "OPENFN: $line"; done; then
         log "Successfully deployed workflow: $workflow_name"
         return 0
     else
-        log "ERROR: Failed to deploy workflow: $workflow_name"
+        local exit_code=$?
+        log "ERROR: Failed to deploy workflow: $workflow_name (exit code: $exit_code)"
         return 1
+    fi
+}
+
+# Deploy all workflows in the workflows directory
+deploy_all_workflows() {
+    log "Deploying all workflows from $WORKFLOW_PATH"
+    
+    # First, let's see what's in the directory
+    log "Checking contents of $WORKFLOW_PATH..."
+    ls -la "$WORKFLOW_PATH" 2>&1 | while read line; do log "  $line"; done
+    
+    local deployed=0
+    local failed=0
+    local total=0
+    
+    log "Scanning for workflows with project.yaml files..."
+    
+    for workflow_dir in "$WORKFLOW_PATH"/*; do
+        log "Checking directory: $workflow_dir"
+        
+        if [[ -d "$workflow_dir" ]]; then
+            log "  → Is a directory"
+            if [[ -f "$workflow_dir/project.yaml" ]]; then
+                log "  → Has project.yaml file"
+                local workflow_name
+                workflow_name=$(basename "$workflow_dir")
+                log "  → Workflow name: $workflow_name"
+                
+                total=$((total + 1))
+                log "  → Total workflows found so far: $total"
+                
+                log "=== Deploying workflow $total: $workflow_name ==="
+                log "Workflow path: $workflow_dir"
+                
+                # Add error handling around deployment
+                set +e  # Don't exit on error
+                if deploy_workflow "$workflow_name"; then
+                    deployed=$((deployed + 1))
+                    log "✅ Successfully deployed: $workflow_name"
+                else
+                    failed=$((failed + 1))
+                    log "❌ Failed to deploy: $workflow_name"
+                    log "Continuing with next workflow..."
+                fi
+                set -e  # Re-enable exit on error
+                
+                log "=== End of $workflow_name deployment ==="
+                log ""
+            else
+                log "  → No project.yaml file found, skipping"
+            fi
+        else
+            log "  → Not a directory, skipping"
+        fi
+    done
+    
+    log "Deployment Summary:"
+    log "  Total workflows found: $total"
+    log "  Successfully deployed: $deployed"
+    log "  Failed deployments: $failed"
+    
+    if [[ $total -eq 0 ]]; then
+        log "WARNING: No workflows found to deploy"
+        return 0
+    elif [[ $failed -gt 0 ]]; then
+        log "ERROR: $failed workflow(s) failed to deploy"
+        return 1
+    else
+        log "All workflows deployed successfully"
+        return 0
     fi
 }
 
@@ -250,27 +352,54 @@ EOF
 # Wait for OpenFN instance to be ready
 wait_for_openfn_ready() {
     log "Waiting for OpenFN to be ready at $OPENFN_ENDPOINT..."
+    
+    # Check if endpoint is set
+    if [[ -z "$OPENFN_ENDPOINT" ]]; then
+        log "ERROR: OPENFN_ENDPOINT is not set"
+        return 1
+    fi
+    
     local max_attempts=30
     local attempt=0
     
     while [[ $attempt -lt $max_attempts ]]; do
         ((attempt++))
-        log "Attempt $attempt/$max_attempts: Checking OpenFN API availability..."
+        log "Attempt $attempt/$max_attempts: Checking OpenFN API availability at $OPENFN_ENDPOINT/users/log_in"
+        
+        # Test basic connectivity first
+        if ! curl -s --connect-timeout 5 --max-time 10 "$OPENFN_ENDPOINT/users/log_in" >/dev/null 2>&1; then
+            log "  → Cannot connect to $OPENFN_ENDPOINT (connection failed)"
+            if [[ $attempt -lt $max_attempts ]]; then
+                log "  → Waiting 10 seconds before retry..."
+                sleep 10
+            fi
+            continue
+        fi
         
         # Check if we get the expected "Log in" h1 text in the response (handles multiline)
-        local response=$(curl -s "$OPENFN_ENDPOINT/users/log_in" 2>/dev/null || true)
-        if [[ -n "$response" ]] && echo "$response" | tr -d '\n\r' | grep -q "<h1[^>]*>.*Log in.*</h1>"; then
-            log "OpenFN API is ready and returning login page with expected content"
+        log "  → Connection successful, checking response content..."
+        local response=$(curl -s --connect-timeout 5 --max-time 10 "$OPENFN_ENDPOINT/users/log_in" 2>/dev/null || true)
+        
+        if [[ -z "$response" ]]; then
+            log "  → Empty response from OpenFN"
+        elif echo "$response" | tr -d '\n\r' | grep -q "<h1[^>]*>.*Log in.*</h1>"; then
+            log "  → OpenFN API is ready and returning login page with expected content"
             return 0
+        else
+            log "  → Response received but does not contain expected login page content"
+            # Show first 200 chars of response for debugging
+            local preview=$(echo "$response" | tr -d '\n\r' | cut -c1-200)
+            log "  → Response preview: $preview..."
         fi
         
         if [[ $attempt -lt $max_attempts ]]; then
-            log "OpenFN API not ready (no valid login page response), waiting 10 seconds..."
+            log "  → OpenFN API not ready, waiting 10 seconds..."
             sleep 10
         fi
     done
     
-    log "ERROR: OpenFN did not become ready within expected time"
+    log "ERROR: OpenFN did not become ready within expected time ($max_attempts attempts)"
+    log "Final endpoint check: $OPENFN_ENDPOINT"
     return 1
 }
 
@@ -357,7 +486,13 @@ main() {
             fi
             ;;
         "deploy")
+            if [[ -z "$WORKFLOW_NAME" ]]; then
+                log "No specific workflow name provided - deploying all workflows"
+                deploy_all_workflows
+            else
+                log "Deploying specific workflow: $WORKFLOW_NAME"
             deploy_workflow "$WORKFLOW_NAME"
+            fi
             
             # Keep container alive if this is part of package lifecycle
             if [[ "${PACKAGE_LIFECYCLE}" == "true" ]]; then

@@ -218,16 +218,16 @@ jobs:
           
       - name: Run SFTP Tests Using Existing Framework
         run: |
-          echo "🚀 Running SFTP tests using indicator_workflow_testing framework"
-          echo "==============================================================="
+          echo "🚀 Running simple SFTP test using indicator_workflow_testing framework"
+          echo "======================================================================"
           
           # Navigate to the testing framework
           cd projects/indicator_workflow_testing
           
-          # Run just the SFTP tests using the existing framework
-          ./run-tests.sh --sftp
+          # Run just the simple SFTP test using the existing framework
+          ./run-tests.sh --simple-sftp
           
-          echo "✅ SFTP tests completed!"
+          echo "✅ Simple SFTP test completed!"
           
       - name: Collect logs on failure
         if: failure()

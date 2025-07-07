@@ -1,0 +1,5 @@
+{
+  "endpoint": "http://localhost:4000",
+  "apiKey": null,
+  "specPath": "./project.yaml"
+} 
