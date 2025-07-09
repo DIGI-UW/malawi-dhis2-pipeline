@@ -32,8 +32,8 @@ function generatePayload(processedFiles, metadata, timeWindow = 3) {
       
       // Add category options if present
       if (row.categoryOptions) {
-        // This would need proper category option combo resolution
-        // For now, we'll just note them in the data value
+        // This marks the data value as having disaggregations.
+        // A later job would need to resolve these names to a DHIS2 categoryOptionCombo UID.
         dataValue.categoryOptions = row.categoryOptions;
       }
       
@@ -91,43 +91,36 @@ function generatePayload(processedFiles, metadata, timeWindow = 3) {
   
   console.log(`Filtered to ${filteredDataValues.length} data values within ${timeWindow} months`);
   
-  // Group by dataset if needed
+  // Group by dataset if needed, and prepare for DHIS2 structure
   const dataSetGroups = {};
   filteredDataValues.forEach(dv => {
-    // Get dataset from metadata if available
-    let dataSetId = 'default';
-    
-    if (metadata?.dataElements?.mappings) {
-      // Find the data element in metadata to get its dataset
-      for (const [category, elements] of Object.entries(metadata.dataElements.mappings)) {
-        if (Array.isArray(elements)) {
-          const element = elements.find(e => e.dhis2Id === dv.dataElement || e.id === dv.dataElement);
-          if (element && element.dataSet) {
-            dataSetId = element.dataSet;
-            break;
-          }
-        }
-      }
-    }
-    
+    // In a real scenario, you'd resolve this via a metadata mapping.
+    // Here we'll use a placeholder or a default from config.
+    const dataSetId = dv.dataSet || 'default';
+
     if (!dataSetGroups[dataSetId]) {
       dataSetGroups[dataSetId] = [];
     }
-    
-    // Clean up the data value for DHIS2
+
+    // Clean up the data value for DHIS2 payload
     const cleanDataValue = {
       dataElement: dv.dataElement,
       orgUnit: dv.orgUnit,
       period: dv.period,
-      value: dv.value
+      value: dv.value,
     };
-    
-    if (dv.categoryOptionCombo) {
-      cleanDataValue.categoryOptionCombo = dv.categoryOptionCombo;
-    }
-    
-    if (dv.attributeOptionCombo) {
-      cleanDataValue.attributeOptionCombo = dv.attributeOptionCombo;
+
+    // IMPORTANT: Category option combo resolution is required here.
+    // DHIS2 needs a specific UID for the combination of category options.
+    // This step is a placeholder to show where that logic would go.
+    if (dv.categoryOptions) {
+      // In a real implementation, you would look up the UID from DHIS2
+      // based on the combination of options, e.g., { age: '25-49', gender: 'Female' }.
+      // cleanDataValue.categoryOptionCombo = resolveCatOptCombo(dv.categoryOptions);
+      console.warn(
+        `Category options found for ${dv.dataElement} but combo resolution is not implemented.`,
+        dv.categoryOptions
+      );
     }
     
     if (dv.comment) {
@@ -143,8 +136,7 @@ function generatePayload(processedFiles, metadata, timeWindow = 3) {
       dataSet: dataSetId !== 'default' ? dataSetId : undefined,
       dataValues: dataValues,
       completeDate: new Date().toISOString(),
-      period: new Date().toISOString().substring(0, 7).replace('-', ''),
-      orgUnit: 'MW' // Default to Malawi country level, should be configurable
+      // period and orgUnit are specified per data value, so no need to set them here
     })),
     metadata: {
       dataSource: 'SFTP Excel Import',

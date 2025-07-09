@@ -7,8 +7,8 @@
 // The runtime provides: get from @openfn/language-sftp
 // and fn from @openfn/language-common
 
-// Configuration
-const LOCAL_DOWNLOAD_PATH = '/tmp/openfn-downloads/';
+// No longer saving to a local path
+// const LOCAL_DOWNLOAD_PATH = '/tmp/openfn-downloads/';
 
 fn((state) => {
   console.log('Starting file download process...');
@@ -46,20 +46,20 @@ fn((state) => {
   };
 });
 
-// Download each file
+// Download each file's content into state
 fn((state) => {
   const downloadPromises = state.filesToDownload.map(async (file, index) => {
-    const localPath = `${LOCAL_DOWNLOAD_PATH}${file.name}`;
-    
-    console.log(`Downloading ${file.name} to ${localPath}`);
+    console.log(`Downloading content of ${file.name}`);
     
     try {
-      // Download the file
-      await get(file.path, localPath);
+      // Download the file content directly into a buffer
+      const content = await get(file.path);
+      
+      console.log(`Successfully downloaded ${file.name}, size: ${content.length} bytes`);
       
       return {
         ...file,
-        localPath,
+        content, // Pass file content in state
         downloadTime: new Date().toISOString(),
         status: 'downloaded'
       };
@@ -78,6 +78,9 @@ fn((state) => {
     const failedDownloads = results.filter(f => f.status === 'failed');
     
     console.log(`Download complete: ${successfulDownloads.length} successful, ${failedDownloads.length} failed`);
+    
+    // Note: File content is now in state. Be mindful of state size limits.
+    // The buffer will be automatically handled by the OpenFN platform.
     
     return {
       ...state,

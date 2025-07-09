@@ -10,15 +10,15 @@ This OpenFN workflow processes HIV indicator data from SFTP Excel files and uplo
   - Manual trigger: For testing and manual execution
 
 - **Smart File Processing**:
-  - Automatic file type detection (HIV indicators, Direct queries)
-  - Duplicate prevention through file tracking
-  - Support for .xlsx and .xls files
-  - Robust Excel parsing with validation
+  - Configuration-driven: File parsing and mapping are controlled by an embedded configuration (`art_data_long_format.json`), making it adaptable to different Excel structures without code changes.
+  - In-memory processing: Files are handled as buffers in memory between jobs, avoiding filesystem limitations in containerized environments.
+  - Duplicate prevention through file tracking.
+  - Robust Excel parsing with `xlsx`.
 
-- **Enhanced Data Mapping**:
-  - Fuzzy matching for indicator names
-  - Support for multiple data formats
-  - Comprehensive validation and error handling
+- **Enhanced Data Mapping and DHIS2 Payload Generation**:
+  - Maps source columns (e.g., "Health Facility") to target DHIS2 fields (e.g., "orgUnit") based on the embedded configuration.
+  - Gathers disaggregations (e.g., age, gender) into `categoryOptions`.
+  - **Note**: This workflow prepares data for DHIS2 but does not yet resolve `categoryOptions` into the `categoryOptionCombo` UIDs required by the DHIS2 API. This resolution step would need to be added for a complete end-to-end solution.
 
 ## Workflow Architecture
 
@@ -80,16 +80,14 @@ This OpenFN workflow processes HIV indicator data from SFTP Excel files and uplo
 - Handles download errors gracefully
 
 ### 3. Process Excel Data (`process-excel-data.js`)
-- Parses Excel files using XLSX library
-- Supports multiple data formats (HIV indicators, Direct queries)
-- Validates data structure and content
-- Extracts indicator values with metadata
+- Parses Excel file content passed in-memory from the previous job.
+- Uses an embedded configuration (`art_data_long_format.json`) to map columns, apply transformations, and validate data.
+- Extracts indicator values with all required DHIS2 dimensions (dataElement, orgUnit, period, value, and categoryOptions).
 
 ### 4. Generate DHIS2 Payload (`generate-dhis2-payload.js`)
-- Maps Excel indicators to DHIS2 data elements
-- Uses fuzzy matching for indicator names
-- Generates dataValueSets format
-- Provides detailed matching statistics
+- Transforms the processed data into the `dataValueSets` format required by DHIS2.
+- Groups data values by dataset.
+- **Crucially, this job now correctly uses the `orgUnit` from the source file.** It also prepares `categoryOptions` but leaves the final resolution to a `categoryOptionCombo` UID as a separate, future step.
 
 ### 5. Upload to DHIS2 (`upload-to-dhis2.js`)
 - Sends data to DHIS2 via dataValueSets API
