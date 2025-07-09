@@ -11,6 +11,8 @@ services:
       OPENFN_API_KEY: ${OPENFN_API_KEY}
       OPENFN_ADMIN_USER: ${OPENFN_ADMIN_USER}
       OPENFN_ADMIN_PASSWORD: ${OPENFN_ADMIN_PASSWORD}
+      SFTP_TEST_USER: "openfn"
+      SFTP_TEST_PASSWORD: "instant101"
       PACKAGE_LIFECYCLE: "true"
       DRY_RUN: "false"
     deploy:

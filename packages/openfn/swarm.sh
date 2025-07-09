@@ -98,6 +98,66 @@ function initialize_package() {
            
            if docker exec "$OPENFN_CONTAINER_ID" sh -c "$SETUP_USER_CMD"; then
                log info "✅ User setup completed successfully"
+               
+               # Now create credentials for the workflows
+               log info "🔑 Creating workflow credentials..."
+               
+               SETUP_CREDENTIALS_CMD="/app/bin/lightning eval '
+               # Get the admin user we just created
+               admin_user = Lightning.Accounts.get_user_by_email(\"${OPENFN_ADMIN_USER}\")
+               
+               if admin_user do
+                 # SFTP Test Credential
+                 case Lightning.Credentials.create_credential(admin_user, %{
+                   name: \"sftp-test-credential\",
+                   schema: \"sftp\",
+                   body: %{
+                     \"username\" => \"${SFTP_TEST_USERNAME:-test}\",
+                     \"password\" => \"${SFTP_TEST_PASSWORD:-instant101}\"
+                   }
+                 }) do
+                   {:ok, _credential} -> IO.puts(\"✅ sftp-test-credential created\")
+                   {:error, changeset} -> IO.puts(\"❌ Failed to create sftp-test-credential: #{inspect(changeset.errors)}\")
+                 end
+                 
+                 # SFTP Production Credential  
+                 case Lightning.Credentials.create_credential(admin_user, %{
+                   name: \"sftp-credential\",
+                   schema: \"sftp\", 
+                   body: %{
+                     \"username\" => \"${SFTP_USERNAME:-sftp}\",
+                     \"password\" => \"${SFTP_PASSWORD:-sftp}\"
+                   }
+                 }) do
+                   {:ok, _credential} -> IO.puts(\"✅ sftp-credential created\")
+                   {:error, changeset} -> IO.puts(\"❌ Failed to create sftp-credential: #{inspect(changeset.errors)}\")
+                 end
+                 
+                 # DHIS2 Credential
+                 case Lightning.Credentials.create_credential(admin_user, %{
+                   name: \"dhis2-credential\",
+                   schema: \"dhis2\",
+                   body: %{
+                     \"username\" => \"${DHIS2_USERNAME:-admin}\",
+                     \"password\" => \"${DHIS2_PASSWORD:-district}\",
+                     \"hostUrl\" => \"${DHIS2_URL:-http://dhis2_dhis2:8080}\"
+                   }
+                 }) do
+                   {:ok, _credential} -> IO.puts(\"✅ dhis2-credential created\")
+                   {:error, changeset} -> IO.puts(\"❌ Failed to create dhis2-credential: #{inspect(changeset.errors)}\")
+                 end
+                 
+                 IO.puts(\"✅ Credential setup completed\")
+               else
+                 IO.puts(\"❌ Admin user not found for credential creation\")
+               end
+               '"
+               
+               if docker exec "$OPENFN_CONTAINER_ID" sh -c "$SETUP_CREDENTIALS_CMD"; then
+                   log info "✅ Credentials setup completed successfully"
+               else
+                   log warning "⚠️ Credentials setup failed, but continuing..."
+               fi
            else
                log error "❌ User setup failed"
            fi
