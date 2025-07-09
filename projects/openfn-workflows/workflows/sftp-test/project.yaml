@@ -1,8 +1,9 @@
-name: sftp-test
-description: Simple SFTP test project to verify connection and list files
+name: sftp-test-uri-fixed
+description: SFTP test project with runtime URI fix for host credentials
 
-# Single source of truth for workflow configuration
+# Single source of truth for workflow configuration  
 # This file is used by both CLI testing and OpenFN platform deployment
+# Note: Uses custom @pmanko/sftp-fixed@2.0.14-dev-20250709-155001 via LOCAL_ADAPTORS mode
 
 credentials:
   sftp-test-credential:
@@ -11,16 +12,16 @@ credentials:
 
 workflows:
   sftp-test-workflow:
-    name: SFTP Test Workflow
+    name: SFTP Test Workflow (Custom Adaptor)
     
     jobs:
       ListFiles:
         name: List SFTP Files
-        adaptor: '@openfn/language-sftp@2.0.14'
+        adaptor: '@openfn/language-sftp@2.0.14-custom-enhanced'
         enabled: true
         credential: sftp-test-credential  # References the credential defined above
         body:
-          path: ./jobs/list-files.js
+          path: ./jobs/list-files-fixed.js
     
     triggers:
       manual:

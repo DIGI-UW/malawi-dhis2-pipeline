@@ -33,7 +33,9 @@ fn((state) => {
     console.log('No files specified for download');
     return {
       ...state,
+      filesToDownload: [],
       downloadedFiles: [],
+      downloadCompleted: true,
       error: 'No files specified for download'
     };
   }
@@ -48,6 +50,17 @@ fn((state) => {
 
 // Download each file
 fn((state) => {
+  // Check if we have files to download
+  if (!state.filesToDownload || state.filesToDownload.length === 0) {
+    console.log('No files to download, skipping download process');
+    return {
+      ...state,
+      downloadedFiles: [],
+      failedDownloads: [],
+      downloadCompleted: true
+    };
+  }
+  
   const downloadPromises = state.filesToDownload.map(async (file, index) => {
     const localPath = `${LOCAL_DOWNLOAD_PATH}${file.name}`;
     
