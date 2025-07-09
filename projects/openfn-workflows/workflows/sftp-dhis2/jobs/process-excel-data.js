@@ -108,7 +108,12 @@ const parseExcelData = (fileContent, config) => {
   });
 
   if (jsonData.length < 2) {
-    return { data: [], validation: { isValid: false, warnings: ['No data found in sheet.'] } };
+    return {
+      type: config.fileType,
+      data: [],
+      validation: { isValid: false, warnings: ['No data found in sheet.'] },
+      processedAt: new Date().toISOString(),
+    };
   }
 
   const headers = jsonData[0];
