@@ -99,64 +99,75 @@ function initialize_package() {
            if docker exec "$OPENFN_CONTAINER_ID" sh -c "$SETUP_USER_CMD"; then
                log info "✅ User setup completed successfully"
                
-               # Now create credentials for the workflows
-               log info "🔑 Creating workflow credentials..."
+               # Wait for Lightning to be fully ready for credential operations
+               log info "🔑 Waiting for Lightning to be fully ready for credentials..."
                
-               SETUP_CREDENTIALS_CMD="/app/bin/lightning eval '
-               # Get the admin user we just created
-               admin_user = Lightning.Accounts.get_user_by_email(\"${OPENFN_ADMIN_USER}\")
+               # Test Lightning API readiness
+               local max_attempts=30
+               local attempt=0
+               while [ $attempt -lt $max_attempts ]; do
+                   if docker exec "$OPENFN_CONTAINER_ID" sh -c "/app/bin/lightning eval 'Lightning.Accounts.list_users() |> length()'" >/dev/null 2>&1; then
+                       log info "✅ Lightning API is ready for credential operations"
+                       break
+                   fi
+                   attempt=$((attempt + 1))
+                   log info "⏳ Waiting for Lightning API... (${attempt}/${max_attempts})"
+                   sleep 2
+               done
                
-               if admin_user do
-                 # SFTP Test Credential
-                 case Lightning.Credentials.create_credential(admin_user, %{
-                   name: \"sftp-test-credential\",
-                   schema: \"sftp\",
-                   body: %{
-                     \"username\" => \"${SFTP_TEST_USERNAME:-test}\",
-                     \"password\" => \"${SFTP_TEST_PASSWORD:-instant101}\"
-                   }
-                 }) do
-                   {:ok, _credential} -> IO.puts(\"✅ sftp-test-credential created\")
-                   {:error, changeset} -> IO.puts(\"❌ Failed to create sftp-test-credential: #{inspect(changeset.errors)}\")
-                 end
-                 
-                 # SFTP Production Credential  
-                 case Lightning.Credentials.create_credential(admin_user, %{
-                   name: \"sftp-credential\",
-                   schema: \"sftp\", 
-                   body: %{
-                     \"username\" => \"${SFTP_USERNAME:-sftp}\",
-                     \"password\" => \"${SFTP_PASSWORD:-sftp}\"
-                   }
-                 }) do
-                   {:ok, _credential} -> IO.puts(\"✅ sftp-credential created\")
-                   {:error, changeset} -> IO.puts(\"❌ Failed to create sftp-credential: #{inspect(changeset.errors)}\")
-                 end
-                 
-                 # DHIS2 Credential
-                 case Lightning.Credentials.create_credential(admin_user, %{
-                   name: \"dhis2-credential\",
-                   schema: \"dhis2\",
-                   body: %{
-                     \"username\" => \"${DHIS2_USERNAME:-admin}\",
-                     \"password\" => \"${DHIS2_PASSWORD:-district}\",
-                     \"hostUrl\" => \"${DHIS2_URL:-http://dhis2_dhis2:8080}\"
-                   }
-                 }) do
-                   {:ok, _credential} -> IO.puts(\"✅ dhis2-credential created\")
-                   {:error, changeset} -> IO.puts(\"❌ Failed to create dhis2-credential: #{inspect(changeset.errors)}\")
-                 end
-                 
-                 IO.puts(\"✅ Credential setup completed\")
+               if [ $attempt -eq $max_attempts ]; then
+                   log warning "⚠️ Lightning API not ready for credentials, but continuing..."
                else
-                 IO.puts(\"❌ Admin user not found for credential creation\")
-               end
-               '"
-               
-               if docker exec "$OPENFN_CONTAINER_ID" sh -c "$SETUP_CREDENTIALS_CMD"; then
-                   log info "✅ Credentials setup completed successfully"
-               else
-                   log warning "⚠️ Credentials setup failed, but continuing..."
+                   # Now create credentials when Lightning is fully ready
+                   log info "🔑 Creating workflow credentials..."
+                   
+                   SETUP_CREDENTIALS_CMD="/app/bin/lightning eval '
+                   # Get the admin user we just created
+                   admin_user = Lightning.Accounts.get_user_by_email(\"${OPENFN_ADMIN_USER}\")
+                   
+                   if admin_user do
+                     # Create credentials using the same approach as the working setup
+                     credentials = [
+                       %{name: \"sftp-test-credential\", schema: \"sftp\", body: %{
+                         \"username\" => \"${SFTP_TEST_USERNAME:-test}\",
+                         \"password\" => \"${SFTP_TEST_PASSWORD:-instant101}\",
+                         \"host\" => \"${SFTP_TEST_HOST:-sftp}\",
+                         \"port\" => ${SFTP_TEST_PORT:-22}
+                       }},
+                       %{name: \"sftp-credential\", schema: \"sftp\", body: %{
+                         \"username\" => \"${SFTP_USERNAME:-sftp}\",
+                         \"password\" => \"${SFTP_PASSWORD:-sftp}\",
+                         \"host\" => \"${SFTP_HOST:-sftp}\",
+                         \"port\" => ${SFTP_PORT:-22}
+                       }},
+                       %{name: \"dhis2-credential\", schema: \"dhis2\", body: %{
+                         \"username\" => \"${DHIS2_USERNAME:-admin}\",
+                         \"password\" => \"${DHIS2_PASSWORD:-district}\",
+                         \"hostUrl\" => \"${DHIS2_URL:-http://dhis2_dhis2:8080}\"
+                       }}
+                     ]
+                     
+                     # Use the same pattern as the working original setup
+                     case Lightning.Setup.setup_user(%{
+                       first_name: \"Test\",
+                       last_name: \"User\", 
+                       email: \"${OPENFN_ADMIN_USER}\",
+                       password: \"${OPENFN_ADMIN_PASSWORD}\",
+                       role: :superuser
+                     }, \"${OPENFN_API_KEY}\", credentials) do
+                       {:ok, _result} -> IO.puts(\"✅ Credentials setup completed successfully\")
+                       {:error, error} -> IO.puts(\"❌ Failed to setup credentials: #{inspect(error)}\")
+                     end
+                   else
+                     IO.puts(\"❌ Admin user not found for credential creation\")
+                   end
+                   '"
+                   
+                   if docker exec "$OPENFN_CONTAINER_ID" sh -c "$SETUP_CREDENTIALS_CMD"; then
+                       log info "✅ Credentials setup completed successfully"
+                   else
+                       log warning "⚠️ Credentials setup failed, but continuing..."
+                   fi
                fi
            else
                log error "❌ User setup failed"
