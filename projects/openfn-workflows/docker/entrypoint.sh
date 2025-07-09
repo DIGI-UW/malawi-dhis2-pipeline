@@ -77,11 +77,6 @@ validate_environment() {
         ((errors++))
     fi
     
-    if [[ "$MODE" == "deploy" && -z "$WORKFLOW_NAME" ]]; then
-        log "ERROR: WORKFLOW_NAME is required for deploy mode"
-        ((errors++))
-    fi
-    
     if [[ "$MODE" == "pull" && -z "$WORKFLOW_NAME" ]]; then
         log "ERROR: WORKFLOW_NAME is required for pull mode"
         ((errors++))
@@ -204,6 +199,11 @@ EOF
     log "Executing OpenFN deploy command..."
     log "Config file content:"
     cat config.json
+    pwd
+    ls -la
+    echo "--- project.yaml content ---"
+    cat project.yaml
+    echo "--- end project.yaml content ---"
     
     if openfn deploy --no-confirm --log info; then
         log "Successfully deployed workflow: $workflow_name"

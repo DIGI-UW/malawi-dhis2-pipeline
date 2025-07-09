@@ -6,10 +6,8 @@ description: Simple SFTP test project to verify connection and list files
 
 credentials:
   sftp-test-credential:
-    owner: sftp-test@openfn.org
-    name: SFTP Test Server
-    # Note: In OpenFN platform, credentials are managed separately
-    # In CLI testing, credentials are included in state configuration
+    name: "sftp-test-credential"
+    owner: "root@openhim.org"
 
 workflows:
   sftp-test-workflow:

@@ -3,9 +3,11 @@ description: SFTP Excel to DHIS2 HIV Indicators Pipeline with Cron and Webhook T
 collections: null
 credentials:
   sftp-credential:
-    name: "SFTP Credentials for DHIS2 Pipeline"
+    name: "sftp-test-credential"
+    owner: "root@openhim.org"
   dhis2-credential:
-    name: "DHIS2 Credentials for Data Upload"
+    name: "dhis2-credential"
+    owner: "root@openhim.org"
 workflows:
   HIVIndicatorsSFTPtoDHIS2Workflow:
     name: HIV Indicators SFTP to DHIS2 Workflow
