@@ -58,8 +58,53 @@ log_error() {
 
 log_debug() {
     if [[ "${VERBOSE:-false}" == "true" ]]; then
-        echo -e "${MAGENTA}[DEBUG]${NC} $1"
+        echo -e "${CYAN}[DEBUG]${NC} $1"
     fi
+}
+
+log_test() {
+    echo -e "${CYAN}[TEST]${NC} $1"
+}
+
+log_step() {
+    echo -e "${MAGENTA}[STEP]${NC} $1"
+}
+
+# Function to get environment variable with fallback to package metadata
+# Migrated from openfn-workflows/scripts/test-end-to-end.sh
+get_env_value() {
+    local var_name="$1"
+    local package_name="$2"
+    local default_value="$3"
+    
+    # Check environment variable first
+    if [[ -n "${!var_name}" ]]; then
+        echo "${!var_name}"
+        return
+    fi
+    
+    # Check package metadata file
+    if [[ -n "$package_name" ]]; then
+        # Look for package metadata in multiple possible locations
+        local metadata_paths=(
+            "../../packages/$package_name/package-metadata.json"
+            "../packages/$package_name/package-metadata.json"
+            "packages/$package_name/package-metadata.json"
+        )
+        
+        for metadata_file in "${metadata_paths[@]}"; do
+            if [[ -f "$metadata_file" ]] && command -v jq >/dev/null 2>&1; then
+                local metadata_value=$(jq -r ".environmentVariables.${var_name} // empty" "$metadata_file" 2>/dev/null)
+                if [[ -n "$metadata_value" && "$metadata_value" != "null" ]]; then
+                    echo "$metadata_value"
+                    return
+                fi
+            fi
+        done
+    fi
+    
+    # Use default value
+    echo "$default_value"
 }
 
 # Function to make API requests
@@ -195,6 +240,6 @@ summarize_results() {
 }
 
 # Export functions for use in other scripts
-export -f log_info log_success log_warning log_error log_debug
+export -f log_info log_success log_warning log_error log_debug log_test log_step
 export -f api_request wait_for_service validate_json
 export -f check_docker_service get_service_logs run_test_with_timeout summarize_results 
