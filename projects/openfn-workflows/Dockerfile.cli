@@ -27,11 +27,10 @@ RUN cd /adaptors && \
         @openfn/language-common@2.5.0 \
         @openfn/language-dhis2@6.3.4
 
-# Copy custom-built SFTP adaptor from build context
+# Copy custom-built packages from the submodule location
+COPY openfn-custom-adaptors/packages/common/ /adaptors/custom-common/
+COPY openfn-custom-adaptors/packages/http/ /adaptors/custom-http/
 COPY openfn-custom-adaptors/packages/sftp/ /adaptors/custom-sftp/
-
-# No npm install needed for custom SFTP adaptor - it's already built
-# (Skipping npm install due to workspace dependencies in package.json)
 
 # Set up proper module resolution for OpenFN CLI
 ENV OPENFN_MODULES_HOME=/adaptors/node_modules
@@ -40,11 +39,10 @@ ENV OPENFN_REPO_DIR=/tmp/openfn/repo
 
 # Pre-install packages in CLI's expected repo location with proper structure
 RUN mkdir -p /tmp/openfn/repo/node_modules/@openfn && \
-    # Copy custom SFTP adaptor (not the official one)
+    # Copy custom packages (not the official ones)
     cp -r /adaptors/custom-sftp "/tmp/openfn/repo/node_modules/@openfn/language-sftp_2.0.14" && \
-    # Copy other properly installed packages (not symlinks)
-    cp -r /adaptors/node_modules/@openfn/language-common "/tmp/openfn/repo/node_modules/@openfn/language-common_2.5.0" && \
-    cp -r /adaptors/node_modules/@openfn/language-http "/tmp/openfn/repo/node_modules/@openfn/language-http_6.4.5" && \
+    cp -r /adaptors/custom-common "/tmp/openfn/repo/node_modules/@openfn/language-common_2.5.0" && \
+    cp -r /adaptors/custom-http "/tmp/openfn/repo/node_modules/@openfn/language-http_6.4.5" && \
     # Create proper package.json for CLI
     cd /tmp/openfn/repo && \
     echo '{"name":"openfn-repo","version":"1.0.0","dependencies":{"@openfn/language-sftp_2.0.14":"npm:@openfn/language-sftp@2.0.14","@openfn/language-common_2.5.0":"npm:@openfn/language-common@2.5.0","@openfn/language-http_6.4.5":"npm:@openfn/language-http@6.4.5"}}' > package.json

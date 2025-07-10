@@ -1,51 +1,90 @@
 /**
- * Download files from SFTP using the working executeManual pattern
- * This job follows the proven pattern that works with our custom SFTP adaptor
+ * Download ART Excel file from SFTP using memory-efficient processing
+ * Returns data structured for the process-excel-data job to handle
  */
 
 fn((state) => {
-  console.log('🔧 Starting SFTP file download...');
+  console.log('🔧 Starting ART Excel file download and processing...');
   
-  // For now, let's download a single test file to establish the working pattern
-  const testFile = '/data/excel-files/ART_data_long_format.xlsx';
+  // Download and process the ART Excel file
+  const artFile = '/data/excel-files/ART_data_long_format.xlsx';
   
-  console.log(`📄 Downloading test file: ${testFile}`);
+  console.log(`📄 Processing ART file: ${artFile}`);
   
   return executeManual(
     connect,
-    getExcelFile(testFile)
+    getXLSX(artFile, {
+      chunkSize: 500,           // Process in chunks for memory efficiency
+      withHeader: true,         // First row contains headers
+      ignoreEmpty: true         // Skip empty rows
+    })
   )(state).then(state => {
-    console.log('✅ File download completed successfully');
+    console.log('✅ ART Excel file processing completed successfully');
     
-    // Smart logging for large data objects
+    // Structure data for process-excel-data job
     if (state.data) {
-      console.log('📊 File data summary:', {
-        filePath: state.data.filePath,
-        size: state.data.size,
-        timestamp: state.data.timestamp,
-        hasContent: !!state.data.content,
-        contentLength: state.data.content?.length || 0
+      console.log('📊 Excel processing summary:', {
+        fileName: state.data.fileName,
+        fileSize: state.data.fileSize,
+        sheets: state.data.sheets,
+        activeSheet: state.data.activeSheet,
+        totalRows: state.data.totalRows,
+        dataLength: state.data.data?.length || 0,
+        processingMethod: state.data.metadata?.processingMethod
 });
 
-      // Show content preview if it exists
-      if (state.data.content) {
-        const contentPreview = state.data.content.toString().substring(0, 100);
-        console.log('📄 Content preview:', contentPreview + (state.data.content.length > 100 ? '...' : ''));
+      // Show sample data
+      if (state.data.data && state.data.data.length > 0) {
+        console.log('📄 Sample data (first 2 rows):');
+        state.data.data.slice(0, 2).forEach((row, index) => {
+          console.log(`  Row ${index + 1}:`, JSON.stringify(row));
+        });
+        
+        if (state.data.data.length > 2) {
+          console.log(`  ... and ${state.data.data.length - 2} more rows`);
+        }
       }
-    } else {
-      console.log('⚠️  No data received from download');
-    }
+
+      // Structure data as array for process-excel-data job
+      const downloadedFiles = [{
+        name: artFile,
+        status: 'downloaded',
+        contentType: 'excel',
+        rowCount: state.data.totalRows,
+        content: state.data.data,  // Array of row objects
+        metadata: {
+          fileSize: state.data.fileSize,
+          sheets: state.data.sheets,
+          activeSheet: state.data.activeSheet,
+          sheetRange: state.data.sheetRange,
+          processingMethod: state.data.metadata?.processingMethod,
+          processedAt: state.data.metadata?.processedAt
+        }
+      }];
+
+      console.log(`📦 Prepared ${downloadedFiles.length} file(s) for processing`);
     
     return {
       ...state,
+        downloadedFiles,
       downloadCompleted: true,
-      downloadedFile: state.data,
       success: true
     };
+    } else {
+      console.log('⚠️  No data received from Excel processing');
+      return {
+        ...state,
+        downloadedFiles: [],
+        downloadCompleted: true,
+        error: 'No data received from Excel processing',
+        success: false
+      };
+    }
   }).catch(error => {
-    console.error('❌ File download failed:', error.message);
+    console.error('❌ ART Excel file processing failed:', error.message);
     return {
       ...state,
+      downloadedFiles: [],
       downloadCompleted: true,
       error: error.message,
       success: false

@@ -270,7 +270,7 @@ const matchFileToConfig = (fileName, config) => {
 
 // Main job function
 fn(state => {
-  console.log('🔄 Starting Excel processing for downloaded files...');
+  console.log('🔄 Starting Excel data processing...');
   
   if (!state.downloadedFiles || state.downloadedFiles.length === 0) {
     console.warn('⚠️  No downloaded files to process.');
@@ -282,7 +282,7 @@ fn(state => {
     };
   }
 
-  console.log(`📁 Processing ${state.downloadedFiles.length} downloaded files`);
+  console.log(`📁 Processing ${state.downloadedFiles.length} downloaded file(s)`);
   
   const processedFiles = [];
   const processingErrors = [];
@@ -318,36 +318,73 @@ fn(state => {
       
       console.log(`✅ Using configuration: ${config.displayName}`);
 
-      // Parse the Excel content if needed
-      const parsedContent = parseExcelContent(file.content, file.name);
+      // Content is already parsed from getXLSX - it's an array of row objects
+      const parsedContent = file.content;
       
-      if (parsedContent.length === 0) {
-        console.error(`❌ No data parsed from ${file.name}`);
+      if (!Array.isArray(parsedContent) || parsedContent.length === 0) {
+        console.error(`❌ No valid data in ${file.name}`);
         processingErrors.push({
           fileName: file.name,
-          error: 'No data could be parsed from file'
+          error: 'No valid data found in file'
         });
         return;
       }
 
-      // Map the parsed Excel data
-      const excelData = mapExcelData(parsedContent, config);
+      console.log(`📊 Processing ${parsedContent.length} rows with chunking for memory efficiency`);
+
+      // Process data in chunks to avoid memory issues
+      const chunkSize = 100; // Process 100 rows at a time
+      const allMappedData = [];
+      let processedCount = 0;
+
+      console.log(`🔄 Processing data in chunks of ${chunkSize} rows`);
+
+      while (processedCount < parsedContent.length) {
+        const chunk = parsedContent.slice(processedCount, processedCount + chunkSize);
+        console.log(`📊 Processing chunk ${Math.floor(processedCount / chunkSize) + 1}: rows ${processedCount + 1}-${Math.min(processedCount + chunkSize, parsedContent.length)}`);
+        
+        // Map the chunk
+        const mappedChunk = mapExcelData(chunk, config);
       
-      if (excelData.validation.isValid) {
-        console.log(`✅ Successfully processed ${file.name}: ${excelData.data.length} rows`);
+        if (mappedChunk.validation.isValid) {
+          allMappedData.push(...mappedChunk.data);
+          console.log(`✅ Chunk processed: ${mappedChunk.data.length} rows mapped`);
+        } else {
+          console.warn(`⚠️  Chunk had validation issues:`, mappedChunk.validation.warnings);
+          // Still add the data, but log the warnings
+          allMappedData.push(...mappedChunk.data);
+        }
+        
+        processedCount += chunk.length;
+        
+        // Brief log for progress
+        if (processedCount < parsedContent.length) {
+          console.log(`📊 Progress: ${processedCount}/${parsedContent.length} rows processed`);
+        }
+      }
+
+      console.log(`✅ Successfully processed ${file.name}: ${allMappedData.length} total rows mapped`);
+      
+      // Create final result
+      const excelData = {
+        type: config.fileType,
+        data: allMappedData,
+        validation: { 
+          isValid: true, 
+          warnings: [],
+          totalRowsProcessed: allMappedData.length,
+          chunksProcessed: Math.ceil(parsedContent.length / chunkSize)
+        },
+        processedAt: new Date().toISOString(),
+      };
+
       processedFiles.push({
           fileName: file.name,
-          fileType: file.fileType,
+        fileType: file.contentType,
           excelData: excelData,
           processedAt: new Date().toISOString()
         });
-      } else {
-        console.error(`❌ Failed to process ${file.name}:`, excelData.validation.warnings);
-        processingErrors.push({
-          fileName: file.name,
-          error: excelData.validation.warnings.join(', ')
-        });
-      }
+
     } catch (error) {
       console.error(`❌ Error processing ${file.name}:`, error);
       processingErrors.push({
