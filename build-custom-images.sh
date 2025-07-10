@@ -45,6 +45,114 @@ get_env_value() {
     echo ""
 }
 
+# Global flag to track if SFTP adaptor has been built
+SFTP_ADAPTOR_BUILT=false
+
+# Function to build custom SFTP adaptor for local adaptors mode (Docker-only dependency)
+build_custom_sftp_adaptor() {
+    # Skip if already built in this session
+    if [[ "$SFTP_ADAPTOR_BUILT" == "true" ]]; then
+        echo "✅ Custom SFTP adaptor already built in this session"
+        return 0
+    fi
+    
+    echo "🔧 Building custom SFTP adaptor for local adaptors mode..."
+    
+    # Default to local adaptors mode (no publishing needed)
+    PUBLISH_ENABLED=${PUBLISH_ENABLED:-false}
+    
+    echo "📦 Using local adaptors mode (no npm publishing needed)"
+
+    
+    # Initialize submodule if needed
+    if [ ! -f "$PROJECT_ROOT/projects/openfn-custom-adaptors/package.json" ]; then
+        echo "📦 Initializing OpenFn adaptors submodule..."
+        git submodule update --init --recursive projects/openfn-custom-adaptors
+    fi
+    
+    # Check if we're on our custom branch
+    cd "$PROJECT_ROOT/projects/openfn-custom-adaptors"
+    current_branch=$(git rev-parse --abbrev-ref HEAD)
+    if [[ "$current_branch" != "fix-sftp-uri-handling" ]]; then
+        echo "⚠️  Not on fix-sftp-uri-handling branch, switching..."
+        git checkout fix-sftp-uri-handling || {
+            echo "❌ Failed to switch to fix-sftp-uri-handling branch"
+            echo "   Make sure you've created the branch with the SFTP fix"
+            return 1
+        }
+    fi
+    
+    # Generate dev version with timestamp
+    DEV_VERSION="2.0.14-custom-enhanced"
+    echo "📦 Dev version: $DEV_VERSION"
+    
+    # Build the adaptor inside Docker container
+    echo "🏗️  Building SFTP adaptor inside Docker container..."
+    docker build -f Dockerfile.build -t openfn-custom-sftp-builder . 
+    
+    # Extract the built adaptor from the container
+    echo "📋 Extracting built adaptor from Docker container..."
+    cd "$PROJECT_ROOT"
+    
+    # Create temporary container to extract files
+    container_id=$(docker create openfn-custom-sftp-builder)
+    
+    # Clean up any existing builds
+    rm -rf projects/openfn/openfn-custom-adaptors 2>/dev/null || true
+    rm -rf projects/openfn-workflows/openfn-custom-adaptors 2>/dev/null || true
+    
+    # Create directories for both OpenFn platform and CLI images
+    mkdir -p projects/openfn/openfn-custom-adaptors/packages/sftp
+    mkdir -p projects/openfn-workflows/openfn-custom-adaptors/packages/sftp
+    
+    # Extract to platform image directory
+    docker cp "$container_id:/output/." projects/openfn/openfn-custom-adaptors/packages/sftp/ || {
+        echo "❌ Failed to extract adaptor for platform image"
+        docker rm "$container_id"
+        return 1
+    }
+    
+    # Extract to CLI image directory  
+    docker cp "$container_id:/output/." projects/openfn-workflows/openfn-custom-adaptors/packages/sftp/ || {
+        echo "❌ Failed to extract adaptor for CLI image"
+        docker rm "$container_id"
+        return 1
+    }
+    
+    # Copy the entire adaptors repository structure for local adaptors mode
+    echo "📋 Copying complete adaptors repository for local adaptors mode..."
+    
+    # For OpenFn platform image, copy the entire repo structure
+    cd "$PROJECT_ROOT/projects/openfn-custom-adaptors"
+    
+    # Copy core repo files to platform image build context
+    cp -r . "$PROJECT_ROOT/projects/openfn/openfn-custom-adaptors/" || {
+        echo "❌ Failed to copy adaptors repository to platform image"
+        return 1
+    }
+    
+    # Copy core repo files to CLI image build context  
+    cp -r . "$PROJECT_ROOT/projects/openfn-workflows/openfn-custom-adaptors/" || {
+        echo "❌ Failed to copy adaptors repository to CLI image"
+        return 1
+    }
+    
+    echo "✅ Complete adaptors repository copied to both build contexts"
+    
+    # Clean up temporary container
+    docker rm "$container_id"
+    
+    echo "✅ Custom SFTP adaptor built successfully for local adaptors mode"
+    echo "   📁 Platform image: projects/openfn/openfn-custom-adaptors/"
+    echo "   📁 CLI image: projects/openfn-workflows/openfn-custom-adaptors/"
+    echo "   🔧 OpenFn will use LOCAL_ADAPTORS=true to load from /app/openfn-adaptors"
+    
+    
+    # Mark as built for this session
+    SFTP_ADAPTOR_BUILT=true
+    return 0
+}
+
 # Function to build custom image for a project
 build_custom_image() {
     local project_name="$1"
@@ -52,12 +160,18 @@ build_custom_image() {
     
     echo "🔨 Checking build configuration for project: $project_name"
     
-    # Special handling for openfn-cli-test which doesn't have its own project directory
-    if [[ "$project_name" == "openfn-cli-test" ]]; then
-        local project_dir="$PROJECT_ROOT/projects/openfn-workflows"
-    else
+    # Determine project directory
     local project_dir="$PROJECT_ROOT/projects/$project_name"
-    fi
+    
+    # Special case handling for projects that don't have their own directory
+    case "$project_name" in
+        "openfn-cli-test")
+            project_dir="$PROJECT_ROOT/projects/openfn-workflows"
+            ;;
+        "openfn-worker")
+            project_dir="$PROJECT_ROOT/projects/openfn"
+            ;;
+    esac
     
     if [[ ! -d "$project_dir" ]]; then
         echo "❌ Project directory not found: $project_dir"
@@ -74,6 +188,13 @@ build_custom_image() {
         dockerfile_arg="-f Dockerfile.cli"
         if [[ ! -f "$dockerfile_path" ]]; then
             echo "❌ Dockerfile.cli not found in: $dockerfile_path"
+            return 1
+        fi
+    elif [[ "$project_name" == "openfn-worker" ]]; then
+        dockerfile_path="$project_dir/Dockerfile.worker"
+        dockerfile_arg="-f Dockerfile.worker"
+        if [[ ! -f "$dockerfile_path" ]]; then
+            echo "❌ Dockerfile.worker not found in: $dockerfile_path"
             return 1
         fi
     elif [[ -f "$dockerfile_path" ]]; then
@@ -120,17 +241,43 @@ build_custom_image() {
     
     # Special handling for openfn project that needs access to openfn-adaptors
     if [[ "$project_name" == "openfn" ]]; then
+        # Build custom SFTP adaptor first
+        build_custom_sftp_adaptor || {
+            echo "❌ Failed to build custom SFTP adaptor"
+            return 1
+        }
+        
         cd "$PROJECT_ROOT/projects"
         docker build \
             -f "openfn/Dockerfile" \
             --build-arg "${project_name^^}_BASE_IMAGE=$base_image" \
             -t "$local_image_tag" \
             .
-    # Special handling for openfn-cli-test that uses a different Dockerfile
-    elif [[ "$project_name" == "openfn-cli-test" ]]; then
+    # Special handling for openfn-worker that needs access to openfn-adaptors
+    elif [[ "$project_name" == "openfn-worker" ]]; then
+        # Build custom SFTP adaptor first
+        build_custom_sftp_adaptor || {
+            echo "❌ Failed to build custom SFTP adaptor"
+            return 1
+        }
+        
         cd "$PROJECT_ROOT/projects"
         docker build \
-            -f "openfn-workflows/Dockerfile.cli" \
+            -f "openfn/Dockerfile.worker" \
+            --build-arg "${project_name^^}_BASE_IMAGE=$base_image" \
+            -t "$local_image_tag" \
+            .
+    # Special handling for openfn-cli-test that uses a different Dockerfile
+    elif [[ "$project_name" == "openfn-cli-test" ]]; then
+        # Build custom SFTP adaptor first for CLI testing
+        build_custom_sftp_adaptor || {
+            echo "❌ Failed to build custom SFTP adaptor"
+            return 1
+        }
+        
+        cd "$PROJECT_ROOT/projects/openfn-workflows"
+        docker build \
+            -f "Dockerfile.cli" \
             --build-arg "OPENFN_CLI_TEST_IMAGE=$base_image" \
             -t "$local_image_tag" \
             .
@@ -166,11 +313,11 @@ EOF
             rm Dockerfile.fallback  # Clean up the temporary Dockerfile
         fi
     else
-    docker build \
-        $dockerfile_arg \
-        --build-arg "${project_name^^}_BASE_IMAGE=$base_image" \
-        -t "$local_image_tag" \
-        .
+        docker build \
+            $dockerfile_arg \
+            --build-arg "${project_name^^}_BASE_IMAGE=$base_image" \
+            -t "$local_image_tag" \
+            .
     fi
     
     if [[ $? -eq 0 ]]; then
@@ -212,18 +359,14 @@ if [[ $# -eq 0 ]] || [[ "$1" == "all" ]]; then
                 continue
             fi
             
-            # Map project name to package name for specific known projects,
-            # otherwise, attempt to build with an empty package name.
+            # Map project name to package name for specific known projects
             case "$project_name" in
-                # The "dhis2" project corresponds to the "dhis2-instance" package.
                 "dhis2")
                     build_custom_image "$project_name" "dhis2-instance"
                     ;;
-                # The "sftp" project corresponds to the "sftp-storage" package.
                 "sftp")
                     build_custom_image "$project_name" "sftp-storage"
                     ;;
-                # The "openfn" project corresponds to the "openfn" package.
                 "openfn")
                     build_custom_image "$project_name" "openfn"
                     ;;
@@ -233,11 +376,14 @@ if [[ $# -eq 0 ]] || [[ "$1" == "all" ]]; then
             esac
         fi
     done
+    
+    # Also build special projects that don't have their own directories
+    build_custom_image "openfn-worker" "openfn"
+    build_custom_image "openfn-cli-test" "openfn"
 else
     # Build specific projects
     for project_name in "$@"; do
-        # Map project name to package name for specific known projects,
-        # otherwise, attempt to build with an empty package name.
+        # Map project name to package name for specific known projects
         case "$project_name" in
             "dhis2")
                 build_custom_image "$project_name" "dhis2-instance"
@@ -245,16 +391,7 @@ else
             "sftp")
                 build_custom_image "$project_name" "sftp-storage"
                 ;;
-            # The "openfn" project corresponds to the "openfn" package.
-            "openfn")
-                build_custom_image "$project_name" "openfn"
-                ;;
-            # The "openfn-cli-test" builds CLI test container from workflows directory
-            "openfn-cli-test")
-                build_custom_image "$project_name" "openfn"
-                ;;
-            # The "openfn-workflows" project is used for workflow loading
-            "openfn-workflows")
+            "openfn"|"openfn-worker"|"openfn-cli-test"|"openfn-workflows")
                 build_custom_image "$project_name" "openfn"
                 ;;
             *)

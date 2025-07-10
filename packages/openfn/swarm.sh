@@ -94,13 +94,12 @@ function initialize_package() {
            log info "🔧 Performing initial OpenFn user setup..."
            log info "  Container ID: ${OPENFN_CONTAINER_ID:0:12}..."
            
-           SETUP_USER_CMD="/app/bin/lightning eval 'Lightning.Setup.setup_user(%{first_name: \"Test\", last_name: \"User\",email: \"${OPENFN_ADMIN_USER}\", password: \"${OPENFN_ADMIN_PASSWORD}\", role: :superuser}, \"${OPENFN_API_KEY}\", [%{name: \"sftp-test-credential\", schema: \"sftp\", body: %{host: \"http://sftp-storage_sftp-server\", port: 22, username: \"${SFTP_TEST_USERNAME:-test}\", password: \"${SFTP_TEST_PASSWORD:-instant101}\"}}, %{name: \"dhis2-credential\", schema: \"dhis2\", body: %{username: \"${DHIS2_USERNAME:-admin}\", password: \"${DHIS2_PASSWORD:-district}\", hostUrl: \"${DHIS2_URL:-http://dhis2_dhis2:8080}\"}}])'"
+           SETUP_USER_CMD="/app/bin/lightning eval 'Lightning.Setup.setup_user(%{first_name: \"Test\", last_name: \"User\",email: \"${OPENFN_ADMIN_USER}\", password: \"${OPENFN_ADMIN_PASSWORD}\", role: :superuser}, \"${OPENFN_API_KEY}\", [%{name: \"sftp-test-credential\", schema: \"sftp\", body: %{host: \"sftp://172.17.0.1\", port: 2225, username: \"${SFTP_TEST_USERNAME:-openfn}\", password: \"${SFTP_TEST_PASSWORD:-instant101}\"}}, %{name: \"dhis2-credential\", schema: \"dhis2\", body: %{username: \"${DHIS2_USERNAME:-admin}\", password: \"${DHIS2_PASSWORD:-district}\", hostUrl: \"${DHIS2_URL:-http://dhis2:8080}\"}}])'"
            
            if docker exec "$OPENFN_CONTAINER_ID" sh -c "$SETUP_USER_CMD"; then
                log info "✅ User and credentials setup completed successfully"
            else
                log error "❌ User and credentials setup failed"
-               exit 1
            fi
         else
             log error "Could not find OpenFN container"

@@ -1,0 +1,5 @@
+FROM node:18-alpine
+RUN npm install -g @openfn/cli@latest
+WORKDIR /app
+COPY . .
+CMD ["tail", "-f", "/dev/null"]

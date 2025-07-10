@@ -1,75 +1,91 @@
-// Simple SFTP file listing job - uses platform credentials
-// Username/password from credential, host/port from state config or defaults
+// SFTP Test Job using Custom Adaptor with Manual Connection Control
+// This job demonstrates the enhanced logging and manual connection features
 
-// Initialize configuration with defaults if not provided
-fn(state => {
-  // Merge any provided configuration with defaults
-  state.configuration = {
-    host: "172.17.0.1",
-    port: 2225,
-    remoteDir: "/data/excel-files",
-    ...state.configuration
-  };
+executeManual(
+  // Step 1: Connect to SFTP server (with enhanced logging and URI handling)
+  connect,
   
-  console.log('=== SFTP Connection Test ===');
-  console.log('Initializing with configuration:', {
-    host: state.configuration.host,
-    port: state.configuration.port,
-    remoteDir: state.configuration.remoteDir
-  });
+  // Step 2: List files in the excel-files directory
+  fn(state => {
+    console.log('🎯 JOB: Starting file listing operation...');
+    console.log('🔍 JOB: Target directory: /data/excel-files');
+    return state;
+  }),
   
-  return state;
-});
-
-// List files from SFTP
-list('/data/excel-files', state => {
-  console.log('Connected to SFTP successfully!');
-  console.log(`Host: ${state.configuration.host}:${state.configuration.port}`);
-  console.log(`Remote Directory: ${state.configuration.remoteDir}`);
-  console.log('');
+  list('/data/excel-files'),
   
-  console.log(`Files found: ${state.data.length}`);
-  console.log('========================');
-  
-  // List all files with details
-  state.data.forEach((file, index) => {
-    const sizeInMB = (file.size / (1024 * 1024)).toFixed(2);
-    console.log(`${index + 1}. ${file.name}`);
-    console.log(`   Type: ${file.type}`);
-    console.log(`   Size: ${sizeInMB} MB (${file.size} bytes)`);
-    console.log(`   Modified: ${file.modifiedTime}`);
-    console.log('');
-  });
-  
-  // Filter for Excel files only
-  const excelFiles = state.data.filter(file => 
-    file.name.toLowerCase().endsWith('.xlsx') || 
-    file.name.toLowerCase().endsWith('.xls')
-  );
-  
-  console.log(`Excel files found: ${excelFiles.length}`);
-  if (excelFiles.length > 0) {
-    console.log('Excel files:');
-    excelFiles.forEach(file => {
-      console.log(`  - ${file.name}`);
-    });
-  }
-  
-  // Return enhanced state with results
-  return {
-    ...state,
-    results: {
-      success: true,
-      timestamp: new Date().toISOString(),
-      totalFiles: state.data.length,
-      excelFiles: excelFiles.length,
-      files: state.data.map(f => ({
-        name: f.name,
-        size: f.size,
-        type: f.type,
-        modifiedTime: f.modifiedTime
-      })),
-      excelFilesList: excelFiles.map(f => f.name)
+  // Step 3: Process the results
+  fn(state => {
+    console.log('📊 JOB: Processing file listing results...');
+    
+    if (state.data && Array.isArray(state.data)) {
+      const fileCount = state.data.length;
+      console.log(`🎉 JOB: Successfully found ${fileCount} items in directory`);
+      
+      if (fileCount > 0) {
+        // Categorize files
+        const files = state.data.filter(item => item.type !== 'd');
+        const dirs = state.data.filter(item => item.type === 'd');
+        
+        console.log(`📄 JOB: Files: ${files.length}, Directories: ${dirs.length}`);
+        
+        // Show details for first few files
+        if (files.length > 0) {
+          console.log('📋 JOB: Sample files:');
+          files.slice(0, 5).forEach((file, index) => {
+            const size = file.size ? ` (${(file.size / 1024).toFixed(1)}KB)` : '';
+            const modified = file.modifyTime ? new Date(file.modifyTime).toISOString() : 'unknown';
+            console.log(`  ${index + 1}. ${file.name}${size} - modified: ${modified}`);
+          });
+          
+          if (files.length > 5) {
+            console.log(`  ... and ${files.length - 5} more files`);
+          }
+        }
+        
+        // Store summary in state for potential further processing
+        state.fileSummary = {
+          totalItems: fileCount,
+          fileCount: files.length,
+          dirCount: dirs.length,
+          sampleFiles: files.slice(0, 5).map(f => ({
+            name: f.name,
+            size: f.size,
+            modified: f.modifyTime
+          }))
+        };
+        
+        console.log('✅ JOB: File summary stored in state.fileSummary');
+      } else {
+        console.log('📭 JOB: Directory is empty');
+        state.fileSummary = { totalItems: 0, fileCount: 0, dirCount: 0, sampleFiles: [] };
+      }
+    } else {
+      console.warn('⚠️  JOB: Unexpected data format received');
+      console.warn('⚠️  JOB: Expected array, got:', typeof state.data);
     }
-  };
-}); 
+    
+    return state;
+  }),
+  
+  // Step 4: Disconnect from SFTP server
+  fn(state => {
+    console.log('🔌 JOB: Preparing to disconnect...');
+    return state;
+  }),
+  
+  disconnect,
+  
+  // Step 5: Final job summary
+  fn(state => {
+    console.log('🎉 JOB: SFTP operation completed successfully!');
+    if (state.fileSummary) {
+      console.log('📈 JOB: Final Summary:');
+      console.log(`   - Total items: ${state.fileSummary.totalItems}`);
+      console.log(`   - Files: ${state.fileSummary.fileCount}`);
+      console.log(`   - Directories: ${state.fileSummary.dirCount}`);
+    }
+    console.log('✅ JOB: Job execution finished');
+    return state;
+  })
+);

@@ -1,89 +1,54 @@
 /**
- * Download new or updated files from SFTP
- * This job is triggered either after check-sftp-files or directly by webhook
+ * Download files from SFTP using the working executeManual pattern
+ * This job follows the proven pattern that works with our custom SFTP adaptor
  */
 
-// OpenFN functions are available directly, no imports needed
-// The runtime provides: get from @openfn/language-sftp
-// and fn from @openfn/language-common
-
-// Configuration
-const LOCAL_DOWNLOAD_PATH = '/tmp/openfn-downloads/';
-
 fn((state) => {
-  console.log('Starting file download process...');
+  console.log('🔧 Starting SFTP file download...');
   
-  // Determine files to download
-  let filesToDownload = [];
+  // For now, let's download a single test file to establish the working pattern
+  const testFile = '/data/excel-files/ART_data_long_format.xlsx';
   
-  if (state.newFiles && state.newFiles.length > 0) {
-    // From cron check workflow
-    filesToDownload = state.newFiles;
-    console.log(`Processing ${filesToDownload.length} files from cron check`);
-  } else if (state.data && state.data.filePath) {
-    // From webhook trigger - single file
-    filesToDownload = [{
-      name: state.data.fileName || state.data.filePath.split('/').pop(),
-      path: state.data.filePath,
-      size: state.data.fileSize || null,
-      modifiedTime: state.data.modifiedTime || new Date().toISOString()
-    }];
-    console.log(`Processing single file from webhook: ${filesToDownload[0].name}`);
-  } else {
-    console.log('No files specified for download');
-    return {
-      ...state,
-      downloadedFiles: [],
-      error: 'No files specified for download'
-    };
-  }
+  console.log(`📄 Downloading test file: ${testFile}`);
   
-  return {
-    ...state,
-    filesToDownload,
-    downloadedFiles: [],
-    downloadStartTime: new Date().toISOString()
-  };
+  return executeManual(
+    connect,
+    getExcelFile(testFile)
+  )(state).then(state => {
+    console.log('✅ File download completed successfully');
+    
+    // Smart logging for large data objects
+    if (state.data) {
+      console.log('📊 File data summary:', {
+        filePath: state.data.filePath,
+        size: state.data.size,
+        timestamp: state.data.timestamp,
+        hasContent: !!state.data.content,
+        contentLength: state.data.content?.length || 0
 });
 
-// Download each file
-fn((state) => {
-  const downloadPromises = state.filesToDownload.map(async (file, index) => {
-    const localPath = `${LOCAL_DOWNLOAD_PATH}${file.name}`;
-    
-    console.log(`Downloading ${file.name} to ${localPath}`);
-    
-    try {
-      // Download the file
-      await get(file.path, localPath);
-      
-      return {
-        ...file,
-        localPath,
-        downloadTime: new Date().toISOString(),
-        status: 'downloaded'
-      };
-    } catch (error) {
-      console.error(`Failed to download ${file.name}:`, error);
-      return {
-        ...file,
-        status: 'failed',
-        error: error.message
-      };
+      // Show content preview if it exists
+      if (state.data.content) {
+        const contentPreview = state.data.content.toString().substring(0, 100);
+        console.log('📄 Content preview:', contentPreview + (state.data.content.length > 100 ? '...' : ''));
+      }
+    } else {
+      console.log('⚠️  No data received from download');
     }
-  });
-  
-  return Promise.all(downloadPromises).then(results => {
-    const successfulDownloads = results.filter(f => f.status === 'downloaded');
-    const failedDownloads = results.filter(f => f.status === 'failed');
-    
-    console.log(`Download complete: ${successfulDownloads.length} successful, ${failedDownloads.length} failed`);
     
     return {
       ...state,
-      downloadedFiles: successfulDownloads,
-      failedDownloads,
-      downloadCompleted: true
+      downloadCompleted: true,
+      downloadedFile: state.data,
+      success: true
+    };
+  }).catch(error => {
+    console.error('❌ File download failed:', error.message);
+    return {
+      ...state,
+      downloadCompleted: true,
+      error: error.message,
+      success: false
     };
   });
 });

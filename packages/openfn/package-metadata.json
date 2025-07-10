@@ -10,7 +10,7 @@
     "OPENFN_DISABLE_DB_SSL": "true",
     "OPENFN_IS_RESETTABLE_DEMO": "true",
     "OPENFN_LISTEN_ADDRESS": "0.0.0.0",
-    "OPENFN_LOG_LEVEL": "debug",
+    "OPENFN_LOG_LEVEL": "warning",
     "OPENFN_ORIGINS": "https://openfn.mwdhis2.info",
     "OPENFN_PRIMARY_ENCRYPTION_KEY": "KLu/IoZuaf+baDECd8wG4Z6auwNe6VAmwh9N8lWdJ1A=",
     "OPENFN_SECRET_KEY_BASE": "jGDxZj2O+Qzegm5wcZ940RfWO4D6RyU8thNCr5BUpHNwa7UNV52M1/Sn+7RxiP+f",
@@ -28,6 +28,7 @@
     "OPENFN_IMAGE": "openfn/lightning:v2.13.3",
     "LOCAL_OPENFN_IMAGE": "openfn-custom:latest",
     "OPENFN_WORKER_IMAGE": "openfn/ws-worker:latest",
+    "LOCAL_OPENFN_WORKER_IMAGE": "openfn-worker-custom:latest",
     "OPENFN_WORKFLOWS_IMAGE": "openfn-workflows:local",
     "LOCAL_OPENFN_WORKFLOWS_IMAGE": "openfn-workflows:local",
     "OPENFN_KAFKA_TRIGGERS_ENABLED": "true",
@@ -38,7 +39,7 @@
     "OPENFN_DOCKER_WORKER_CPUS": "2",
     "OPENFN_DOCKER_WORKER_MEMORY": "4G",
     "OPENFN_WORKFLOW_MANUAL_CLI": "false",
-    "OPENFN_LOAD_WORKFLOWS_ON_STARTUP": "true",
+    "OPENFN_LOAD_WORKFLOWS_ON_STARTUP": "false",
     "OPENFN_ADMIN_USER": "root@openhim.org",
     "OPENFN_ADMIN_PASSWORD": "instant101secure",
     "FHIR_SERVER_BASE_URL": "http://openhim-core:5001",
@@ -48,11 +49,14 @@
     "OPENFN_SYNC_INTERVAL": "300",
     "OPENFN_CONFLICT_RESOLUTION": "prompt",
     "OPENFN_ENABLE_AUTO_SNAPSHOT": "true",
-    "OPENFN_SYNC_ON_DEPLOY": "true",
+    "OPENFN_SYNC_ON_DEPLOY": "false",
     "OPENFN_SYNC_ON_STARTUP": "false",
     "OPENFN_WORKFLOW_BASE_DIR": "projects/openfn-workflows/workflows",
     "OPENFN_STATE_DIR": ".openfn-sync",
     "LOCAL_OPENFN_CLI_TEST_IMAGE": "openfn-cli-test:latest",
-    "OPENFN_CLI_TEST_IMAGE": "node:18-alpine"
+    "OPENFN_CLI_TEST_IMAGE": "node:18-alpine",
+    "LOCAL_ADAPTORS": "true",
+    "OPENFN_ADAPTORS_REPO": "/app/openfn-adaptors",
+    "WORKER_MAX_RUN_MEMORY_MB": "2048"
   }
 }
