@@ -1,0 +1,45 @@
+{
+  "test_data": {
+    "sites": [
+      {
+        "site_id": "SITE001",
+        "site_name": "Test Health Center 1",
+        "district": "Test District 1",
+        "region": "Test Region 1",
+        "indicators": {
+          "art_patients": 150,
+          "hiv_tests": 300,
+          "viral_load_tests": 75
+        }
+      },
+      {
+        "site_id": "SITE002", 
+        "site_name": "Test Health Center 2",
+        "district": "Test District 2",
+        "region": "Test Region 1",
+        "indicators": {
+          "art_patients": 200,
+          "hiv_tests": 450,
+          "viral_load_tests": 120
+        }
+      },
+      {
+        "site_id": "SITE003",
+        "site_name": "Test Health Center 3", 
+        "district": "Test District 1",
+        "region": "Test Region 2",
+        "indicators": {
+          "art_patients": 180,
+          "hiv_tests": 380,
+          "viral_load_tests": 95
+        }
+      }
+    ],
+    "metadata": {
+      "reporting_period": "Q2 FY25",
+      "total_sites": 3,
+      "generated_date": "2025-01-15",
+      "data_type": "test_sample"
+    }
+  }
+} 
