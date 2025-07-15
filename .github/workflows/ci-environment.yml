@@ -60,6 +60,8 @@ jobs:
       # =================================================================
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          submodules: recursive
         
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -131,11 +133,7 @@ jobs:
           echo "🔨 Building custom images using ./build-custom-images.sh (same as users)"
           
           # Use the documented build script that users follow
-          ./build-custom-images.sh all
-          
-          # Also build the CLI test image specifically for testing framework
-          echo "🧪 Building CLI test image for testing framework..."
-          ./build-custom-images.sh openfn-cli-test
+          ./build-custom-images.sh
           
           # Verify images were built
           echo "📦 Verifying built images:"
