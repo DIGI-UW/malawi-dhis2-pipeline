@@ -8,8 +8,8 @@
 #./instant project init --env-file .env
 
 
-# ./instant package destroy -n database-postgres
-# ./instant package init -n database-postgres -d
+./instant package destroy -n database-postgres
+./instant package init -n database-postgres -d
 
 ./instant package destroy -n openfn
 ./instant package init -n openfn -d

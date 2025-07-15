@@ -58,23 +58,18 @@ build_custom_openfn_adaptors() {
     
     echo "🔧 Building custom OpenFn adaptors for local adaptors mode..."
     
-    # Build the adaptors inside Docker container with volume mount to submodule
-    echo "🏗️  Building OpenFn adaptors inside Docker container with volume mount..."
+    # Build the adaptors using the Dockerfile.build with volume mount
+    echo "🏗️  Building OpenFn adaptors using Dockerfile.build with volume mount..."
     cd "$PROJECT_ROOT/projects/openfn-custom-adaptors"
     
-    # Use volume mount to directly write built packages to submodule location
+    # Build the Docker image with the build process
+    docker build -f Dockerfile.build -t openfn-adaptors-builder .
+    
+    # Run the container with volume mount - build output will be created directly in host filesystem
     docker run --rm \
         -v "$(pwd):/workspace" \
         -w /workspace \
-        node:18-alpine \
-        sh -c "
-            npm install -g pnpm@8.15.0 &&
-            pnpm install &&
-            pnpm -C packages/common build &&
-            pnpm -C packages/http build &&
-            pnpm -C packages/sftp build &&
-            echo '✅ All packages built successfully'
-        "
+        openfn-adaptors-builder
     
     echo "✅ Custom OpenFn adaptors built successfully"
     echo "   📁 Built packages available in submodule location"
