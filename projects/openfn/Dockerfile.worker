@@ -7,10 +7,8 @@ USER root
 # Create directory for local adaptors repository
 RUN mkdir -p /app/openfn-adaptors
 
-# Copy the built packages from the submodule location
-COPY openfn-custom-adaptors/packages/common/ /app/openfn-adaptors/packages/common/
-COPY openfn-custom-adaptors/packages/http/ /app/openfn-adaptors/packages/http/
-COPY openfn-custom-adaptors/packages/sftp/ /app/openfn-adaptors/packages/sftp/
+# Copy the published adaptors repository (npm-style packages with all dependencies)
+COPY openfn-custom-adaptors/published-adaptors/ /app/openfn-adaptors/
 
 # Switch back to the original user (if there was one)
 USER root
@@ -18,6 +16,6 @@ USER root
 # Set working directory back to app root
 WORKDIR /app
 
-# Add environment variables to identify this as a worker with local adaptors
-ENV LOCAL_ADAPTORS_ENABLED=true
-ENV CUSTOM_ADAPTORS_PATH=/app/openfn-adaptors 
+# Set up environment variables for local adaptors mode
+ENV LOCAL_ADAPTORS=true
+ENV OPENFN_ADAPTORS_REPO=/app/openfn-adaptors

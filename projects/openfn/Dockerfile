@@ -20,13 +20,11 @@ RUN if [ -d "/app/priv/openfn/@openfn/language-sftp" ]; then \
       mv /app/priv/openfn/@openfn/language-sftp /app/priv/openfn/@openfn/language-sftp.original; \
     fi
 
-# Create directory for local adaptors repository
+# Create directory for clean published adaptors repository
 RUN mkdir -p /app/openfn-adaptors
 
-# Copy the built packages from the submodule location
-COPY openfn-custom-adaptors/packages/common/ /app/openfn-adaptors/packages/common/
-COPY openfn-custom-adaptors/packages/http/ /app/openfn-adaptors/packages/http/
-COPY openfn-custom-adaptors/packages/sftp/ /app/openfn-adaptors/packages/sftp/
+# Copy the clean published adaptors repository (npm-style packages)
+COPY openfn-custom-adaptors/published-adaptors/ /app/openfn-adaptors/
 
 # Also install custom SFTP adaptor in traditional location as backup
 RUN mkdir -p /app/priv/openfn/@openfn/language-sftp && \
@@ -36,11 +34,14 @@ RUN mkdir -p /app/priv/openfn/@openfn/language-sftp && \
         echo "✅ Custom SFTP adaptor also installed in traditional location"; \
     fi
 
+# Set up environment variables for local adaptors mode
+ENV LOCAL_ADAPTORS=true
+ENV OPENFN_ADAPTORS_REPO=/app/openfn-adaptors
+
 # Switch back to lightning user
 USER lightning
 
 # Add environment variables to identify this as the custom URI-fixed package with local adaptors
 ENV CUSTOM_SFTP_ADAPTOR=true
-ENV SFTP_ADAPTOR_VERSION=2.0.14-custom-uri-fixed
-ENV LOCAL_ADAPTORS_ENABLED=true
-ENV CUSTOM_ADAPTORS_PATH=/app/openfn-adaptors 
+ENV SFTP_ADAPTOR_VERSION=2.0.14-custom-enhanced
+ENV LOCAL_ADAPTORS_ENABLED=true 

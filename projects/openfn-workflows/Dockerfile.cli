@@ -27,10 +27,9 @@ RUN cd /adaptors && \
         @openfn/language-common@2.5.0 \
         @openfn/language-dhis2@6.3.4
 
-# Copy custom-built packages from the submodule location
-COPY openfn-custom-adaptors/packages/common/ /adaptors/custom-common/
-COPY openfn-custom-adaptors/packages/http/ /adaptors/custom-http/
-COPY openfn-custom-adaptors/packages/sftp/ /adaptors/custom-sftp/
+# Copy custom-built packages from the published-adaptors location (npm-style packages with all dependencies)
+COPY openfn-custom-adaptors/published-adaptors/packages/common/ /adaptors/custom-common/
+COPY openfn-custom-adaptors/published-adaptors/packages/sftp/ /adaptors/custom-sftp/
 
 # Set up proper module resolution for OpenFN CLI
 ENV OPENFN_MODULES_HOME=/adaptors/node_modules
@@ -42,7 +41,8 @@ RUN mkdir -p /tmp/openfn/repo/node_modules/@openfn && \
     # Copy custom packages (not the official ones)
     cp -r /adaptors/custom-sftp "/tmp/openfn/repo/node_modules/@openfn/language-sftp_2.0.14" && \
     cp -r /adaptors/custom-common "/tmp/openfn/repo/node_modules/@openfn/language-common_2.5.0" && \
-    cp -r /adaptors/custom-http "/tmp/openfn/repo/node_modules/@openfn/language-http_6.4.5" && \
+    # Copy official http package from npm installed location
+    cp -r /adaptors/node_modules/@openfn/language-http "/tmp/openfn/repo/node_modules/@openfn/language-http_6.4.5" && \
     # Create proper package.json for CLI
     cd /tmp/openfn/repo && \
     echo '{"name":"openfn-repo","version":"1.0.0","dependencies":{"@openfn/language-sftp_2.0.14":"npm:@openfn/language-sftp@2.0.14","@openfn/language-common_2.5.0":"npm:@openfn/language-common@2.5.0","@openfn/language-http_6.4.5":"npm:@openfn/language-http@6.4.5"}}' > package.json
