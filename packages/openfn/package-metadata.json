@@ -39,7 +39,7 @@
     "OPENFN_DOCKER_WORKER_CPUS": "2",
     "OPENFN_DOCKER_WORKER_MEMORY": "4G",
     "OPENFN_WORKFLOW_MANUAL_CLI": "false",
-    "OPENFN_LOAD_WORKFLOWS_ON_STARTUP": "true",
+    "OPENFN_LOAD_WORKFLOWS_ON_STARTUP": "false",
     "OPENFN_ADMIN_USER": "root@openhim.org",
     "OPENFN_ADMIN_PASSWORD": "instant101secure",
     "FHIR_SERVER_BASE_URL": "http://openhim-core:5001",

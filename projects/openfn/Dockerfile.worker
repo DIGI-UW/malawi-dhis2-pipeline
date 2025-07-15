@@ -19,3 +19,7 @@ WORKDIR /app
 # Set up environment variables for local adaptors mode
 ENV LOCAL_ADAPTORS=true
 ENV OPENFN_ADAPTORS_REPO=/app/openfn-adaptors
+
+# Add environment variables to identify this as a worker with local adaptors
+ENV LOCAL_ADAPTORS_ENABLED=true
+ENV CUSTOM_ADAPTORS_PATH=/app/openfn-adaptors 
