@@ -32,13 +32,50 @@ fn(state => {
     console.log('📋 Sample data values:', state.payload.dataValues.slice(0, 2));
   }
   
-  return state;
+  // Store attribution data in state for tracking but don't send to DHIS2
+  const attribution = state.payload.attribution;
+  
+  return {
+    ...state,
+    attribution: attribution // Store for logging/tracking purposes
+  };
 });
 
 // Upload to DHIS2 using the simple pattern from OpenFn examples
 create("dataValueSets", (state) => {
   console.log('📤 Sending payload to DHIS2...');
   
-  // Return the payload directly - DHIS2 adaptor will handle the rest
-  return state.payload;
+  // Create clean DHIS2 payload without attribution field
+  const dhis2Payload = {
+    dataSet: state.payload.dataSet,
+    period: state.payload.period,
+    orgUnit: state.payload.orgUnit,
+    completeDate: state.payload.completeDate,
+    dataValues: state.payload.dataValues
+  };
+  
+  console.log('🔍 Clean DHIS2 payload structure:', {
+    dataSet: dhis2Payload.dataSet,
+    period: dhis2Payload.period,
+    orgUnit: dhis2Payload.orgUnit,
+    dataValuesCount: dhis2Payload.dataValues?.length || 0
+  });
+  
+  return dhis2Payload;
+});
+
+fn(state => {
+  console.log('✅ DHIS2 upload completed successfully');
+  
+  // Add upload completion metadata
+  return {
+    ...state,
+    uploadCompleted: true,
+    uploadedAt: new Date().toISOString(),
+    uploadSummary: {
+      status: 'completed',
+      dataValuesCount: state.payload.dataValues?.length || 0,
+      attribution: state.attribution
+    }
+  };
 });
