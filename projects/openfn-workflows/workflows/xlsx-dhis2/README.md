@@ -1,199 +1,88 @@
-# Excel Sheet to DHIS2 Workflow - Large File Processing
+# Excel Sheet to DHIS2 Workflow (Simplified)
 
-This workflow is specifically designed to handle large Excel files (1M+ rows) and process them efficiently without running into memory limitations.
+This workflow is designed to process large Excel files and upload their data to DHIS2 in an efficient, memory-safe manner. It's built to be understandable and maintainable, especially for developers new to the project.
 
-## Architecture Overview
+## Simplified Architecture
 
-This workflow uses a **chunked processing architecture** to handle large files:
+The workflow has been refactored into a clear, four-step process. This streamlined design improves readability and makes it easier to follow the flow of data.
 
 ```
-Excel File (30MB+) → Download & Chunk → Process Chunks → Generate Batches → Upload to DHIS2 → Consolidate Results
+1. Check for New Files → 2. Process File in Chunks → 3. Consolidate Results → 4. Update File Tracking
 ```
 
-### Key Features
+### Key Improvements
 
-- **Memory Efficient**: Processes files in 1000-row chunks
-- **Parallel Processing**: Multiple chunks can be processed simultaneously
-- **Error Resilient**: Individual chunk failures don't stop the entire process
-- **Detailed Tracking**: Comprehensive logging and result consolidation
-- **Fallback Safe**: Doesn't interfere with the original `sftp-dhis2` workflow
+- **Simplicity**: The number of jobs has been reduced from ten to four, making the workflow easier to grasp.
+- **Clarity**: The logic within each job has been simplified, with improved commenting to explain each step.
+- **Efficiency**: Core functionality remains, but the streamlined process is more efficient and easier to debug.
 
 ## Workflow Jobs
 
-### 1. `download-and-chunk-excel.js`
-- Downloads Excel file from SFTP
-- Processes it in streaming chunks (1000 rows each)
-- Creates lightweight chunk metadata
-- **Memory Target**: <500MB
+### 1. `1-check-for-new-files.js`
+- **Purpose**: Checks an SFTP directory for new or updated Excel files based on predefined patterns.
+- **Trigger**: Runs on a CRON schedule (e.g., every 5 minutes).
+- **Output**: A list of new files to be processed.
 
-### 2. `process-excel-chunk.js`
-- Processes individual chunks
-- Applies data transformation and validation
-- Maps Excel columns to DHIS2 fields
-- **Memory Target**: <100MB per chunk
+### 2. `2-process-file-chunks.js`
+- **Purpose**: Reads each new Excel file in chunks, transforms the data, and uploads it to DHIS2. This job is memory-efficient as it does not load the entire file at once.
+- **Core Logic**:
+  - Uses `getXLSX` to stream the file.
+  - Maps Excel columns to DHIS2 fields for each chunk.
+  - Uploads each chunk to DHIS2 using `create('dataValueSets', ...)`.
+- **Output**: Results of the chunk processing, including successes and failures.
 
-### 3. `generate-dhis2-batch.js`
-- Creates DHIS2 dataValueSet payloads
-- Validates payload structure and size
-- Optimizes for DHIS2 API performance
-- **Memory Target**: <50MB per batch
+### 3. `3-consolidate-results.js`
+- **Purpose**: Gathers the results from the chunk processing job and creates a summary of the entire operation.
+- **Metrics**: Calculates success rates for both chunks and individual data values.
+- **Output**: A final consolidation summary.
 
-### 4. `upload-dhis2-batch.js`
-- Uploads individual batches to DHIS2
-- Implements retry logic for failures
-- Provides detailed error reporting
-- **Memory Target**: <50MB per upload
-
-### 5. `consolidate-results.js`
-- Consolidates results from all chunk uploads
-- Calculates success/failure rates
-- Provides comprehensive summary
-- **Memory Target**: <50MB
+### 4. `4-update-file-tracking.js`
+- **Purpose**: Marks the processed file with its outcome in the `fileTracking` state to prevent it from being reprocessed.
+- **State Management**: Ensures the workflow is idempotent and maintains a history of processed files.
+- **Output**: The final, updated state of the workflow.
 
 ## Configuration
 
-### File Target
-Currently configured for: `/data/excel-files/ART_data_long_format.xlsx`
-
-### Chunk Size
-- **Default**: 1000 rows per chunk
-- **Configurable**: Adjust `CHUNK_SIZE` in `download-and-chunk-excel.js`
-
-### Memory Limits
-- **Per Job**: 500MB (configurable)
-- **Total Workflow**: <2GB (well within OpenFn limits)
-
-### DHIS2 Configuration
+### DHIS2 Parameters
+The DHIS2 configuration is managed within `2-process-file-chunks.js`:
 ```javascript
-dataSet: 'necyFYLlEI0'
-orgUnit: 'drsiURo4DeK'
-period: '202501'
-categoryOptionCombo: 'HllvX50cXC0'
-attributeOptionCombo: 'HllvX50cXC0'
+const DHIS2_CONFIG = {
+  dataSet: 'necyFYLlEI0',
+  orgUnit: 'drsiURo4DeK',
+  period: '202501',
+};
 ```
 
-## Column Mappings
+### Column Mappings
+Data mapping is also handled in `2-process-file-chunks.js`. Here's an example of how Excel columns are mapped to DHIS2 data values:
+```javascript
+const dataValues = chunk.map(row => ({
+  dataElement: row['Indicator_name'],
+  orgUnit: row['Site'] || DHIS2_CONFIG.orgUnit,
+  period: row['Quarter'] || DHIS2_CONFIG.period,
+  value: row['IndicatorValue'],
+}));
+```
 
-| Excel Column | DHIS2 Field | Type | Required |
-|-------------|-------------|------|----------|
-| `Indicator_name` | `dataElement` | String | Yes |
-| `IndicatorValue` | `value` | Numeric | Yes |
-| `Site` | `orgUnit` | String | Yes |
-| `Quarter` | `period` | String | No |
-| `Region` | `region` | String | No |
+## How to Use
 
-## Usage
+### Triggers
+- **Automated**: The workflow is triggered by a CRON job that checks for new files.
+- **Manual**: You can manually trigger the workflow via a webhook to the `2-process-file-chunks` job for testing or ad-hoc processing.
 
-### Triggering the Workflow
+### Customization
+- **File Patterns**: To change which files are processed, modify the `LARGE_FILE_PATTERNS` in `1-check-for-new-files.js`.
+- **Chunk Size**: Adjust the `CHUNK_SIZE` in `2-process-file-chunks.js` to balance memory usage and the number of DHIS2 API calls.
+- **DHIS2 Mapping**: Update the `DHIS2_CONFIG` and the column mapping logic in `2-process-file-chunks.js` to fit your specific DHIS2 implementation.
 
-1. **Manual Trigger**: Use the `manual-excel-processing` webhook
-2. **File Path**: Currently hardcoded to ART file (can be made configurable)
+## Development and Troubleshooting
 
-### Expected Performance
-
-For a 30MB Excel file with 1M+ rows:
-- **Processing Time**: 5-10 minutes
-- **Memory Usage**: 500MB per job, 1.5GB total
-- **Success Rate**: >95% (depends on data quality)
-
-## Error Handling
-
-### Chunk-Level Errors
-- Individual chunk failures don't stop the workflow
-- Detailed error reporting for each chunk
-- Retry logic for transient failures
-
-### DHIS2 Upload Errors
-- Automatic retry for 5xx errors
-- Detailed conflict reporting
-- Graceful handling of payload size limits
-
-### Memory Management
-- Forced garbage collection between chunks
-- Memory monitoring and limits
-- Automatic cleanup of processed data
-
-## Monitoring
-
-### Success Metrics
-- **Chunk Success Rate**: % of chunks processed successfully
-- **Data Value Success Rate**: % of data values uploaded to DHIS2
-- **Processing Speed**: Rows per second
-
-### Key Logs to Watch
-- `📊 Processing chunk X: Y rows`
-- `✅ DHIS2 upload completed`
-- `📈 Consolidation Summary`
-- `💾 Memory usage: XMB`
-
-## Comparison with Original Workflow
-
-| Feature | Original SFTP-DHIS2 | New Excel-DHIS2 |
-|---------|-------------------|------------------|
-| **File Size Limit** | ~10MB | 100MB+ |
-| **Row Limit** | ~50K rows | 1M+ rows |
-| **Memory Usage** | 1.5GB+ | <500MB per job |
-| **Processing Model** | All-at-once | Chunked |
-| **Error Recovery** | Fail-fast | Chunk-level recovery |
-| **Parallel Processing** | No | Yes |
-
-## Troubleshooting
+### Logging
+Each job provides clear and informative logs. The job number prefix (e.g., "1.", "2.") helps you follow the workflow's progress in the logs.
 
 ### Common Issues
+- **SFTP Connection**: Ensure that the SFTP credentials and server address are correctly configured in your OpenFn project.
+- **DHIS2 Permissions**: The DHIS2 user needs the necessary permissions to create and update data value sets.
+- **Data Mapping**: If you see errors during the `2-process-file-chunks` job, double-check that the Excel column names match what's expected in the mapping logic.
 
-1. **Memory Errors**
-   - Reduce `CHUNK_SIZE` in download job
-   - Check `MAX_MEMORY_MB` limits
-
-2. **DHIS2 Upload Failures**
-   - Check DHIS2 server status
-   - Verify data element mappings
-   - Review conflict reports
-
-3. **Performance Issues**
-   - Consider reducing chunk size
-   - Monitor parallel processing limits
-   - Check DHIS2 API performance
-
-### Debug Mode
-To enable detailed logging, set environment variables:
-```bash
-DEBUG=true
-VERBOSE_LOGGING=true
-```
-
-## Future Enhancements
-
-1. **Dynamic File Selection**: Make file path configurable
-2. **Adaptive Chunk Size**: Adjust based on memory usage
-3. **Parallel Limits**: Control number of concurrent chunks
-4. **Resume Capability**: Resume from failed chunks
-5. **File Type Support**: Support for CSV, JSON, etc.
-
-## Prerequisites
-
-- SFTP server with Excel file access
-- DHIS2 instance with appropriate permissions
-- OpenFn Lightning with sufficient memory allocation
-- Enhanced SFTP adaptor with streaming support
-
-## Dependencies
-
-- `@openfn/language-sftp@2.0.14-custom-enhanced`
-- `@openfn/language-dhis2@6.3.4`
-- `@openfn/language-common@2.4.0`
-
-## Development
-
-To test with smaller files:
-1. Adjust file path in `download-and-chunk-excel.js`
-2. Reduce chunk size for testing
-3. Use manual trigger for controlled testing
-
-## Support
-
-For issues with large file processing:
-1. Check memory usage in logs
-2. Review chunk success rates
-3. Examine DHIS2 conflict reports
-4. Monitor processing performance 
+This refactored workflow should be much easier to work with. If you have any questions, the simplified structure and improved logging are there to help guide you. 
