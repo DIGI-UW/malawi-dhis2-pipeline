@@ -1,0 +1,12 @@
+This is a simple test file for SFTP download testing.
+
+File created: 2025-01-15
+Purpose: Testing basic file download functionality
+Type: Plain text
+
+Test data:
+- Line 1: Basic text content
+- Line 2: More test content
+- Line 3: Final test line
+
+This file should be easy to download and verify that the SFTP connection is working properly. 

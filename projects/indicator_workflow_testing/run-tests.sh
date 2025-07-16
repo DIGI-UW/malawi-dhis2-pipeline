@@ -80,6 +80,15 @@ while [[ $# -gt 0 ]]; do
             SPECIFIC_TEST="cli-workflow"
             shift
             ;;
+        --simple-sftp)
+            RUN_API_TESTS=false
+            RUN_EXCEL_TESTS=false
+            RUN_SFTP_TESTS=false
+            RUN_INTEGRATION_TESTS=false
+            RUN_CLI_WORKFLOW_TESTS=false
+            SPECIFIC_TEST="simple-sftp"
+            shift
+            ;;
         --verbose|-v)
             VERBOSE=true
             export VERBOSE=true
@@ -91,21 +100,21 @@ while [[ $# -gt 0 ]]; do
             echo "Usage: $0 [OPTIONS]"
             echo ""
             echo "Options:"
-            echo "  --env-file FILE    Source environment variables from specified file"
-            echo "  --api              Run only API connectivity tests"
-            echo "  --workflows        Run only workflow validation tests"
-            echo "  --excel            Run only Excel parsing tests"
-            echo "  --sftp             Run only SFTP integration tests"
-            echo "  --integration      Run only end-to-end integration tests"
-            echo "  --cli-workflow     Run CLI-based workflow tests (3 working tests)"
-            echo "  --verbose, -v      Enable verbose output"
-            echo "  --help, -h         Show this help message"
+            echo "  --api          Run only API connectivity tests"
+            echo "  --workflows    Run only workflow validation tests"
+            echo "  --excel        Run only Excel parsing tests"
+            echo "  --sftp         Run only SFTP integration tests"
+            echo "  --integration  Run only end-to-end integration tests"
+            echo "  --cli-workflow Run CLI-based workflow tests (3 working tests)"
+            echo "  --simple-sftp  Run only the simple SFTP job test"
+            echo "  --verbose, -v  Enable verbose output"
+            echo "  --help, -h     Show this help message"
             echo ""
             echo "Examples:"
-            echo "  $0                               # Run all tests"
-            echo "  $0 --cli-workflow                # Run 3 CLI tests (SFTP basic, simple job, full workflow)"
-            echo "  $0 --api --verbose               # Run API tests with verbose output"
-            echo "  $0 --env-file .env --integration # Run integration tests with custom environment"
+            echo "  $0                     # Run all tests"
+            echo "  $0 --cli-workflow      # Run 3 CLI tests (SFTP basic, simple job, full workflow)"
+            echo "  $0 --simple-sftp       # Run only the simple SFTP job test"
+            echo "  $0 --api --verbose     # Run API tests with verbose output"
             echo ""
             echo "CLI Tests Available:"
             echo "  • test-sftp-working-command.sh   - ⭐ PROVEN WORKING (30s)"
@@ -421,6 +430,11 @@ main() {
         run_cli_test "CLI SFTP Basic" "Proven working SFTP connectivity test (30s)"
         run_cli_test "CLI Simple Job" "Simple inline SFTP job test"
         run_cli_test "CLI SFTP Workflow" "Complete SFTP→Excel→DHIS2 workflow test"
+    fi
+    
+    if [[ "$SPECIFIC_TEST" == "simple-sftp" ]]; then
+        # Run just the simple SFTP job test
+        run_cli_test "CLI Simple Job" "Simple inline SFTP job test"
     fi
     
     # Generate summary

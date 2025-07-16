@@ -1,89 +1,93 @@
 /**
- * Download new or updated files from SFTP
- * This job is triggered either after check-sftp-files or directly by webhook
+ * Download ART Excel file from SFTP using memory-efficient processing
+ * Returns data structured for the process-excel-data job to handle
  */
 
-// OpenFN functions are available directly, no imports needed
-// The runtime provides: get from @openfn/language-sftp
-// and fn from @openfn/language-common
-
-// Configuration
-const LOCAL_DOWNLOAD_PATH = '/tmp/openfn-downloads/';
-
 fn((state) => {
-  console.log('Starting file download process...');
+  console.log('🔧 Starting ART Excel file download and processing...');
   
-  // Determine files to download
-  let filesToDownload = [];
+  // Download and process the ART Excel file
+  const artFile = '/data/excel-files/ART_data_long_format.xlsx';
   
-  if (state.newFiles && state.newFiles.length > 0) {
-    // From cron check workflow
-    filesToDownload = state.newFiles;
-    console.log(`Processing ${filesToDownload.length} files from cron check`);
-  } else if (state.data && state.data.filePath) {
-    // From webhook trigger - single file
-    filesToDownload = [{
-      name: state.data.fileName || state.data.filePath.split('/').pop(),
-      path: state.data.filePath,
-      size: state.data.fileSize || null,
-      modifiedTime: state.data.modifiedTime || new Date().toISOString()
-    }];
-    console.log(`Processing single file from webhook: ${filesToDownload[0].name}`);
-  } else {
-    console.log('No files specified for download');
+  console.log(`📄 Processing ART file: ${artFile}`);
+  
+  return executeManual(
+    connect,
+    getXLSX(artFile, {
+      chunkSize: 500,           // Process in chunks for memory efficiency
+      withHeader: true,         // First row contains headers
+      ignoreEmpty: true         // Skip empty rows
+    })
+  )(state).then(state => {
+    console.log('✅ ART Excel file processing completed successfully');
+    
+    // Structure data for process-excel-data job
+    if (state.data) {
+      console.log('📊 Excel processing summary:', {
+        fileName: state.data.fileName,
+        fileSize: state.data.fileSize,
+        sheets: state.data.sheets,
+        activeSheet: state.data.activeSheet,
+        totalRows: state.data.totalRows,
+        dataLength: state.data.data?.length || 0,
+        processingMethod: state.data.metadata?.processingMethod
+});
+
+      // Show sample data
+      if (state.data.data && state.data.data.length > 0) {
+        console.log('📄 Sample data (first 2 rows):');
+        state.data.data.slice(0, 2).forEach((row, index) => {
+          console.log(`  Row ${index + 1}:`, JSON.stringify(row));
+        });
+        
+        if (state.data.data.length > 2) {
+          console.log(`  ... and ${state.data.data.length - 2} more rows`);
+        }
+      }
+
+      // Structure data as array for process-excel-data job
+      const downloadedFiles = [{
+        name: artFile,
+        status: 'downloaded',
+        contentType: 'excel',
+        rowCount: state.data.totalRows,
+        content: state.data.data,  // Array of row objects
+        metadata: {
+          fileSize: state.data.fileSize,
+          sheets: state.data.sheets,
+          activeSheet: state.data.activeSheet,
+          sheetRange: state.data.sheetRange,
+          processingMethod: state.data.metadata?.processingMethod,
+          processedAt: state.data.metadata?.processedAt
+        }
+      }];
+
+      console.log(`📦 Prepared ${downloadedFiles.length} file(s) for processing`);
+    
+    return {
+      ...state,
+        downloadedFiles,
+      downloadCompleted: true,
+      success: true
+    };
+    } else {
+      console.log('⚠️  No data received from Excel processing');
+      return {
+        ...state,
+        downloadedFiles: [],
+        downloadCompleted: true,
+        error: 'No data received from Excel processing',
+        success: false
+      };
+    }
+  }).catch(error => {
+    console.error('❌ ART Excel file processing failed:', error.message);
     return {
       ...state,
       downloadedFiles: [],
-      error: 'No files specified for download'
-    };
-  }
-  
-  return {
-    ...state,
-    filesToDownload,
-    downloadedFiles: [],
-    downloadStartTime: new Date().toISOString()
-  };
-});
-
-// Download each file
-fn((state) => {
-  const downloadPromises = state.filesToDownload.map(async (file, index) => {
-    const localPath = `${LOCAL_DOWNLOAD_PATH}${file.name}`;
-    
-    console.log(`Downloading ${file.name} to ${localPath}`);
-    
-    try {
-      // Download the file
-      await get(file.path, localPath);
-      
-      return {
-        ...file,
-        localPath,
-        downloadTime: new Date().toISOString(),
-        status: 'downloaded'
-      };
-    } catch (error) {
-      console.error(`Failed to download ${file.name}:`, error);
-      return {
-        ...file,
-        status: 'failed',
-        error: error.message
-      };
-    }
-  });
-  
-  return Promise.all(downloadPromises).then(results => {
-    const successfulDownloads = results.filter(f => f.status === 'downloaded');
-    const failedDownloads = results.filter(f => f.status === 'failed');
-    
-    console.log(`Download complete: ${successfulDownloads.length} successful, ${failedDownloads.length} failed`);
-    
-    return {
-      ...state,
-      downloadedFiles: successfulDownloads,
-      failedDownloads,
-      downloadCompleted: true
+      downloadCompleted: true,
+      error: error.message,
+      success: false
     };
   });
 });

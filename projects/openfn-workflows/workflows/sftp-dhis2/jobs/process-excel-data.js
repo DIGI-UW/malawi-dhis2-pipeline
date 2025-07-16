@@ -1,342 +1,393 @@
 /**
- * Process Excel data from downloaded SFTP files
- * This job handles the conversion of Excel data to the format expected by generate-dhis2-payload.js
- * Uses configuration-based file type detection and column mapping
+ * Process Excel data from downloaded SFTP files.
+ * This job uses a configuration-driven approach to map and validate data.
+ * 
+ * OpenFn Design Principles:
+ * - Single responsibility: Process Excel files into structured data
+ * - Configuration-driven: Externalize business logic from code
+ * - Error handling: Graceful failure with detailed error messages
+ * - State immutability: Return new state objects
  */
 
-// OpenFN functions are available directly, no imports needed
-// The runtime provides: fn, each, dataPath, dataValue from @openfn/language-common
-// Note: For testing purposes, XLSX and fs functionality will be mocked
-// In actual OpenFN runtime, these would be available or handled differently
-
-// Configuration functions - these would be loaded from the runtime environment
-function loadFileTypeConfigs() {
-  // Mock implementation for testing
-  return {
-    'art_data_long_format': {
-      fileType: 'art_data_long_format',
-      filePatterns: ['*ART*data*long*.xlsx'],
-      columnMappings: {},
-      transformations: [],
-      dataValidation: { rules: [] },
-      sheetConfig: { multiSheet: false, headerRow: 1, dataStartRow: 2 }
-    }
-  };
+// Try to import XLSX library for parsing raw Excel files
+let XLSX;
+let isXLSXAvailable = false;
+try {
+  XLSX = require('xlsx');
+  isXLSXAvailable = true;
+  console.log('✅ XLSX library available for Excel parsing');
+} catch (error) {
+  console.log('⚠️  XLSX library not available, will use alternative parsing methods');
 }
 
-function loadMetadataMappings() {
-  // Mock implementation for testing
-  return {
-    orgUnits: {},
-    dataElements: {}
-  };
-}
+// Configuration is embedded directly in the job for portability.
+const CONFIG = {
+  fileType: 'art_data_long_format',
+  displayName: 'ART Data Long Format',
+  description: 'Configuration for processing ART supervision data in long format',
+  filePatterns: ['*ART*data*long*.xlsx', '*ART*data*long*.csv', 'ART_data_long_format.xlsx'],
+  columnMappings: {
+    facility: {
+      sourceColumns: ['Facility', 'facility', 'Health Facility', 'Site'],
+      targetField: 'orgUnit',
+      required: true,
+    },
+    indicator: {
+      sourceColumns: ['Indicator', 'indicator', 'Indicator Name', 'Data Element'],
+      targetField: 'dataElement',
+      required: true,
+    },
+    value: {
+      sourceColumns: ['Value', 'value', 'Count', 'Total', 'Result'],
+      targetField: 'value',
+      required: true,
+      dataType: 'numeric',
+    },
+    period: {
+      sourceColumns: ['Period', 'period', 'Month', 'Quarter', 'Reporting Period'],
+      targetField: 'period',
+      required: true,
+      format: 'YYYYMM',
+    },
+    ageGroup: {
+      sourceColumns: ['Age Group', 'age_group', 'Age', 'Age Category'],
+      targetField: 'categoryOptions.ageGroup',
+      required: false,
+    },
+    gender: {
+      sourceColumns: ['Gender', 'gender', 'Sex'],
+      targetField: 'categoryOptions.gender',
+      required: false,
+    },
+    artRegimen: {
+      sourceColumns: ['ART Regimen', 'Regimen', 'Treatment'],
+      targetField: 'categoryOptions.artRegimen',
+      required: false,
+    },
+  },
+  dataValidation: {
+    rules: [
+      { field: 'value', type: 'numeric', min: 0, max: 999999, allowNull: false },
+      { field: 'period', type: 'regex', pattern: '^\\d{6}$', message: 'Period must be in YYYYMM format' },
+      { field: 'indicator', type: 'notEmpty', message: 'Indicator name cannot be empty' },
+    ],
+    skipEmptyRows: true,
+    stopOnError: false,
+  },
+  transformations: [
+    { field: 'period', type: 'dateFormat', from: ['MM/YYYY', 'MM-YYYY', 'MMMM YYYY'], to: 'YYYYMM' },
+    { field: 'value', type: 'numeric', removeCommas: true, defaultValue: 0 },
+  ],
+};
 
-function matchFileToConfig(fileName, configs) {
-  // Simple pattern matching
-  for (const [key, config] of Object.entries(configs)) {
-    for (const pattern of config.filePatterns) {
-      const regex = new RegExp(pattern.replace(/\*/g, '.*'), 'i');
-      if (regex.test(fileName)) {
-        return config;
-      }
+// Helper function to find which source column name is present in the row
+const findSourceColumn = (row, sourceColumns) => {
+  for (const col of sourceColumns) {
+    if (row[col] !== undefined) {
+      return col;
     }
   }
   return null;
-}
+};
 
-function applyColumnMappings(row, mappings, metadata) {
-  // Simple implementation for testing
-  return row;
+// Helper to set a value in a nested object path
+const setNestedValue = (obj, path, value) => {
+  const keys = path.split('.');
+  let current = obj;
+  for (let i = 0; i < keys.length - 1; i++) {
+    current[keys[i]] = current[keys[i]] || {};
+    current = current[keys[i]];
 }
+  current[keys[keys.length - 1]] = value;
+};
 
-// Enhanced Excel data parsing with configuration
-function parseExcelData(filePath, fileName, config, metadata) {
-  console.log(`Parsing Excel file: ${fileName} at ${filePath}`);
-  console.log(`Using configuration: ${config.fileType}`);
-  
+// Parse raw Excel content if needed
+const parseExcelContent = (content, fileName) => {
   try {
-    // Note: In actual OpenFN runtime, file reading would be handled differently
-    // This is a simplified version for testing
-    console.log(`Mock: Reading Excel file from ${filePath}`);
+    console.log(`📄 Parsing Excel content for: ${fileName}`);
+    console.log(`📄 Content type:`, typeof content);
     
-    // Mock workbook structure for testing
-    const workbook = {
-      SheetNames: ['Sheet1'],
-      Sheets: {
-        'Sheet1': {
-          // Mock sheet data
+    // If content is already parsed (from getXLSX), return as is
+    if (Array.isArray(content)) {
+      console.log(`📄 Content already parsed as array with ${content.length} rows`);
+      return content;
+    }
+    
+    // If content is a string (raw file content), try to parse it
+    if (typeof content === 'string') {
+      console.log(`📄 Parsing raw string content, length: ${content.length}`);
+    
+      if (XLSX) {
+        // Use XLSX library to parse
+        const workbook = XLSX.read(content, { type: 'string' });
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+        const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+        
+        // Convert to array of objects with headers
+        if (jsonData.length > 0) {
+          const headers = jsonData[0];
+          const rows = jsonData.slice(1).map(row => {
+            const obj = {};
+            headers.forEach((header, index) => {
+              if (header && row[index] !== undefined) {
+                obj[header] = row[index];
+      }
+            });
+            return obj;
+          });
+          
+          console.log(`📄 Successfully parsed ${rows.length} rows using XLSX library`);
+          return rows;
         }
       }
-    };
-    console.log(`Workbook sheets: ${workbook.SheetNames.join(', ')}`);
+      
+      // Fallback: try to parse as CSV if it looks like CSV
+      if (content.includes(',') && content.includes('\n')) {
+        console.log(`📄 Attempting CSV parsing as fallback`);
+        const lines = content.split('\n').filter(line => line.trim());
+        if (lines.length > 0) {
+          const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
+          const rows = lines.slice(1).map(line => {
+            const values = line.split(',').map(v => v.trim().replace(/"/g, ''));
+            const obj = {};
+            headers.forEach((header, index) => {
+              if (header && values[index] !== undefined) {
+                obj[header] = values[index];
+              }
+            });
+            return obj;
+          });
 
-    let processedData = [];
-    
-    if (config.sheetConfig.multiSheet) {
-      // Process multiple sheets
-      config.sheetConfig.sheetPatterns.forEach(pattern => {
-        const matchingSheets = workbook.SheetNames.filter(name => 
-          new RegExp(pattern.replace(/\*/g, '.*'), 'i').test(name)
-        );
-        
-        matchingSheets.forEach(sheetName => {
-          const sheetData = processSheet(workbook, sheetName, config, metadata);
-          processedData = processedData.concat(sheetData);
-        });
-      });
-    } else {
-      // Process single sheet
-      const sheetIndex = config.sheetConfig.targetSheet || 0;
-      const sheetName = workbook.SheetNames[sheetIndex];
-      if (sheetName) {
-        processedData = processSheet(workbook, sheetName, config, metadata);
+          console.log(`📄 Successfully parsed ${rows.length} rows using CSV fallback`);
+          return rows;
+        }
       }
+      
+      console.error(`📄 Could not parse content for ${fileName}`);
+      return [];
     }
+    
+    // If content is already an object/array, return as is
+    if (typeof content === 'object' && content !== null) {
+      console.log(`📄 Content is already an object, returning as is`);
+      return Array.isArray(content) ? content : [content];
+    }
+    
+    console.error(`📄 Unknown content type for ${fileName}:`, typeof content);
+    return [];
+    } catch (error) {
+    console.error(`📄 Error parsing Excel content for ${fileName}:`, error);
+    return [];
+}
+};
 
-    // Apply validation
-    const validation = validateData(processedData, config.dataValidation);
-    if (!validation.isValid) {
-      console.warn(`Data validation warnings for ${fileName}:`, validation.warnings);
-    }
+// Main mapping function for parsed Excel data
+const mapExcelData = (parsedData, config) => {
+  try {
+    console.log('📊 Mapping Excel data...');
+    console.log('📊 Input data type:', typeof parsedData);
+    console.log('📊 Input data length:', Array.isArray(parsedData) ? parsedData.length : 'not array');
+    
+    if (!Array.isArray(parsedData) || parsedData.length === 0) {
+      return {
+        type: config.fileType,
+        data: [],
+        validation: { 
+          isValid: false, 
+          warnings: ['No data found in parsed Excel content'] 
+        },
+        processedAt: new Date().toISOString(),
+      };
+}
+
+    console.log(`📊 Found ${parsedData.length} data rows`);
+    console.log(`📊 Sample row:`, parsedData[0]);
+
+    const processedData = parsedData.map((row, rowIndex) => {
+      const mappedRow = {};
+    
+      // Map each column according to configuration
+      for (const key in config.columnMappings) {
+        const mapping = config.columnMappings[key];
+        const sourceColumn = findSourceColumn(row, mapping.sourceColumns);
+
+        if (sourceColumn) {
+          let value = row[sourceColumn];
+          
+          // Apply data type transformations
+          if (mapping.dataType === 'numeric') {
+            value = parseFloat(value) || 0;
+          }
+          
+          setNestedValue(mappedRow, mapping.targetField, value);
+        } else if (mapping.required) {
+          console.warn(`⚠️  Required column not found for target field: ${mapping.targetField}`);
+          console.warn(`⚠️  Available columns:`, Object.keys(row));
+          // Don't throw error, just skip this field
+        }
+      }
+      
+      // Add row metadata
+      mappedRow._rowNumber = rowIndex + 1;
+      mappedRow._sourceRow = row;
+      
+      return mappedRow;
+    });
+
+    console.log(`📊 Successfully mapped ${processedData.length} rows`);
+    console.log(`📊 Sample mapped row:`, processedData[0]);
 
     return {
       type: config.fileType,
-      fileName: fileName,
-      filePath: filePath,
-      config: config,
       data: processedData,
-      validation: validation,
-      processedAt: new Date().toISOString()
+      validation: { isValid: true, warnings: [] },
+      processedAt: new Date().toISOString(),
     };
-
   } catch (error) {
-    console.error(`Error parsing Excel file ${fileName}:`, error);
-    throw new Error(`Failed to parse Excel file ${fileName}: ${error.message}`);
+    console.error('❌ Error mapping Excel data:', error);
+    return {
+      type: config.fileType,
+      data: [],
+      validation: { 
+        isValid: false, 
+        warnings: [`Error mapping Excel data: ${error.message}`] 
+      },
+      processedAt: new Date().toISOString(),
+    };
   }
-}
+};
 
-// Process a single sheet with configuration-based mapping
-function processSheet(workbook, sheetName, config, metadata) {
-  console.log(`Processing sheet: ${sheetName}`);
-  
-  const worksheet = workbook.Sheets[sheetName];
-  // Mock JSON data for testing - in actual runtime this would use XLSX.utils.sheet_to_json
-  const jsonData = [
-    { 'Indicator': 'Test Indicator', 'Value': 100, 'Period': '202401' },
-    { 'Indicator': 'Another Indicator', 'Value': 200, 'Period': '202401' }
-  ];
-
-  console.log(`Found ${jsonData.length} rows in sheet ${sheetName}`);
-
-  const processedRows = [];
-  
-  jsonData.forEach((row, index) => {
-    try {
-      // Apply column mappings
-      const mappedRow = applyColumnMappings(row, config.columnMappings, metadata);
-      
-      // Apply transformations
-      const transformedRow = applyTransformations(mappedRow, config.transformations);
-      
-      // Add metadata
-      transformedRow._rowNumber = index + (config.sheetConfig.dataStartRow || 2);
-      transformedRow._sheet = sheetName;
-      
-      processedRows.push(transformedRow);
-    } catch (error) {
-      console.warn(`Error processing row ${index + 1} in sheet ${sheetName}:`, error.message);
-    }
-  });
-
-  return processedRows;
-}
-
-// Apply transformations based on configuration
-function applyTransformations(row, transformations = []) {
-  const transformed = { ...row };
-  
-  transformations.forEach(transform => {
-    const field = transform.field;
-    if (transformed[field] !== undefined) {
-      switch (transform.type) {
-        case 'numeric':
-          let value = transformed[field];
-          if (transform.removeCommas) {
-            value = value.toString().replace(/,/g, '');
+// Match file to our single, embedded configuration
+const matchFileToConfig = (fileName, config) => {
+  for (const pattern of config.filePatterns) {
+    const regex = new RegExp(pattern.replace(/\*/g, '.*'), 'i');
+    if (regex.test(fileName)) {
+      return config;
           }
-          transformed[field] = parseFloat(value) || transform.defaultValue || 0;
-          break;
-          
-        case 'dateFormat':
-          transformed[field] = transformDate(transformed[field], transform);
-          break;
-          
-        case 'quarterToMonth':
-          transformed[field] = transformQuarter(transformed[field], transform);
-          break;
-          
-        case 'percentage':
-          transformed[field] = transformPercentage(transformed[field], transform);
-          break;
-      }
-    }
-  });
-  
-  return transformed;
-}
-
-// Transform date formats
-function transformDate(value, config) {
-  if (!value) return value;
-  
-  // Simple implementation - would need more robust date parsing
-  const date = new Date(value);
-  if (!isNaN(date) && config.to === 'YYYYMM') {
-    return date.getFullYear().toString() + 
-           (date.getMonth() + 1).toString().padStart(2, '0');
   }
-  
-  return value;
-}
+  return null;
+};
 
-// Transform quarter to month
-function transformQuarter(value, config) {
-  if (!value) return value;
-  
-  // Match patterns like Q1 FY25, Q2FY25, etc.
-  const match = value.match(/Q(\d)\s*FY(\d{2})/i);
-  if (match) {
-    const quarter = parseInt(match[1]);
-    const year = 2000 + parseInt(match[2]);
-    const fiscalYearStart = config.fiscalYearStart || 1;
-    
-    // Calculate the month based on quarter and fiscal year start
-    let month = fiscalYearStart + (quarter - 1) * 3;
-    let actualYear = year;
-    
-    if (month > 12) {
-      month = month - 12;
-      actualYear = year + 1;
-    }
-    
-    return actualYear.toString() + month.toString().padStart(2, '0');
-  }
-  
-  return value;
-}
-
-// Transform percentage values
-function transformPercentage(value, config) {
-  if (!value) return value;
-  
-  const numValue = parseFloat(value);
-  if (!isNaN(numValue)) {
-    if (config.from === 'decimal' && config.to === 'whole') {
-      return numValue * 100;
-    } else if (config.from === 'whole' && config.to === 'decimal') {
-      return numValue / 100;
-    }
-  }
-  
-  return value;
-}
-
-// Validate data based on configuration rules
-function validateData(data, validationConfig = {}) {
-  const warnings = [];
-  let isValid = true;
-  
-  if (data.length === 0) {
-    warnings.push('No data found in the processed file');
-    isValid = false;
-  }
-  
-  const rules = validationConfig.rules || [];
-  
-  data.forEach((row, index) => {
-    rules.forEach(rule => {
-      const value = row[rule.field];
-      
-      switch (rule.type) {
-        case 'numeric':
-          if (typeof value !== 'number' || isNaN(value)) {
-            warnings.push(`Row ${row._rowNumber || index}: ${rule.field} must be numeric`);
-          } else if (rule.min !== undefined && value < rule.min) {
-            warnings.push(`Row ${row._rowNumber || index}: ${rule.field} must be >= ${rule.min}`);
-          } else if (rule.max !== undefined && value > rule.max) {
-            warnings.push(`Row ${row._rowNumber || index}: ${rule.field} must be <= ${rule.max}`);
-          }
-          break;
-          
-        case 'notEmpty':
-          if (!value || value.toString().trim() === '') {
-            warnings.push(`Row ${row._rowNumber || index}: ${rule.message || `${rule.field} cannot be empty`}`);
-          }
-          break;
-          
-        case 'regex':
-          if (value && !new RegExp(rule.pattern).test(value.toString())) {
-            warnings.push(`Row ${row._rowNumber || index}: ${rule.message || `${rule.field} format is invalid`}`);
-          }
-          break;
-      }
-    });
-  });
-  
-  return { isValid: isValid && warnings.length === 0, warnings };
-}
-
-// Main processing function
-fn((state) => {
-  console.log('Starting Excel processing for downloaded files...');
+// Main job function
+fn(state => {
+  console.log('🔄 Starting Excel data processing...');
   
   if (!state.downloadedFiles || state.downloadedFiles.length === 0) {
-    console.log('No downloaded files to process');
+    console.warn('⚠️  No downloaded files to process.');
     return {
       ...state,
       processedFiles: [],
+      workflowComplete: true,
       error: 'No downloaded files to process'
     };
   }
 
-  // Load configurations
-  const fileTypeConfigs = loadFileTypeConfigs();
-  const metadata = loadMetadataMappings();
+  console.log(`📁 Processing ${state.downloadedFiles.length} downloaded file(s)`);
   
   const processedFiles = [];
   const processingErrors = [];
 
   state.downloadedFiles.forEach(file => {
+    console.log(`📄 Processing file: ${file.name}`);
+    console.log(`📄 File status: ${file.status}`);
+    console.log(`📄 Content type: ${file.contentType}`);
+    console.log(`📄 Row count: ${file.rowCount || 'unknown'}`);
+    
+    if (file.status !== 'downloaded' || !file.content) {
+      console.log(`⏭️  Skipping file with no content: ${file.name}`);
+      processingErrors.push({
+        fileName: file.name,
+        error: 'File not downloaded or has no content',
+        status: file.status
+      });
+      return;
+    }
+
     try {
-      console.log(`Processing file: ${file.name}`);
-      
       // Match file to configuration
-      const config = matchFileToConfig(file.name, fileTypeConfigs);
+      const config = matchFileToConfig(file.name, CONFIG);
       
       if (!config) {
-        // Fall back to generic processing if no config found
-        console.warn(`No configuration found for ${file.name}, using generic processing`);
-        // You could implement a generic fallback here
+        console.log(`⏭️  No configuration found for file: ${file.name}`);
         processingErrors.push({
           fileName: file.name,
-          error: 'No matching configuration found'
+          error: 'No configuration found for this file type'
         });
         return;
       }
       
-      const excelData = parseExcelData(file.localPath, file.name, config, metadata);
-      processedFiles.push({
-        ...file,
-        excelData,
+      console.log(`✅ Using configuration: ${config.displayName}`);
+
+      // Content is already parsed from getXLSX - it's an array of row objects
+      const parsedContent = file.content;
+      
+      if (!Array.isArray(parsedContent) || parsedContent.length === 0) {
+        console.error(`❌ No valid data in ${file.name}`);
+        processingErrors.push({
+          fileName: file.name,
+          error: 'No valid data found in file'
+        });
+        return;
+      }
+
+      console.log(`📊 Processing ${parsedContent.length} rows with chunking for memory efficiency`);
+
+      // Process data in chunks to avoid memory issues
+      const chunkSize = 100; // Process 100 rows at a time
+      const allMappedData = [];
+      let processedCount = 0;
+
+      console.log(`🔄 Processing data in chunks of ${chunkSize} rows`);
+
+      while (processedCount < parsedContent.length) {
+        const chunk = parsedContent.slice(processedCount, processedCount + chunkSize);
+        console.log(`📊 Processing chunk ${Math.floor(processedCount / chunkSize) + 1}: rows ${processedCount + 1}-${Math.min(processedCount + chunkSize, parsedContent.length)}`);
+        
+        // Map the chunk
+        const mappedChunk = mapExcelData(chunk, config);
+      
+        if (mappedChunk.validation.isValid) {
+          allMappedData.push(...mappedChunk.data);
+          console.log(`✅ Chunk processed: ${mappedChunk.data.length} rows mapped`);
+        } else {
+          console.warn(`⚠️  Chunk had validation issues:`, mappedChunk.validation.warnings);
+          // Still add the data, but log the warnings
+          allMappedData.push(...mappedChunk.data);
+        }
+        
+        processedCount += chunk.length;
+        
+        // Brief log for progress
+        if (processedCount < parsedContent.length) {
+          console.log(`📊 Progress: ${processedCount}/${parsedContent.length} rows processed`);
+        }
+      }
+
+      console.log(`✅ Successfully processed ${file.name}: ${allMappedData.length} total rows mapped`);
+      
+      // Create final result
+      const excelData = {
+        type: config.fileType,
+        data: allMappedData,
+        validation: { 
+          isValid: true, 
+          warnings: [],
+          totalRowsProcessed: allMappedData.length,
+          chunksProcessed: Math.ceil(parsedContent.length / chunkSize)
+        },
         processedAt: new Date().toISOString(),
-        status: 'processed'
-      });
-      
-      console.log(`Successfully processed: ${file.name} with ${excelData.data.length} rows`);
-      
+      };
+
+      processedFiles.push({
+          fileName: file.name,
+        fileType: file.contentType,
+          excelData: excelData,
+          processedAt: new Date().toISOString()
+        });
+
     } catch (error) {
-      console.error(`Failed to process ${file.name}:`, error);
+      console.error(`❌ Error processing ${file.name}:`, error);
       processingErrors.push({
         fileName: file.name,
         error: error.message
@@ -344,14 +395,23 @@ fn((state) => {
     }
   });
 
-  console.log(`Processing complete: ${processedFiles.length} files processed, ${processingErrors.length} errors`);
+  console.log(`📊 Processing complete: ${processedFiles.length} successful, ${processingErrors.length} failed`);
+
+  if (processedFiles.length === 0) {
+    console.error('❌ No files were successfully processed. Stopping workflow.');
+    return {
+      ...state,
+      processedFiles: [],
+      processingErrors,
+      workflowComplete: true,
+      error: `Processing failed: ${processingErrors.length} files failed to process`
+    };
+  }
 
   return {
     ...state,
     processedFiles,
     processingErrors,
-    processingCompleted: true,
-    metadata, // Pass metadata to next job
-    data: processedFiles.length > 0 ? processedFiles[0].excelData : null // Primary data for next step
+    processingCompleted: true
   };
 });

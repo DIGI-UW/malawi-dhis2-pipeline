@@ -8,18 +8,16 @@ output.json
 Dockerfile.act
 
 # Data directories - prevent committing sensitive data
-data/
-*/data/
 packages/*/data/
-projects/*/data/
 
 # Additional data file patterns
-*.csv
 *.xls
+*.xlsx
 **/DHIS2_HIV*.xlsx
 **/DHIS2_HIV*.csv
 **/*DQ_*.xlsx
 **/*malawi*.sql
+!projects/sftp/data/excel-files/test.xlsx
 
 # Allow test data for CI builds
 !.github/test-data/**/*.xlsx

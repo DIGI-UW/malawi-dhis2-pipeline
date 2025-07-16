@@ -10,6 +10,24 @@ log() {
     echo "[$(date +'%Y-%m-%d %H:%M:%S')] $*" >&2
 }
 
+# Error handler - log but don't exit in some cases
+error_log() {
+    log "ERROR: $1"
+}
+
+# Keep container alive function (our improvement)
+keep_alive() {
+    log "Keeping container alive for debugging..."
+    log "You can exec into this container with: docker exec -it <container_id> sh"
+    log "To exit, send SIGTERM to the container"
+    
+    # Keep running until we receive SIGTERM
+    while true; do
+        log "Container is alive and waiting..."
+        sleep 30
+    done
+}
+
 # Initialize OpenFN CLI environment
 initialize_openfn_env() {
     log "Initializing OpenFN CLI environment..."
@@ -56,11 +74,6 @@ validate_environment() {
     
     if [[ -z "$OPENFN_API_KEY" && (-z "$OPENFN_ADMIN_USER" || -z "$OPENFN_ADMIN_PASSWORD") ]]; then
         log "ERROR: Either OPENFN_API_KEY or OPENFN_ADMIN_USER+OPENFN_ADMIN_PASSWORD is required"
-        ((errors++))
-    fi
-    
-    if [[ "$MODE" == "deploy" && -z "$WORKFLOW_NAME" ]]; then
-        log "ERROR: WORKFLOW_NAME is required for deploy mode"
         ((errors++))
     fi
     
@@ -186,6 +199,11 @@ EOF
     log "Executing OpenFN deploy command..."
     log "Config file content:"
     cat config.json
+    pwd
+    ls -la
+    echo "--- project.yaml content ---"
+    cat project.yaml
+    echo "--- end project.yaml content ---"
     
     if openfn deploy --no-confirm --log info; then
         log "Successfully deployed workflow: $workflow_name"
@@ -247,7 +265,7 @@ EOF
     fi
 }
 
-# Wait for OpenFN instance to be ready
+# Wait for OpenFN instance to be ready (improved from working version)
 wait_for_openfn_ready() {
     log "Waiting for OpenFN to be ready at $OPENFN_ENDPOINT..."
     local max_attempts=30
@@ -286,6 +304,87 @@ wait_for_completion() {
     while true; do
         sleep 30
     done
+}
+
+# Deploy all workflows (our improvement from current version)
+deploy_all_workflows() {
+    log "Deploying all workflows..."
+    local deployment_errors=0
+    local workflow_count=0
+    
+    # Count and list workflows
+    for workflow_dir in "$WORKFLOW_PATH"/*; do
+        if [[ -d "$workflow_dir" && -f "$workflow_dir/project.yaml" ]]; then
+            local workflow_name=$(basename "$workflow_dir")
+            log "Found workflow: $workflow_name"
+            ((workflow_count++))
+        fi
+    done
+    
+    if [[ $workflow_count -eq 0 ]]; then
+        error_log "No valid workflows found in $WORKFLOW_PATH"
+        if [[ "${PACKAGE_LIFECYCLE}" == "true" ]]; then
+            keep_alive
+        fi
+        return 1
+    fi
+    
+    log "Found $workflow_count workflow(s) to deploy"
+    
+    # Deploy each workflow
+    for workflow_dir in "$WORKFLOW_PATH"/*; do
+        if [[ -d "$workflow_dir" && -f "$workflow_dir/project.yaml" ]]; then
+            local workflow_name=$(basename "$workflow_dir")
+            if ! deploy_workflow "$workflow_name"; then
+                ((deployment_errors++))
+            fi
+        fi
+    done
+    
+    # Report results (our improvement)
+    log "Deployment Summary:"
+    log "  Total workflows: $workflow_count"
+    log "  Failed deployments: $deployment_errors"
+    log "  Successful deployments: $((workflow_count - deployment_errors))"
+    
+    if [[ $deployment_errors -gt 0 ]]; then
+        log ""
+        log "⚠️  DEPLOYMENT ISSUES DETECTED ⚠️"
+        log "================================================"
+        log "Some workflows failed to deploy. This could be due to:"
+        log "1. Credential initialization issues"
+        log "2. Workflow configuration problems"
+        log "3. OpenFN service connectivity issues"
+        log ""
+        log "Troubleshooting steps:"
+        log "1. Check OpenFN Lightning at: $OPENFN_ENDPOINT"
+        log "2. Verify credentials were created in Lightning database"
+        log "3. Check workflow syntax in project.yaml files"
+        log "4. Review container logs for specific errors"
+        log ""
+        log "If credentials are missing, they should have been created during OpenFN init."
+        log "Check the OpenFN service logs for credential creation status."
+        log ""
+        
+        if [[ "${PACKAGE_LIFECYCLE}" == "true" ]]; then
+            keep_alive
+        fi
+        return 1
+    else
+        log "✅ All workflows deployed successfully!"
+        log ""
+        log "🎉 DEPLOYMENT COMPLETE!"
+        log "======================"
+        log "Your OpenFN workflows are now deployed."
+        log ""
+        log "Next steps:"
+        log "1. Open OpenFN Lightning: $OPENFN_ENDPOINT"
+        log "2. Verify your workflows are listed in the project"
+        log "3. Check that credentials are properly configured"
+        log "4. Test the workflows with manual triggers"
+        log ""
+        return 0
+    fi
 }
 
 # Main execution logic
@@ -357,7 +456,20 @@ main() {
             fi
             ;;
         "deploy")
-            deploy_workflow "$WORKFLOW_NAME"
+            if [[ -n "$WORKFLOW_NAME" ]]; then
+                # Deploy specific workflow
+                if ! deploy_workflow "$WORKFLOW_NAME"; then
+                    if [[ "${PACKAGE_LIFECYCLE}" == "true" ]]; then
+                        keep_alive
+                    fi
+                    exit 1
+                fi
+            else
+                # Deploy all workflows (our improvement)
+                if ! deploy_all_workflows; then
+                    exit 1
+                fi
+            fi
             
             # Keep container alive if this is part of package lifecycle
             if [[ "${PACKAGE_LIFECYCLE}" == "true" ]]; then
@@ -365,7 +477,12 @@ main() {
             fi
             ;;
         "pull")
-            pull_workflow "$WORKFLOW_NAME"
+            if ! pull_workflow "$WORKFLOW_NAME"; then
+                if [[ "${PACKAGE_LIFECYCLE}" == "true" ]]; then
+                    keep_alive
+                fi
+                exit 1
+            fi
             
             # Keep container alive if this is part of package lifecycle
             if [[ "${PACKAGE_LIFECYCLE}" == "true" ]]; then

@@ -12,6 +12,8 @@ This documentation covers the complete development, testing, and deployment life
 4. **[SFTP to DHIS2 Testing Plan](04-sftp-dhis2-testing-plan.md)** - Specific testing plan for SFTP workflow
 5. **[Docker Environment](05-docker-environment.md)** - Docker setup and configuration
 6. **[Troubleshooting Guide](06-troubleshooting.md)** - Common issues and solutions
+7. **[OpenFn Design Compliance](07-openfn-design-compliance.md)** - How our workflows follow OpenFn's official design principles
+8. **[DHIS2 Pattern Examples](08-dhis2-pattern-examples.md)** - Specific examples of DHIS2 pattern compliance
 
 ## Project Architecture
 

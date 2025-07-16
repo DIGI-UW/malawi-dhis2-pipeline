@@ -22,7 +22,10 @@ services:
       - SECRET_KEY_BASE=${OPENFN_SECRET_KEY_BASE}
       - WORKER_RUNS_PRIVATE_KEY=${OPENFN_WORKER_RUNS_PRIVATE_KEY}
       - WORKER_SECRET=${OPENFN_WORKER_SECRET}
+      - WORKER_MAX_RUN_MEMORY_MB=${WORKER_MAX_RUN_MEMORY_MB}
       - KAFKA_TRIGGERS_ENABLED=${OPENFN_KAFKA_TRIGGERS_ENABLED}
+      - LOCAL_ADAPTORS=${LOCAL_ADAPTORS}
+      - OPENFN_ADAPTORS_REPO=${OPENFN_ADAPTORS_REPO}
     healthcheck:
       test: '${DOCKER_WEB_HEALTHCHECK_TEST:-curl localhost:4000/health_check}'
       interval: '10s'
@@ -34,8 +37,9 @@ services:
       - postgres
       - openfn_public
       - reverse_proxy_public
+      - dhis2_public
   worker:
-    image: ${OPENFN_WORKER_IMAGE}
+    image: ${LOCAL_OPENFN_WORKER_IMAGE:-$OPENFN_WORKER_IMAGE}
     deploy:
       resources:
         limits:
@@ -44,12 +48,16 @@ services:
     environment:
       - WORKER_LIGHTNING_PUBLIC_KEY=${OPENFN_WORKER_LIGHTNING_PUBLIC_KEY}
       - WORKER_SECRET=${OPENFN_WORKER_SECRET}
+      - WORKER_MAX_RUN_MEMORY_MB=${WORKER_MAX_RUN_MEMORY_MB}
       - NODE_ENV=production
-    command: [ 'pnpm', 'start:prod', '-l', 'ws://openfn:${URL_PORT-4000}/worker' ]
+      - LOCAL_ADAPTORS=${LOCAL_ADAPTORS}
+      - OPENFN_ADAPTORS_REPO=${OPENFN_ADAPTORS_REPO}
+    command: [ 'pnpm', '-C', 'packages/ws-worker', 'start:prod', '-l', 'ws://openfn:${URL_PORT-4000}/worker' ]
     networks:
       - kafka_public
       - openfn_public
       - postgres
+      - dhis2_public
 
 networks:
   openfn_public:
@@ -63,6 +71,9 @@ networks:
     external: true
   reverse_proxy_public:
     name: reverse-proxy_public
+    external: true
+  dhis2_public:
+    name: dhis2_public
     external: true
   
 

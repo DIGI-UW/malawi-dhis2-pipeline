@@ -1,4 +1,3 @@
-
 services:
   workflow-loader:
     image: ${OPENFN_WORKFLOWS_IMAGE:-openfn-workflows:local}
@@ -6,12 +5,14 @@ services:
       - openfn_public
     environment:
       MODE: deploy
-      WORKFLOW_NAME: sftp-dhis2
+      WORKFLOW_NAME: ""  # Empty means deploy all workflows
       WORKFLOW_PATH: /app/workflows
       OPENFN_ENDPOINT: ${OPENFN_ENDPOINT:-http://openfn:4000}
       OPENFN_API_KEY: ${OPENFN_API_KEY}
       OPENFN_ADMIN_USER: ${OPENFN_ADMIN_USER}
       OPENFN_ADMIN_PASSWORD: ${OPENFN_ADMIN_PASSWORD}
+      SFTP_TEST_USER: "openfn"
+      SFTP_TEST_PASSWORD: "instant101"
       PACKAGE_LIFECYCLE: "true"
       DRY_RUN: "false"
     deploy:

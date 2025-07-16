@@ -1,4 +1,4 @@
-# CLI Testing Environment with Official SFTP Package (Fixed Build)
+# CLI Testing Environment with Custom Adaptors
 FROM node:18-alpine
 
 # Install dependencies for building and debugging
@@ -19,15 +19,11 @@ RUN npm install -g @openfn/cli@latest
 RUN mkdir -p /adaptors && cd /adaptors && \
     npm init -y
 
-# Install official packages with PROPER npm install (not broken symlinks)
-# This is the key fix - ensure clean installation
-RUN cd /adaptors && \
-    rm -rf node_modules package-lock.json && \
-    npm install --no-optional --no-package-lock \
-        @openfn/language-sftp@2.0.14 \
-        @openfn/language-http@6.4.5 \
-        @openfn/language-common@2.5.0 \
-        @openfn/language-dhis2@6.3.4
+# Copy custom-built packages from the published-adaptors location (npm-style packages with all dependencies)
+COPY openfn-custom-adaptors/published-adaptors/packages/common/ /adaptors/custom-common/
+COPY openfn-custom-adaptors/published-adaptors/packages/sftp/ /adaptors/custom-sftp/
+COPY openfn-custom-adaptors/published-adaptors/packages/dhis2/ /adaptors/custom-dhis2/
+COPY openfn-custom-adaptors/published-adaptors/packages/http/ /adaptors/custom-http/
 
 # Set up proper module resolution for OpenFN CLI
 ENV OPENFN_MODULES_HOME=/adaptors/node_modules
@@ -36,13 +32,14 @@ ENV OPENFN_REPO_DIR=/tmp/openfn/repo
 
 # Pre-install packages in CLI's expected repo location with proper structure
 RUN mkdir -p /tmp/openfn/repo/node_modules/@openfn && \
-    # Copy properly installed packages (not symlinks)
-    cp -r /adaptors/node_modules/@openfn/language-sftp "/tmp/openfn/repo/node_modules/@openfn/language-sftp_2.0.14" && \
-    cp -r /adaptors/node_modules/@openfn/language-common "/tmp/openfn/repo/node_modules/@openfn/language-common_2.5.0" && \
-    cp -r /adaptors/node_modules/@openfn/language-http "/tmp/openfn/repo/node_modules/@openfn/language-http_6.4.5" && \
+    # Copy custom packages
+    cp -r /adaptors/custom-sftp "/tmp/openfn/repo/node_modules/@openfn/language-sftp_2.0.14" && \
+    cp -r /adaptors/custom-common "/tmp/openfn/repo/node_modules/@openfn/language-common_2.5.0" && \
+    cp -r /adaptors/custom-dhis2 "/tmp/openfn/repo/node_modules/@openfn/language-dhis2_6.3.4" && \
+    cp -r /adaptors/custom-http "/tmp/openfn/repo/node_modules/@openfn/language-http_6.4.5" && \
     # Create proper package.json for CLI
     cd /tmp/openfn/repo && \
-    echo '{"name":"openfn-repo","version":"1.0.0","dependencies":{"@openfn/language-sftp_2.0.14":"npm:@openfn/language-sftp@2.0.14","@openfn/language-common_2.5.0":"npm:@openfn/language-common@2.5.0","@openfn/language-http_6.4.5":"npm:@openfn/language-http@6.4.5"}}' > package.json
+    echo '{"name":"openfn-repo","version":"1.0.0","dependencies":{"@openfn/language-sftp_2.0.14":"npm:@openfn/language-sftp@2.0.14","@openfn/language-common_2.5.0":"npm:@openfn/language-common@2.5.0","@openfn/language-dhis2_6.3.4":"npm:@openfn/language-dhis2@6.3.4","@openfn/language-http_6.4.5":"npm:@openfn/language-http@6.4.5"}}' > package.json
 
 # Create symlink from default repo location 
 RUN ln -sf /tmp/openfn/repo /tmp/repo
@@ -55,6 +52,12 @@ RUN echo '#!/bin/bash' > /usr/local/bin/test-sftp && \
 RUN echo '#!/bin/bash' > /usr/local/bin/run-workflow && \
     echo 'openfn run "$@" -l debug --no-expand-references' >> /usr/local/bin/run-workflow && \
     chmod +x /usr/local/bin/run-workflow
+
+# Add environment variable to identify this uses custom adaptors
+ENV CUSTOM_SFTP_ADAPTOR=true
+ENV CUSTOM_DHIS2_ADAPTOR=true
+ENV CUSTOM_HTTP_ADAPTOR=true
+ENV SFTP_ADAPTOR_VERSION=2.0.14-custom-uri-fixed
 
 # Default command
 CMD ["bash"] 

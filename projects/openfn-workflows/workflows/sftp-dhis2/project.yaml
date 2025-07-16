@@ -1,20 +1,27 @@
 name: malawi-sftp
 description: SFTP Excel to DHIS2 HIV Indicators Pipeline with Cron and Webhook Triggers
 collections: null
+credentials:
+  sftp-credential:
+    name: "sftp-test-credential"
+    owner: "root@openhim.org"
+  dhis2-credential:
+    name: "dhis2-credential"
+    owner: "root@openhim.org"
 workflows:
   HIVIndicatorsSFTPtoDHIS2Workflow:
     name: HIV Indicators SFTP to DHIS2 Workflow
     jobs:
       CheckSFTPFiles:
         name: Check SFTP for New or Updated Files
-        adaptor: '@openfn/language-sftp@2.0.14'
-        credential: null
+        adaptor: '@openfn/language-sftp@2.0.14-custom-enhanced'
+        credential: sftp-credential
         body:
           path: ./jobs/check-sftp-files.js
       DownloadSFTPFiles:
         name: Download New SFTP Files
-        adaptor: '@openfn/language-sftp@2.0.14'
-        credential: null
+        adaptor: '@openfn/language-sftp@2.0.14-custom-enhanced'
+        credential: sftp-credential
         body:
           path: ./jobs/download-sftp-files.js
       ProcessExcelData:
@@ -32,7 +39,7 @@ workflows:
       UploadToDHIS2:
         name: Upload to DHIS2
         adaptor: '@openfn/language-dhis2@6.3.4'
-        credential: null
+        credential: dhis2-credential
         body:
           path: ./jobs/upload-to-dhis2.js
       UpdateFileTracking:
