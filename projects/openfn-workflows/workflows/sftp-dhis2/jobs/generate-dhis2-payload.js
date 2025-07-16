@@ -45,7 +45,7 @@ function generateDataValueSet(processedFiles, config) {
       Object.entries(row).forEach(([columnName, value]) => {
         const dataElementId = config.dataElementMapping[columnName];
         
-        if (dataElementId && value !== null && value !== undefined && value !== '') {
+        if (dataElementId && value != null && value !== '') {
       const dataValue = {
             dataElement: dataElementId,
             period: row.period || config.period,
