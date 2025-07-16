@@ -11,12 +11,13 @@
 
 // Try to import XLSX library for parsing raw Excel files
 let XLSX;
+let isXLSXAvailable = false;
 try {
   XLSX = require('xlsx');
+  isXLSXAvailable = true;
   console.log('✅ XLSX library available for Excel parsing');
 } catch (error) {
   console.log('⚠️  XLSX library not available, will use alternative parsing methods');
-  XLSX = null;
 }
 
 // Configuration is embedded directly in the job for portability.
