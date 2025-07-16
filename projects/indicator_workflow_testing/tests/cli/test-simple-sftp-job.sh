@@ -30,7 +30,7 @@ echo "🚀 Running simple SFTP job with unified state file..."
 docker run --rm -i \
     -v "$(pwd)/../../../openfn-workflows/workflows/sftp-test/state:/state" \
     -v "$(pwd)/outputs:/outputs" \
-    "$DOCKER_IMAGE" /bin/sh <<'EOF'
+    "$DOCKER_IMAGE" /bin/sh <<EOF
 # Create temporary job file
 echo "list('/data/excel-files', state => { console.log('Files:', state.data); return state; });" > /tmp/simple-job.js
 
