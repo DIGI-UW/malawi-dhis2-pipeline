@@ -68,6 +68,6 @@ fn(state => {
   console.log(`    - Data Value Success Rate: ${consolidationSummary.dataValueSuccessRate}%`);
 
   // Return the summary and the original `newFile` for the final step.
-  // We get `newFile` from the first result, assuming one file per run.
-  return { ...state, consolidationSummary, newFile: uploadResults[0].newFile };
+  // Use `state.newFile` to ensure the file is correctly passed to the final job.
+  return { ...state, consolidationSummary, newFile: state.newFile };
 }); 

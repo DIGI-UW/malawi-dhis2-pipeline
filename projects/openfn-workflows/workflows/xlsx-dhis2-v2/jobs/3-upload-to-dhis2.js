@@ -26,11 +26,11 @@ each(
 
       console.log('  - Payload uploaded successfully to DHIS2.');
       // Return a success status and the response from DHIS2.
-      return { ...state, uploadStatus: 'success', dhis2Response: response.data };
+      return { ...state, uploadStatus: 'success', dhis2Response: response.data, newFile: state.newFile };
     } catch (error) {
       console.error('  - Error uploading payload to DHIS2:', error.message);
       // Return a failure status and the error details.
-      return { ...state, uploadStatus: 'error', error: error.message };
+      return { ...state, uploadStatus: 'error', error: error.message, newFile: state.newFile };
     }
   })
 );
