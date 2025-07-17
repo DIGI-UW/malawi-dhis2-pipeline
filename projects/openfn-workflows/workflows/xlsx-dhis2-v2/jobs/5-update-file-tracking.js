@@ -1,5 +1,5 @@
 /**
- * Job: 4. Update File Tracking State
+ * Job: 5. Update File Tracking State
  *
  * Description:
  * This job is the final step in the workflow. It updates the file tracking
@@ -14,8 +14,9 @@
  */
 
 fn(state => {
-  console.log('4. Updating file tracking state...');
+  console.log('5. Updating file tracking state...');
 
+  // The `newFile` being processed is now correctly passed in the state.
   const { newFile, fileTracking, consolidationSummary } = state;
 
   if (!newFile) {
