@@ -280,6 +280,11 @@ if [[ $# -eq 0 ]] || [[ "$1" == "all" ]]; then
         if [[ -d "$project_dir" && ( -f "$project_dir/Dockerfile" || -f "$project_dir/docker/Dockerfile" ) ]]; then
             project_name=$(basename "$project_dir")
             
+            # Skip openfn-custom-adaptors - it's handled by build_custom_openfn_adaptors function
+            if [[ "$project_name" == "openfn-custom-adaptors" ]]; then
+                continue
+            fi
+            
             # Handle openfn-workflows specially - it's needed for workflow loading
             if [[ "$project_name" == "openfn-workflows" ]]; then
                 build_custom_image "$project_name" "openfn"
