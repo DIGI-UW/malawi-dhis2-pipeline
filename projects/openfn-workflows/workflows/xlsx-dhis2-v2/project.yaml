@@ -1,0 +1,91 @@
+name: excel-sheet-dhis2-v2
+description: Simplified Excel Sheet to DHIS2 Large File Processing Pipeline (v2)
+collections: null
+credentials:
+  sftp-credential:
+    name: "sftp-test-credential"
+    owner: "root@openhim.org"
+  dhis2-credential:
+    name: "dhis2-credential"
+    owner: "root@openhim.org"
+workflows:
+  ExcelSheetToDHIS2WorkflowV2:
+    name: Excel Sheet to DHIS2 Workflow (v2)
+    jobs:
+      "1-check-for-new-files":
+        name: "1. Check SFTP for New Excel Files"
+        adaptor: "@openfn/language-sftp@2.0.14-custom-enhanced"
+        credential: "sftp-credential"
+        body:
+          path: "./jobs/1-check-for-new-files.js"
+      "2-prepare-dhis2-payloads":
+        name: "2. Prepare DHIS2 Payloads from Excel"
+        adaptor: "@openfn/language-sftp@2.0.14-custom-enhanced"
+        credential: "sftp-credential"
+        body:
+          path: "./jobs/2-prepare-dhis2-payloads.js"
+      "3-upload-to-dhis2":
+        name: "3. Upload Payloads to DHIS2"
+        adaptor: "@openfn/language-dhis2@6.3.4"
+        credential: "dhis2-credential"
+        body:
+          path: "./jobs/3-upload-to-dhis2.js"
+      "4-consolidate-results":
+        name: "4. Consolidate Processing Results"
+        adaptor: "@openfn/language-common@2.4.0"
+        credential: null
+        body:
+          path: "./jobs/4-consolidate-results.js"
+      "5-update-file-tracking":
+        name: "5. Update File Tracking State"
+        adaptor: "@openfn/language-common@2.4.0"
+        credential: null
+        body:
+          path: "./jobs/5-update-file-tracking.js"
+
+    triggers:
+      cron-file-check:
+        type: cron
+        cron_expression: "*/5 * * * *"
+        enabled: true
+      manual-excel-processing:
+        type: webhook
+        enabled: true
+
+    edges:
+      # Cron-triggered workflow path
+      cronToCheck:
+        source_trigger: "cron-file-check"
+        target_job: "1-check-for-new-files"
+        condition_type: "always"
+        enabled: true
+      
+      # Manual-triggered workflow path (for testing)
+      manualToPrepare:
+        source_trigger: "manual-excel-processing"
+        target_job: "2-prepare-dhis2-payloads"
+        condition_type: "always"
+        enabled: true
+
+      # Main workflow execution path
+      checkToPrepare:
+        source_job: "1-check-for-new-files"
+        target_job: "2-prepare-dhis2-payloads"
+        condition_type: "on_job_success"
+        condition_expression: "state.newFilesFound === true"
+        enabled: true
+      prepareToUpload:
+        source_job: "2-prepare-dhis2-payloads"
+        target_job: "3-upload-to-dhis2"
+        condition_type: "on_job_success"
+        enabled: true
+      uploadToConsolidate:
+        source_job: "3-upload-to-dhis2"
+        target_job: "4-consolidate-results"
+        condition_type: "on_job_success"
+        enabled: true
+      consolidateToUpdate:
+        source_job: "4-consolidate-results"
+        target_job: "5-update-file-tracking"
+        condition_type: "on_job_success"
+        enabled: true 
