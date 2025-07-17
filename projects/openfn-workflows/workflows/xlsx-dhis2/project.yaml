@@ -1,5 +1,5 @@
 name: excel-sheet-dhis2
-description: Simplified Excel Sheet to DHIS2 Large File Processing Pipeline
+description: Excel Sheet to DHIS2 Large File Processing Pipeline with Chunked Architecture
 collections: null
 credentials:
   sftp-credential:
@@ -12,57 +12,144 @@ workflows:
   ExcelSheetToDHIS2Workflow:
     name: Excel Sheet to DHIS2 Workflow
     jobs:
-      "1-check-for-new-files":
-        name: "1. Check SFTP for New Excel Files"
-        adaptor: "@openfn/language-sftp@2.0.14-custom-enhanced"
-        credential: "sftp-credential"
+      CheckSFTPFiles:
+        name: Check SFTP for New or Updated Files
+        adaptor: '@openfn/language-sftp@2.0.14-custom-enhanced'
+        credential: sftp-credential
         body:
-          path: "./jobs/1-check-for-new-files.js"
-      "2-process-file-chunks":
-        name: "2. Process Excel File in Chunks"
-        adaptor: "@openfn/language-sftp@2.0.14-custom-enhanced"
-        credential: "sftp-credential"
+          path: ./jobs/check-sftp-files.js
+      DownloadAndChunkExcel:
+        name: Download and Chunk Excel File
+        adaptor: '@openfn/language-sftp@2.0.14-custom-enhanced'
+        credential: sftp-credential
         body:
-          path: "./jobs/2-process-file-chunks.js"
-      "3-consolidate-results":
-        name: "3. Consolidate Processing Results"
-        adaptor: "@openfn/language-dhis2@6.3.4"
-        credential: "dhis2-credential"
-        body:
-          path: "./jobs/3-consolidate-results.js"
-      "4-update-file-tracking":
-        name: "4. Update File Tracking State"
-        adaptor: "@openfn/language-common@2.4.0"
+          path: ./jobs/download-and-chunk-excel.js
+      ProcessExcelChunk:
+        name: Process Excel Chunk
+        adaptor: '@openfn/language-common@2.4.0'
         credential: null
         body:
-          path: "./jobs/4-update-file-tracking.js"
+          path: ./jobs/process-excel-chunk.js
+      GenerateDHIS2Batch:
+        name: Generate DHIS2 Batch Payload
+        adaptor: '@openfn/language-common@2.4.0'
+        credential: null
+        body:
+          path: ./jobs/generate-dhis2-batch.js
+      UploadDHIS2Batch:
+        name: Upload DHIS2 Batch
+        adaptor: '@openfn/language-dhis2@6.3.4'
+        credential: dhis2-credential
+        body:
+          path: ./jobs/upload-dhis2-batch.js
+      ConsolidateResults:
+        name: Consolidate Processing Results
+        adaptor: '@openfn/language-common@2.4.0'
+        credential: null
+        body:
+          path: ./jobs/consolidate-results.js
+      TrackChunkState:
+        name: Track Chunk State and Monitor Data Integrity
+        adaptor: '@openfn/language-common@2.4.0'
+        credential: null
+        body:
+          path: ./jobs/track-chunk-state.js
+      RetryFailedChunks:
+        name: Retry Failed Chunks
+        adaptor: '@openfn/language-common@2.4.0'
+        credential: null
+        body:
+          path: ./jobs/retry-failed-chunks.js
+      MonitoringDashboard:
+        name: Monitoring Dashboard
+        adaptor: '@openfn/language-common@2.4.0'
+        credential: null
+        body:
+          path: ./jobs/monitoring-dashboard.js
+      UpdateFileTracking:
+        name: Update File Tracking State
+        adaptor: '@openfn/language-common@2.4.0'
+        credential: null
+        body:
+          path: ./jobs/update-file-tracking.js
           
     triggers:
+      # Cron trigger - runs every 5 minutes for file monitoring
       cron-file-check:
         type: cron
         cron_expression: "*/5 * * * *"
-        job: "1-check-for-new-files"
         enabled: true
+      # Manual trigger for testing
       manual-excel-processing:
         type: webhook
-        job: "2-process-file-chunks"
         enabled: true
         
     edges:
-      # Main workflow execution path
-      checkToProcess:
-        source_job: "1-check-for-new-files"
-        target_job: "2-process-file-chunks"
-        condition_type: "on_job_success"
+      # Cron-triggered workflow
+      cronFileCheckToCheckSFTPFiles:
+        source_trigger: cron-file-check
+        target_job: CheckSFTPFiles
+        condition_type: always
+        enabled: true
+      # Manual trigger for testing
+      manualTriggerToDownloadAndChunk:
+        source_trigger: manual-excel-processing
+        target_job: DownloadAndChunkExcel
+        condition_type: always
+        enabled: true
+      # Job flow after file check
+      CheckSFTPFilesToDownloadAndChunk:
+        source_job: CheckSFTPFiles
+        target_job: DownloadAndChunkExcel
+        condition_type: on_job_success
         condition_expression: "state.newFilesFound === true"
         enabled: true
-      processToConsolidate:
-        source_job: "2-process-file-chunks"
-        target_job: "3-consolidate-results"
-        condition_type: "on_job_success"
+      # Job flow after download and chunking
+      DownloadAndChunkToProcessChunk:
+        source_job: DownloadAndChunkExcel
+        target_job: ProcessExcelChunk
+        condition_type: on_job_success
         enabled: true
-      consolidateToUpdate:
-        source_job: "3-consolidate-results"
-        target_job: "4-update-file-tracking"
-        condition_type: "on_job_success"
+      # Job flow after chunk processing
+      ProcessChunkToGenerateBatch:
+        source_job: ProcessExcelChunk
+        target_job: GenerateDHIS2Batch
+        condition_type: on_job_success
+        enabled: true
+      # Job flow to DHIS2 upload
+      GenerateBatchToUploadBatch:
+        source_job: GenerateDHIS2Batch
+        target_job: UploadDHIS2Batch
+        condition_type: on_job_success
+        enabled: true
+      # Job flow after upload
+      UploadBatchToConsolidateResults:
+        source_job: UploadDHIS2Batch
+        target_job: ConsolidateResults
+        condition_type: on_job_success
+        enabled: true
+      # Update tracking after consolidation
+      ConsolidateResultsToUpdateFileTracking:
+        source_job: ConsolidateResults
+        target_job: UpdateFileTracking
+        condition_type: on_job_success
+        enabled: true
+      # Monitoring jobs (can be triggered from various points)
+      UploadBatchToTrackChunkState:
+        source_job: UploadDHIS2Batch
+        target_job: TrackChunkState
+        condition_type: on_job_success
+        enabled: true
+      # Retry logic
+      TrackChunkStateToRetryFailedChunks:
+        source_job: TrackChunkState
+        target_job: RetryFailedChunks
+        condition_type: on_job_success
+        condition_expression: "state.failedChunks && state.failedChunks.length > 0"
+        enabled: true
+      # Dashboard monitoring
+      ConsolidateResultsToMonitoringDashboard:
+        source_job: ConsolidateResults
+        target_job: MonitoringDashboard
+        condition_type: on_job_success
         enabled: true 
