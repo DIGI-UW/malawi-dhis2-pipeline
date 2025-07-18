@@ -1,30 +1,51 @@
 /**
- * Process Excel Chunk - Extract and Transform Data
+ * Process Excel Chunk - Transform Data for DHIS2
  * 
- * This job processes individual Excel chunks created by the download step
- * and transforms them into structured data for DHIS2 processing.
+ * This job processes a single chunk of Excel data from state and transforms it
+ * into structured format for DHIS2 upload.
  * 
- * Memory Strategy:
- * - Process one chunk at a time (max 1000 rows)
- * - Use OpenFn-compatible memory management
- * - Target: <100MB per chunk (well within OpenFn limits)
+ * OpenFN Best Practice:
+ * - Simple job with clear scope
+ * - Processes chunk data from state
+ * - Transforms data for next step
+ * - Manages memory efficiently
  */
 
 fn((state) => {
-  console.log('🔄 Starting Excel chunk processing...');
+  console.log('🔄 Starting Excel chunk data processing...');
   
-  // Check if we have chunks to process
+  // Check if we have a chunk to process
   if (!state.chunks || state.chunks.length === 0) {
     console.log('⚠️  No chunks found in state. Skipping chunk processing.');
     return {
       ...state,
-      chunkProcessingComplete: true,
-      processedChunks: [],
-      totalRowsProcessed: 0
+      processedChunk: null,
+      continueProcessing: false,
+      error: 'No chunks found for processing'
     };
   }
   
-  console.log(`📊 Processing ${state.chunks.length} chunks...`);
+  // Get the single chunk to process
+  const chunk = state.chunks[0];
+  
+  if (!chunk.data || !Array.isArray(chunk.data)) {
+    console.error('❌ Chunk data is missing or invalid');
+    return {
+      ...state,
+      processedChunk: {
+        failed: true,
+        error: 'Invalid chunk data structure',
+        chunkId: chunk.chunkId
+      },
+      continueProcessing: false
+    };
+  }
+  
+  console.log(`📊 Processing chunk:`);
+  console.log(`   Chunk ID: ${chunk.chunkId}`);
+  console.log(`   File: ${chunk.fileName}`);
+  console.log(`   Rows: ${chunk.startRow} to ${chunk.endRow} (${chunk.rowCount} rows)`);
+  console.log(`   Data size: ${chunk.dataSize} bytes`);
   
   // Configuration for data transformation
   const CONFIG = {
@@ -58,91 +79,164 @@ fn((state) => {
     }
   };
   
-  // Process chunks
-  const processedChunks = [];
-  let totalRowsProcessed = 0;
-  let processingErrors = [];
-
-  
-  // Process each chunk
-  state.chunks.forEach((chunk, chunkIndex) => {
-    try {
-      console.log(`📦 Processing chunk ${chunkIndex + 1}/${state.chunks.length}`);
-      console.log(`📊 Chunk contains ${chunk.rowCount} rows (${chunk.startRow} to ${chunk.endRow})`);
+  try {
+    const rawData = chunk.data;
+    const processedRows = [];
+    const processingErrors = [];
+    
+    // Get headers and data rows
+    const headers = rawData.length > 0 ? rawData[0] : [];
+    const dataRows = rawData.slice(1);
+    
+    console.log(`📋 Headers found: ${headers.length} columns`);
+    console.log(`📊 Data rows to process: ${dataRows.length}`);
+    
+    // Find column indices for mapping
+    const columnIndices = {};
+    Object.keys(CONFIG.columnMappings).forEach(fieldName => {
+      const mapping = CONFIG.columnMappings[fieldName];
+      let foundIndex = -1;
       
-      // Process chunk data (this would be actual Excel data in production)
-      const processedRows = [];
-      
-      // In a real implementation, you would:
-      // 1. Read the actual Excel chunk data from the file
-      // 2. Transform each row according to the column mappings
-      // 3. Create DHIS2 data values
-      
-      // For now, simulate processing
-      for (let rowIndex = chunk.startRow; rowIndex <= chunk.endRow; rowIndex++) {
-        try {
-          // This would be actual row processing logic
-          const processedRow = {
-            originalRowIndex: rowIndex,
-            chunkIndex: chunkIndex,
-            dataElement: `simulated_data_element_${rowIndex}`,
-            period: CONFIG.period,
-            orgUnit: CONFIG.orgUnit,
-            value: Math.floor(Math.random() * 100), // Simulated value
-            categoryOptionCombo: CONFIG.categoryOptionCombo,
-            attributeOptionCombo: CONFIG.attributeOptionCombo,
-            processedAt: new Date().toISOString()
-          };
-          
-          processedRows.push(processedRow);
-          totalRowsProcessed++;
-          
-        } catch (rowError) {
-          console.error(`❌ Error processing row ${rowIndex}:`, rowError.message);
-          processingErrors.push({
-            chunkIndex: chunkIndex,
-            rowIndex: rowIndex,
-            error: rowError.message
-          });
+      for (const sourceCol of mapping.sourceColumns) {
+        const index = headers.findIndex(header => 
+          header && header.toString().toLowerCase().includes(sourceCol.toLowerCase())
+        );
+        if (index !== -1) {
+          foundIndex = index;
+          break;
         }
       }
       
-      // Create processed chunk result
-      const processedChunk = {
-        chunkIndex: chunkIndex,
-        fileName: chunk.fileName,
-        startRow: chunk.startRow,
-        endRow: chunk.endRow,
-        rowCount: chunk.rowCount,
-        processedRows: processedRows,
-        processingErrors: processingErrors.filter(e => e.chunkIndex === chunkIndex),
-        processedAt: new Date().toISOString()
-      };
+      columnIndices[fieldName] = foundIndex;
       
-      processedChunks.push(processedChunk);
-      
-      console.log(`✅ Chunk ${chunkIndex + 1} processed: ${processedRows.length} rows, ${processedChunk.processingErrors.length} errors`);
-      
-    } catch (chunkError) {
-      console.error(`❌ Error processing chunk ${chunkIndex}:`, chunkError.message);
-      processingErrors.push({
-        chunkIndex: chunkIndex,
-        error: chunkError.message
+      if (foundIndex === -1 && mapping.required) {
+        console.warn(`⚠️  Required column not found: ${fieldName} (looking for: ${mapping.sourceColumns.join(', ')})`);
+      }
+    });
+    
+    console.log(`📍 Column mappings found:`, columnIndices);
+    
+    // Process each data row
+    dataRows.forEach((row, rowIndex) => {
+      try {
+        // Extract values using column mappings
+        const facility = columnIndices.facility !== -1 ? row[columnIndices.facility] : null;
+        const indicator = columnIndices.indicator !== -1 ? row[columnIndices.indicator] : null;
+        const value = columnIndices.value !== -1 ? row[columnIndices.value] : null;
+        const period = columnIndices.period !== -1 ? row[columnIndices.period] : CONFIG.period;
+        
+        // Validate required fields
+        if (!facility || !indicator || value === null || value === undefined) {
+          processingErrors.push({
+            rowIndex: rowIndex + 1,
+            error: 'Missing required fields',
+            details: { facility, indicator, value }
+          });
+          return;
+        }
+        
+        // Convert value to number
+        let numericValue = value;
+        if (typeof value === 'string') {
+          numericValue = parseFloat(value);
+          if (isNaN(numericValue)) {
+            processingErrors.push({
+              rowIndex: rowIndex + 1,
+              error: 'Invalid numeric value',
+              value: value
+            });
+            return;
+          }
+        }
+        
+        // Create processed row
+        const processedRow = {
+          facility: facility,
+          indicator: indicator,
+          value: numericValue,
+          period: period,
+          originalRowIndex: rowIndex + 1
+        };
+        
+        processedRows.push(processedRow);
+        
+      } catch (error) {
+        processingErrors.push({
+          rowIndex: rowIndex + 1,
+          error: error.message
+        });
+      }
+    });
+    
+    const successRate = dataRows.length > 0 ? (processedRows.length / dataRows.length) * 100 : 0;
+    
+    console.log(`✅ Chunk processing completed:`);
+    console.log(`   Total rows processed: ${dataRows.length}`);
+    console.log(`   Successful rows: ${processedRows.length}`);
+    console.log(`   Error rows: ${processingErrors.length}`);
+    console.log(`   Success rate: ${successRate.toFixed(1)}%`);
+    
+    // Log errors if any
+    if (processingErrors.length > 0) {
+      console.warn(`⚠️  Processing errors (first 3):`);
+      processingErrors.slice(0, 3).forEach(error => {
+        console.warn(`   Row ${error.rowIndex}: ${error.error}`);
       });
     }
-  });
-  
-  console.log('✅ Chunk processing completed');
-  console.log(`📊 Total chunks processed: ${processedChunks.length}`);
-  console.log(`📊 Total rows processed: ${totalRowsProcessed}`);
-  console.log(`📊 Processing errors: ${processingErrors.length}`);
-  
-  return {
-    ...state,
-    processedChunks: processedChunks,
-    totalRowsProcessed: totalRowsProcessed,
-    processingErrors: processingErrors,
-    chunkProcessingComplete: true,
-    processedAt: new Date().toISOString()
-  };
+    
+    // Create processed chunk result
+    const processedChunk = {
+      chunkId: chunk.chunkId,
+      chunkIndex: chunk.chunkIndex,
+      fileName: chunk.fileName,
+      startRow: chunk.startRow,
+      endRow: chunk.endRow,
+      rowCount: chunk.rowCount,
+      processedRows: processedRows,
+      validRows: processedRows.length,
+      errorRows: processingErrors.length,
+      successRate: successRate,
+      processingErrors: processingErrors,
+      processedAt: new Date().toISOString(),
+      failed: false
+    };
+    
+    return {
+      ...state,
+      processedChunk: processedChunk,
+      totalRowsProcessed: processedRows.length,
+      CONFIG: CONFIG,
+      // Clean up raw chunk data to save memory
+      chunks: null
+    };
+    
+  } catch (error) {
+    console.error(`❌ Error processing chunk:`, error.message);
+    
+    const errorChunk = {
+      chunkId: chunk.chunkId,
+      chunkIndex: chunk.chunkIndex,
+      fileName: chunk.fileName,
+      startRow: chunk.startRow,
+      endRow: chunk.endRow,
+      rowCount: chunk.rowCount,
+      processedRows: [],
+      validRows: 0,
+      errorRows: chunk.rowCount,
+      successRate: 0,
+      processingErrors: [{ error: error.message }],
+      processedAt: new Date().toISOString(),
+      failed: true
+    };
+    
+    return {
+      ...state,
+      processedChunk: errorChunk,
+      totalRowsProcessed: 0,
+      CONFIG: CONFIG,
+      continueProcessing: false,
+      // Clean up memory
+      chunks: null
+    };
+  }
 }); 

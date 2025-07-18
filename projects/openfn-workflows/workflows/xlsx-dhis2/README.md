@@ -179,7 +179,7 @@ VERBOSE_LOGGING=true
 
 ## Dependencies
 
-- `@openfn/language-sftp@2.0.14-custom-enhanced`
+- `@openfn/language-sftp@2.0.17-custom`
 - `@openfn/language-dhis2@6.3.4`
 - `@openfn/language-common@2.4.0`
 

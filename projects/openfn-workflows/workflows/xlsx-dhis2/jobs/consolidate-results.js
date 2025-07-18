@@ -1,234 +1,143 @@
 /**
- * Consolidate Results from All Chunk Uploads
+ * Consolidate Results from Single Chunk Upload
  * 
- * This job consolidates results from all chunk uploads and provides
- * a comprehensive summary of the large file processing operation.
+ * This job consolidates results from a single chunk upload and determines
+ * whether to continue processing the next chunk or complete the workflow.
  * 
- * Consolidation Strategy:
- * - Collects results from all parallel chunk uploads
- * - Calculates overall success/failure rates
- * - Provides detailed processing summary
- * - Updates final tracking information
+ * OpenFN Best Practice:
+ * - Simple job with clear scope
+ * - Tracks individual chunk results
+ * - Controls workflow looping through state
+ * - Manages memory efficiently
  */
 
 fn((state) => {
-  console.log('📋 Starting results consolidation...');
+  console.log('📋 Starting chunk results consolidation...');
   
   const startTime = Date.now();
   
-  // Initialize consolidation tracking
-  const consolidation = {
+  // Initialize or get consolidation tracking
+  const consolidation = state.consolidation || {
     startedAt: new Date().toISOString(),
     fileInfo: state.fileInfo || {},
     chunkResults: [],
     overallStats: {
-      totalChunks: 0,
-      successfulChunks: 0,
-      failedChunks: 0,
-      totalDataValues: 0,
-      successfulDataValues: 0,
-      failedDataValues: 0,
-      totalProcessingTime: 0,
-      totalUploadTime: 0,
-      conflicts: []
+      totalChunksProcessed: 0,
+      totalRowsProcessed: 0,
+      totalSuccessfulUploads: 0,
+      totalFailedUploads: 0,
+      totalValidRows: 0,
+      totalErrorRows: 0
     }
   };
   
-  // Check if we have upload results or errors
-  const hasUploadResult = state.uploadResult && state.uploadResult.uploadSuccess;
-  const hasUploadError = state.uploadError && !state.uploadError.uploadSuccess;
+  // Get current chunk info
+  const currentChunkIndex = state.currentChunkIndex || 0;
+  const uploadSuccess = state.uploadSuccess !== false; // Default to true if not specified
+  const processedChunk = state.processedChunk;
   
-  if (hasUploadResult) {
-    console.log('✅ Processing successful chunk result...');
+  console.log(`📊 Consolidating results for chunk ${currentChunkIndex + 1}:`);
+  console.log(`   Upload success: ${uploadSuccess}`);
+  console.log(`   Processed chunk: ${processedChunk ? processedChunk.chunkId : 'None'}`);
+  
+  // Add current chunk results to consolidation
+  if (processedChunk) {
+    const chunkResult = {
+      chunkIndex: currentChunkIndex,
+      chunkId: processedChunk.chunkId,
+      fileName: processedChunk.fileName,
+      success: uploadSuccess && !processedChunk.failed,
+      validRows: processedChunk.validRows || 0,
+      errorRows: processedChunk.errorRows || 0,
+      uploadSuccess: uploadSuccess,
+      processedAt: processedChunk.processedAt,
+      uploadedAt: new Date().toISOString()
+    };
     
-    const result = state.uploadResult;
-    const importCount = result.dhis2Response.importCount || {};
-    const conflicts = result.dhis2Response.conflicts || [];
-    
-    // Add to consolidation
-    consolidation.chunkResults.push({
-      chunkIndex: result.chunkIndex,
-      chunkId: result.chunkId,
-      success: true,
-      uploadedAt: result.uploadedAt,
-      uploadTimeMs: result.uploadTimeMs,
-      dataValuesCount: result.dataValuesCount,
-      dhis2Stats: {
-        imported: importCount.imported || 0,
-        updated: importCount.updated || 0,
-        deleted: importCount.deleted || 0,
-        ignored: importCount.ignored || 0
-      },
-      conflicts: conflicts
-    });
+    consolidation.chunkResults.push(chunkResult);
     
     // Update overall stats
-    consolidation.overallStats.totalChunks++;
-    consolidation.overallStats.successfulChunks++;
-    consolidation.overallStats.totalDataValues += result.dataValuesCount;
-    consolidation.overallStats.successfulDataValues += 
-      (importCount.imported || 0) + (importCount.updated || 0) + (importCount.ignored || 0);
-    consolidation.overallStats.totalUploadTime += result.uploadTimeMs;
+    consolidation.overallStats.totalChunksProcessed++;
+    consolidation.overallStats.totalRowsProcessed += processedChunk.validRows || 0;
+    consolidation.overallStats.totalValidRows += processedChunk.validRows || 0;
+    consolidation.overallStats.totalErrorRows += processedChunk.errorRows || 0;
     
-    if (conflicts.length > 0) {
-      consolidation.overallStats.conflicts.push(...conflicts);
+    if (uploadSuccess && !processedChunk.failed) {
+      consolidation.overallStats.totalSuccessfulUploads++;
+    } else {
+      consolidation.overallStats.totalFailedUploads++;
     }
     
-    console.log(`📊 Chunk ${result.chunkIndex + 1} consolidated:`);
-    console.log(`   DataValues: ${result.dataValuesCount}`);
-    console.log(`   DHIS2 Processed: ${(importCount.imported || 0) + (importCount.updated || 0) + (importCount.ignored || 0)}`);
-    console.log(`   Conflicts: ${conflicts.length}`);
+    console.log(`✅ Chunk ${currentChunkIndex + 1} consolidated:`);
+    console.log(`   Valid rows: ${processedChunk.validRows || 0}`);
+    console.log(`   Error rows: ${processedChunk.errorRows || 0}`);
+    console.log(`   Upload success: ${uploadSuccess}`);
+  }
+  
+  // Determine if we should continue processing
+  const shouldContinue = state.continueProcessing === true && !state.allChunksProcessed;
+  const nextChunkIndex = currentChunkIndex + 1;
+  
+  console.log(`📊 Consolidation summary:`);
+  console.log(`   Chunks processed: ${consolidation.overallStats.totalChunksProcessed}`);
+  console.log(`   Total rows processed: ${consolidation.overallStats.totalRowsProcessed}`);
+  console.log(`   Successful uploads: ${consolidation.overallStats.totalSuccessfulUploads}`);
+  console.log(`   Failed uploads: ${consolidation.overallStats.totalFailedUploads}`);
+  console.log(`   Continue processing: ${shouldContinue}`);
+  console.log(`   Next chunk index: ${nextChunkIndex}`);
+  
+  if (shouldContinue) {
+    console.log(`🔄 Continuing to process chunk ${nextChunkIndex + 1}...`);
     
-  } else if (hasUploadError) {
-    console.log('❌ Processing failed chunk result...');
-    
-    const error = state.uploadError;
-    
-    // Add to consolidation
-    consolidation.chunkResults.push({
-      chunkIndex: error.chunkIndex,
-      chunkId: error.chunkId,
-      success: false,
-      failedAt: error.failedAt,
-      uploadTimeMs: error.uploadTimeMs,
-      dataValuesCount: error.dataValuesCount,
-      error: error.error
-    });
-    
-    // Update overall stats
-    consolidation.overallStats.totalChunks++;
-    consolidation.overallStats.failedChunks++;
-    consolidation.overallStats.totalDataValues += error.dataValuesCount || 0;
-    consolidation.overallStats.failedDataValues += error.dataValuesCount || 0;
-    consolidation.overallStats.totalUploadTime += error.uploadTimeMs || 0;
-    
-    console.log(`❌ Chunk ${error.chunkIndex + 1} failed:`);
-    console.log(`   Error: ${error.error?.message || 'Unknown error'}`);
-    console.log(`   DataValues lost: ${error.dataValuesCount || 0}`);
-    
+    return {
+      ...state,
+      consolidation: consolidation,
+      currentChunkIndex: nextChunkIndex,
+      continueProcessing: true,
+      allChunksProcessed: false,
+      // Clean up current chunk data to save memory
+      processedChunk: null,
+      uploadSuccess: null,
+      payload: null,
+      chunks: null,
+      // Keep file info for next chunk
+      fileInfo: state.fileInfo,
+      CONFIG: state.CONFIG
+    };
   } else {
-    console.log('⚠️  No upload results found in state');
-  }
-  
-  // Calculate success rates
-  const chunkSuccessRate = consolidation.overallStats.totalChunks > 0 ? 
-    (consolidation.overallStats.successfulChunks / consolidation.overallStats.totalChunks) * 100 : 0;
-  
-  const dataValueSuccessRate = consolidation.overallStats.totalDataValues > 0 ? 
-    (consolidation.overallStats.successfulDataValues / consolidation.overallStats.totalDataValues) * 100 : 0;
-  
-  const consolidationTime = Date.now() - startTime;
-  
-  // Create final summary
-  const summary = {
-    ...consolidation,
-    completedAt: new Date().toISOString(),
-    consolidationTimeMs: consolidationTime,
-    successRates: {
-      chunks: chunkSuccessRate,
-      dataValues: dataValueSuccessRate
-    },
-    overallSuccess: consolidation.overallStats.failedChunks === 0,
-    recommendations: generateRecommendations(consolidation)
-  };
-  
-  // Log detailed summary
-  console.log(`📈 Consolidation Summary:`);
-  console.log(`   File: ${summary.fileInfo.fileName || 'unknown'}`);
-  console.log(`   Total Chunks: ${summary.overallStats.totalChunks}`);
-  console.log(`   Successful Chunks: ${summary.overallStats.successfulChunks}`);
-  console.log(`   Failed Chunks: ${summary.overallStats.failedChunks}`);
-  console.log(`   Chunk Success Rate: ${chunkSuccessRate.toFixed(1)}%`);
-  console.log(`   Total DataValues: ${summary.overallStats.totalDataValues}`);
-  console.log(`   Successful DataValues: ${summary.overallStats.successfulDataValues}`);
-  console.log(`   Failed DataValues: ${summary.overallStats.failedDataValues}`);
-  console.log(`   DataValue Success Rate: ${dataValueSuccessRate.toFixed(1)}%`);
-  console.log(`   Total Upload Time: ${summary.overallStats.totalUploadTime}ms`);
-  console.log(`   Total Conflicts: ${summary.overallStats.conflicts.length}`);
-  
-  // Log recommendations
-  if (summary.recommendations.length > 0) {
-    console.log(`💡 Recommendations:`);
-    summary.recommendations.forEach((rec, index) => {
-      console.log(`   ${index + 1}. ${rec}`);
-    });
-  }
-  
-  // Determine final status
-  const finalStatus = summary.overallSuccess ? 'SUCCESS' : 'PARTIAL_SUCCESS';
-  
-  console.log(`🎯 Final Status: ${finalStatus}`);
-  
-  return {
-    ...state,
-    consolidationComplete: true,
-    finalStatus: finalStatus,
-    processingComplete: true,
-    summary: summary,
-    // Clean up temporary state
-    uploadResult: null,
-    uploadError: null,
-    payload: null,
-    payloadInfo: null,
-    processedChunk: null,
-    chunks: null
-  };
-});
-
-/**
- * Generate recommendations based on processing results
- */
-function generateRecommendations(consolidation) {
-  const recommendations = [];
-  const stats = consolidation.overallStats;
-  
-  // Performance recommendations
-  if (stats.totalUploadTime > 300000) { // 5 minutes
-    recommendations.push('Consider reducing chunk size to improve upload performance');
-  }
-  
-  // Error rate recommendations
-  if (stats.failedChunks > 0) {
-    recommendations.push('Some chunks failed - check DHIS2 server status and data quality');
-  }
-  
-  // Conflict recommendations
-  if (stats.conflicts.length > 0) {
-    recommendations.push('Data conflicts detected - review data element mappings and periods');
-  }
-  
-  // Success rate recommendations
-  const successRate = stats.totalChunks > 0 ? (stats.successfulChunks / stats.totalChunks) * 100 : 0;
-  if (successRate < 95) {
-    recommendations.push('Success rate below 95% - consider improving error handling');
-  }
-  
-  // Memory recommendations
-  if (stats.totalChunks > 100) {
-    recommendations.push('Large number of chunks processed - monitor memory usage');
-  }
-  
-  return recommendations;
-}
-
-/**
- * Final cleanup and memory management
- */
-fn((state) => {
-  console.log(`✅ Results consolidation completed successfully`);
-  
-  // Log final completion
-  if (state.summary) {
-    const processingTime = state.summary.fileInfo.processingTimeMs || 0;
-    const uploadTime = state.summary.overallStats.totalUploadTime || 0;
-    const totalTime = processingTime + uploadTime;
+    console.log('🏁 All chunks processed - workflow complete!');
     
-    console.log(`🏁 Large file processing completed:`);
-    console.log(`   Total processing time: ${totalTime}ms`);
-    console.log(`   Final status: ${state.finalStatus}`);
-    console.log(`   Records processed: ${state.summary.overallStats.successfulDataValues}`);
-    console.log(`   Memory efficient: ✅`);
+    const finalStats = {
+      ...consolidation.overallStats,
+      completedAt: new Date().toISOString(),
+      totalProcessingTime: startTime ? Date.now() - startTime : 0,
+      successRate: consolidation.overallStats.totalChunksProcessed > 0 
+        ? (consolidation.overallStats.totalSuccessfulUploads / consolidation.overallStats.totalChunksProcessed) * 100 
+        : 0
+    };
+    
+    console.log(`📊 Final workflow summary:`);
+    console.log(`   Total chunks processed: ${finalStats.totalChunksProcessed}`);
+    console.log(`   Total rows processed: ${finalStats.totalRowsProcessed}`);
+    console.log(`   Successful uploads: ${finalStats.totalSuccessfulUploads}`);
+    console.log(`   Failed uploads: ${finalStats.totalFailedUploads}`);
+    console.log(`   Success rate: ${finalStats.successRate.toFixed(1)}%`);
+    console.log(`   Processing time: ${finalStats.totalProcessingTime}ms`);
+    
+    return {
+      ...state,
+      consolidation: consolidation,
+      finalStats: finalStats,
+      workflowComplete: true,
+      continueProcessing: false,
+      allChunksProcessed: true,
+      // Clean up all processing data
+      processedChunk: null,
+      uploadSuccess: null,
+      payload: null,
+      chunks: null,
+      currentChunkIndex: null,
+      nextChunkIndex: null
+    };
   }
-  
-  return state;
 }); 

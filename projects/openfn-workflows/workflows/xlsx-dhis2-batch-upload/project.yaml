@@ -1,0 +1,77 @@
+name: excel-sheet-dhis2-batch-upload
+description: Excel Sheet to DHIS2 Batch Upload Pipeline
+collections: null
+credentials:
+  sftp-credential:
+    name: "sftp-test-credential"
+    owner: "root@openhim.org"
+  dhis2-credential:
+    name: "dhis2-credential"
+    owner: "root@openhim.org"
+workflows:
+  ExcelSheetToDHIS2BatchUploadWorkflow:
+    name: Excel Sheet to DHIS2 Batch Upload Workflow
+    jobs:
+      CheckForTargetFile:
+        name: Check for Target Excel File
+        adaptor: '@openfn/language-sftp@2.0.17-custom'
+        credential: sftp-credential
+        body:
+          path: ./jobs/check-and-setup-processing.js
+      ParseExcelMetadata:
+        name: Parse Excel File Metadata and Generate DHIS2 Structures
+        adaptor: '@openfn/language-sftp@2.0.17-custom'
+        credential: sftp-credential
+        body:
+          path: ./jobs/parse-excel-metadata.js
+      CheckAndSetupMetadata:
+        name: Check and Setup DHIS2 Metadata
+        adaptor: '@openfn/language-dhis2@7.1.2-custom'
+        credential: dhis2-credential
+        body:
+          path: ./jobs/check-and-setup-metadata.js
+      ProcessAllChunksSequentially:
+        name: Process All Excel Chunks Sequentially
+        adaptor: '@openfn/language-dhis2@7.1.2-custom'
+        credential: dhis2-credential
+        body:
+          path: ./jobs/process-all-chunks-sequentially.js
+          
+    triggers:
+      # Cron trigger - runs every 5 minutes for file monitoring
+      cron-file-check:
+        type: cron
+        cron_expression: "*/5 * * * *"
+        enabled: true
+        
+    edges:
+      # Stage 1: Check for files
+      cronFileCheckToCheckForTargetFile:
+        source_trigger: cron-file-check
+        target_job: CheckForTargetFile
+        condition_type: always
+        enabled: true
+
+      # Stage 2: Parse metadata and generate DHIS2 structures if target file found
+      CheckForTargetFileToParseExcelMetadata:
+        source_job: CheckForTargetFile
+        target_job: ParseExcelMetadata
+        condition_type: on_job_success
+        condition_expression: "state.targetFileFound === true && !state.noFilesToProcess"
+        enabled: true
+
+      # Stage 3: Setup DHIS2 metadata if metadata parsed successfully
+      ParseExcelMetadataToCheckAndSetupMetadata:
+        source_job: ParseExcelMetadata
+        target_job: CheckAndSetupMetadata
+        condition_type: on_job_success
+        condition_expression: "state.metadataParsed === true && state.totalChunks > 0"
+        enabled: true
+
+      # Stage 4: Process chunks if metadata setup completed
+      CheckAndSetupMetadataToProcessAllChunksSequentially:
+        source_job: CheckAndSetupMetadata
+        target_job: ProcessAllChunksSequentially
+        condition_type: on_job_success
+        condition_expression: "state.metadataSetupComplete === true"
+        enabled: true 

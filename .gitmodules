@@ -1,3 +1,6 @@
 [submodule "projects/openfn-custom-adaptors"]
 	path = projects/openfn-custom-adaptors
 	url = https://github.com/OpenFn/adaptors.git
+[submodule "projects/lightning"]
+	path = projects/lightning
+	url = https://github.com/OpenFn/lightning.git

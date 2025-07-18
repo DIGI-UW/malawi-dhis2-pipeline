@@ -281,7 +281,7 @@ if [[ $# -eq 0 ]] || [[ "$1" == "all" ]]; then
             project_name=$(basename "$project_dir")
             
             # Skip openfn-custom-adaptors - it's handled by build_custom_openfn_adaptors function
-            if [[ "$project_name" == "openfn-custom-adaptors" ]]; then
+            if [[ "$project_name" == "openfn-custom-adaptors" || "$project_name" == "lightning" ]]; then
                 continue
             fi
             

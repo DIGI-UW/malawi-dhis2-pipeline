@@ -13,31 +13,31 @@ workflows:
     name: Excel Sheet to DHIS2 Workflow (v2)
     jobs:
       "1-check-for-new-files":
-        name: "1. Check SFTP for New Excel Files"
+        name: "Check SFTP for New Excel Files"
         adaptor: "@openfn/language-sftp@2.0.14-custom-enhanced"
         credential: "sftp-credential"
         body:
           path: "./jobs/1-check-for-new-files.js"
       "2-prepare-dhis2-payloads":
-        name: "2. Prepare DHIS2 Payloads from Excel"
+        name: "Prepare DHIS2 Payloads from Excel"
         adaptor: "@openfn/language-sftp@2.0.14-custom-enhanced"
         credential: "sftp-credential"
         body:
           path: "./jobs/2-prepare-dhis2-payloads.js"
       "3-upload-to-dhis2":
-        name: "3. Upload Payloads to DHIS2"
+        name: "Upload Payloads to DHIS2"
         adaptor: "@openfn/language-dhis2@6.3.4"
         credential: "dhis2-credential"
         body:
           path: "./jobs/3-upload-to-dhis2.js"
       "4-consolidate-results":
-        name: "4. Consolidate Processing Results"
+        name: "Consolidate Processing Results"
         adaptor: "@openfn/language-common@2.4.0"
         credential: null
         body:
           path: "./jobs/4-consolidate-results.js"
       "5-update-file-tracking":
-        name: "5. Update File Tracking State"
+        name: "Update File Tracking State"
         adaptor: "@openfn/language-common@2.4.0"
         credential: null
         body:

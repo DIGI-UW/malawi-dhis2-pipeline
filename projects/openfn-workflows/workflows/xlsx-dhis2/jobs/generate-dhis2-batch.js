@@ -1,11 +1,11 @@
 /**
- * Generate DHIS2 Batch Payload from Processed Chunks
+ * Generate DHIS2 Batch Payload from a Single Processed Chunk
  * 
- * This job takes processed chunk data and generates a DHIS2 dataValueSet payload
+ * This job takes a single processed chunk and generates a DHIS2 dataValueSet payload
  * optimized for batch upload to DHIS2 API.
  * 
  * Payload Strategy:
- * - Creates standard DHIS2 dataValueSet structure
+ * - Creates standard DHIS2 dataValueSet structure from ONE chunk
  * - Includes batch metadata for tracking
  * - Validates payload size and structure
  * - Optimizes for DHIS2 API performance
@@ -14,17 +14,31 @@
 fn((state) => {
   console.log('🔄 Starting DHIS2 batch payload generation...');
   
-  // Validate that we have processed chunk data
-  if (!state.processedChunks || !Array.isArray(state.processedChunks) || state.processedChunks.length === 0) {
-    console.warn('⚠️  No processed chunk data found. Skipping payload generation.');
+  // Validate that we have a processed chunk
+  if (!state.processedChunk || state.processedChunk.failed) {
+    console.warn('⚠️  No valid processed chunk found. Skipping payload generation.');
     return {
       ...state,
       payloadGenerationSkipped: true,
-      reason: 'No processed chunk data available'
+      reason: 'No valid processed chunk available'
     };
   }
   
-  console.log(`📦 Generating DHIS2 payload for ${state.processedChunks.length} chunks`);
+  const chunk = state.processedChunk;
+  
+  if (!chunk.processedRows || !Array.isArray(chunk.processedRows) || chunk.processedRows.length === 0) {
+    console.warn('⚠️  No processed rows found in chunk. Skipping payload generation.');
+    return {
+      ...state,
+      payloadGenerationSkipped: true,
+      reason: 'No processed rows in chunk'
+    };
+  }
+  
+  console.log(`📦 Generating DHIS2 payload for single chunk:`);
+  console.log(`   Chunk ID: ${chunk.chunkId}`);
+  console.log(`   File: ${chunk.fileName}`);
+  console.log(`   Processed rows: ${chunk.processedRows.length}`);
   
   const startTime = Date.now();
   
@@ -38,51 +52,41 @@ fn((state) => {
       attributeOptionCombo: 'HllvX50cXC0'
     };
     
-    // Generate dataValues array for DHIS2 from all processed chunks
+    // Generate dataValues array for DHIS2 from the single chunk
     const dataValues = [];
     let validDataValues = 0;
     let skippedDataValues = 0;
-    let totalProcessedRows = 0;
     
-    state.processedChunks.forEach((chunk, chunkIndex) => {
-      if (!chunk.processedRows || !Array.isArray(chunk.processedRows)) {
-        console.warn(`⚠️  Chunk ${chunkIndex} has no processedRows data`);
-        return;
-      }
-      
-      chunk.processedRows.forEach((row, rowIndex) => {
-        try {
-          // Create DHIS2 dataValue structure
-          const dataValue = {
-            dataElement: row.dataElement,
-            period: row.period || CONFIG.period,
-            orgUnit: row.orgUnit || CONFIG.orgUnit,
-            value: row.value.toString(),
-            categoryOptionCombo: row.categoryOptionCombo || CONFIG.categoryOptionCombo,
-            attributeOptionCombo: row.attributeOptionCombo || CONFIG.attributeOptionCombo,
-            // Add metadata for tracking
-            comment: `Chunk ${chunkIndex + 1}, Row ${row.originalRowIndex + 1}`,
-            followUp: false,
-            created: new Date().toISOString(),
-            lastUpdated: new Date().toISOString()
-          };
-          
-          // Basic validation
-          if (!dataValue.dataElement || dataValue.value === 'undefined' || dataValue.value === 'null') {
-            console.warn(`⚠️  Skipping invalid dataValue in chunk ${chunkIndex}, row ${rowIndex}: missing dataElement or value`);
-            skippedDataValues++;
-            return;
-          }
-          
-          dataValues.push(dataValue);
-          validDataValues++;
-          totalProcessedRows++;
-          
-        } catch (error) {
-          console.error(`❌ Error creating dataValue in chunk ${chunkIndex}, row ${rowIndex}:`, error.message);
+    chunk.processedRows.forEach((row, rowIndex) => {
+      try {
+        // Create DHIS2 dataValue structure
+        const dataValue = {
+          dataElement: row.indicator,  // indicator maps to dataElement
+          period: row.period || CONFIG.period,
+          orgUnit: row.facility || CONFIG.orgUnit,  // facility maps to orgUnit
+          value: row.value.toString(),
+          categoryOptionCombo: CONFIG.categoryOptionCombo,
+          attributeOptionCombo: CONFIG.attributeOptionCombo,
+          // Add metadata for tracking
+          comment: `Chunk ${chunk.chunkIndex + 1}, Row ${row.originalRowIndex}`,
+          followUp: false
+        };
+        
+        // Basic validation
+        if (!dataValue.dataElement || !dataValue.orgUnit || dataValue.value === 'undefined' || dataValue.value === 'null') {
+          console.warn(`⚠️  Skipping invalid dataValue in row ${rowIndex}: missing dataElement, orgUnit, or value`);
+          console.warn(`   dataElement: ${dataValue.dataElement}, orgUnit: ${dataValue.orgUnit}, value: ${dataValue.value}`);
           skippedDataValues++;
+          return;
         }
-      });
+        
+        dataValues.push(dataValue);
+        validDataValues++;
+        
+      } catch (error) {
+        console.error(`❌ Error creating dataValue for row ${rowIndex}:`, error.message);
+        skippedDataValues++;
+      }
     });
     
     // Create DHIS2 dataValueSet structure
@@ -92,17 +96,7 @@ fn((state) => {
       period: CONFIG.period,
       completeDate: new Date().toISOString(),
       dataValues: dataValues,
-      // Add batch metadata
-      attributeOptionCombo: CONFIG.attributeOptionCombo,
-      // Custom metadata for tracking (will be removed before sending to DHIS2)
-      _batchMetadata: {
-        totalChunks: state.processedChunks.length,
-        totalProcessedRows: totalProcessedRows,
-        validDataValues: validDataValues,
-        skippedDataValues: skippedDataValues,
-        processingTimestamp: new Date().toISOString(),
-        sourceFile: state.fileInfo ? state.fileInfo.fileName : 'unknown'
-      }
+      attributeOptionCombo: CONFIG.attributeOptionCombo
     };
     
     // Validate payload size
@@ -110,43 +104,30 @@ fn((state) => {
     const payloadSizeMB = payloadSize / (1024 * 1024);
     
     console.log(`📊 DHIS2 payload generation completed:`);
-    console.log(`   Total chunks processed: ${state.processedChunks.length}`);
+    console.log(`   Single chunk processed: ${chunk.chunkId}`);
     console.log(`   Total dataValues: ${validDataValues}`);
     console.log(`   Skipped dataValues: ${skippedDataValues}`);
     console.log(`   Payload size: ${payloadSizeMB.toFixed(2)}MB`);
     
-    // Check if payload exceeds reasonable size limits
-    const MAX_PAYLOAD_SIZE_MB = 5; // Conservative limit
+    // Check if payload exceeds reasonable size limits (should be small now)
+    const MAX_PAYLOAD_SIZE_MB = 5;
     if (payloadSizeMB > MAX_PAYLOAD_SIZE_MB) {
       console.warn(`⚠️  Payload size ${payloadSizeMB.toFixed(2)}MB exceeds recommended limit ${MAX_PAYLOAD_SIZE_MB}MB`);
-      
-      // Could implement payload splitting here if needed
-      return {
-        ...state,
-        payloadGenerationWarning: true,
-        warning: `Payload size ${payloadSizeMB.toFixed(2)}MB exceeds recommended limit`,
-        payload: dataValueSet,
-        payloadInfo: {
-          totalChunks: state.processedChunks.length,
-          validDataValues: validDataValues,
-          skippedDataValues: skippedDataValues,
-          payloadSizeMB: payloadSizeMB,
-          generatedAt: new Date().toISOString()
-        }
-      };
     }
     
     const processingTime = Date.now() - startTime;
     
     console.log(`✅ DHIS2 payload generation completed in ${processingTime}ms`);
-    console.log(`🎯 Payload ready for DHIS2 upload`);
+    console.log(`🎯 Payload ready for DHIS2 upload (${validDataValues} dataValues)`);
     
     return {
       ...state,
       payloadGenerationComplete: true,
       payload: dataValueSet,
       payloadInfo: {
-        totalChunks: state.processedChunks.length,
+        chunkId: chunk.chunkId,
+        chunkIndex: chunk.chunkIndex,
+        fileName: chunk.fileName,
         validDataValues: validDataValues,
         skippedDataValues: skippedDataValues,
         payloadSizeMB: payloadSizeMB,
@@ -154,7 +135,7 @@ fn((state) => {
         processingTimeMs: processingTime
       },
       // Remove processed chunk data to free memory
-      processedChunks: null,
+      processedChunk: null,
       // Flag for next step
       nextStep: 'upload_dhis2_batch'
     };
@@ -169,7 +150,9 @@ fn((state) => {
         message: error.message,
         timestamp: new Date().toISOString()
       },
-      success: false
+      success: false,
+      // Clean up memory
+      processedChunk: null
     };
   }
 });
@@ -191,7 +174,7 @@ fn((state) => {
     }
     
     // Sample validation - check first few dataValues
-    const sampleSize = Math.min(5, dataValuesCount);
+    const sampleSize = Math.min(3, dataValuesCount);
     console.log(`🔍 Validating sample of ${sampleSize} dataValues:`);
     
     for (let i = 0; i < sampleSize; i++) {

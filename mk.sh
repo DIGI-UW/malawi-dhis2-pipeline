@@ -1,5 +1,5 @@
 #!/bin/bash
-# ./build-custom-images.sh
+./build-custom-images.sh
 ./build-image.sh
 
 #./instant project up --env-file .env -d
