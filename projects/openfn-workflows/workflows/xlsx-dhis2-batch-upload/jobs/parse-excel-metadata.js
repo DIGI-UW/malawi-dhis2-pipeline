@@ -1,6 +1,8 @@
 // Job 2: Parse Excel file metadata and generate DHIS2 metadata structures
-// Configuration
-const CHUNK_SIZE = 5000; // Rows per chunk for processing
+// STATE CONTRACT:
+// Input:  { fileName, filePath, targetFileFound, noFilesToProcess, config }
+// Output: { fileName, filePath, chunkSize, totalChunks, totalRows, 
+//          metadataParsed, data: { uniqueValues, dhis2Structures }, config }
 
 // Get Excel metadata with unique values and generate DHIS2 structures
 fn(state => {
@@ -8,7 +10,24 @@ fn(state => {
   console.log(`📄 Processing file: ${state.fileName}`);
   console.log(`📁 File path: ${state.filePath}`);
   
-  return getExcelMetadata(state.filePath, CHUNK_SIZE)(state).then(newState => {
+  // Use static config from Job 1
+  const config = state.config;
+  const chunkSize = config.chunkSize;
+  
+  // Convert config.columnMapping to adaptor format
+  const adaptorColumnMapping = {};
+  Object.keys(config.columnMapping).forEach(columnName => {
+    const mapping = config.columnMapping[columnName];
+    if (mapping.uniqueValueKey) {
+      adaptorColumnMapping[mapping.uniqueValueKey] = [columnName];
+    }
+  });
+  
+  console.log(`🔧 Configuration:`);
+  console.log(`   • Chunk size: ${chunkSize} rows`);
+  console.log(`   • Column mapping keys: ${Object.keys(adaptorColumnMapping).join(', ')}`);
+  
+  return getExcelMetadata(state.filePath, chunkSize, { columnMapping: adaptorColumnMapping })(state).then(newState => {
     const metadata = newState.data;
     
     if (!metadata || !metadata.totalRows) {
@@ -24,39 +43,40 @@ fn(state => {
     if (!metadata.uniqueValues) {
       console.log('⚠️  No unique values found in metadata - using basic processing');
       
-      // Prepare basic state for chunk processing job
+      // STRICT OUTPUT: Only what Job 3 needs
       return { 
-        ...state,
-        metadataParsed: true,
-        totalRows: metadata.totalRows,
+        fileName: state.fileName,
+        filePath: state.filePath,
         chunkSize: metadata.chunkSize,
         totalChunks: metadata.totalChunks,
+        totalRows: metadata.totalRows,
+        metadataParsed: true,
+        config,
         data: {
-          fileName: state.fileName,
-          filePath: state.filePath,
-          basicProcessing: true
+          uniqueValues: {},
+          dhis2Structures: { orgUnits: [], categories: [], dataElements: [] }
         }
       };
     }
     
-    // Generate DHIS2 metadata structures from unique values
-    const dhis2Structures = generateDHIS2Structures(metadata.uniqueValues);
+    // Generate DHIS2 metadata structures from unique values using config
+    const dhis2Structures = generateDHIS2Structures(metadata.uniqueValues, config);
     
     console.log('🏗️ Generated DHIS2 metadata structures:');
     console.log(`   • Organization Units: ${dhis2Structures.orgUnits.length} total`);
     console.log(`   • Categories: ${dhis2Structures.categories.length} categories`);
     console.log(`   • Data Elements: ${dhis2Structures.dataElements.length} indicators`);
     
-    // Prepare clean state for next stages
+    // STRICT OUTPUT: Only what Job 3 needs
     return { 
-      ...state,
-      metadataParsed: true,
-      totalRows: metadata.totalRows,
+      fileName: state.fileName,
+      filePath: state.filePath,
       chunkSize: metadata.chunkSize,
       totalChunks: metadata.totalChunks,
+      totalRows: metadata.totalRows,
+      metadataParsed: true,
+      config,
       data: {
-        fileName: state.fileName,
-        filePath: state.filePath,
         uniqueValues: metadata.uniqueValues,
         dhis2Structures
       }
@@ -65,23 +85,23 @@ fn(state => {
 });
 
 // Helper function to generate DHIS2 metadata structures
-function generateDHIS2Structures(uniqueValues) {
+function generateDHIS2Structures(uniqueValues, config) {
   return {
-    orgUnits: generateOrgUnitStructures(uniqueValues),
-    categories: generateCategoryStructures(uniqueValues),
-    dataElements: generateDataElementStructures(uniqueValues)
+    orgUnits: generateOrgUnitStructures(uniqueValues, config),
+    categories: generateCategoryStructures(uniqueValues, config),
+    dataElements: generateDataElementStructures(uniqueValues, config)
   };
 }
 
 // Generate organization unit structures (5-level hierarchy)
-function generateOrgUnitStructures(uniqueValues) {
+function generateOrgUnitStructures(uniqueValues, config) {
   const orgUnits = [];
   
-  // Level 1: Country (hardcoded)
+  // Level 1: Country (from config)
   orgUnits.push({
-    name: 'Malawi',
-    shortName: 'Malawi',
-    code: 'MW',
+    name: config.countryConfig.name,
+    shortName: config.countryConfig.shortName,
+    code: config.countryConfig.code,
     level: 1,
     parent: null
   });
@@ -93,7 +113,7 @@ function generateOrgUnitStructures(uniqueValues) {
       shortName: name.substring(0, 50),
       code: generateCodeFromName(name),
       level: 2,
-      parent: 'Malawi'
+      parent: config.countryConfig.name
     });
   });
   
@@ -134,15 +154,15 @@ function generateOrgUnitStructures(uniqueValues) {
 }
 
 // Generate category structures
-function generateCategoryStructures(uniqueValues) {
+function generateCategoryStructures(uniqueValues, config) {
   const categories = [];
   
   // Health Sector category
-  if (uniqueValues.hsectors.length > 0) {
+  if (uniqueValues.hsectors && uniqueValues.hsectors.length > 0) {
     categories.push({
-      name: 'Health Sector',
-      shortName: 'Health Sector',
-      code: 'HEALTH_SECTOR',
+      name: config.categoryConfig.healthSector.name,
+      shortName: config.categoryConfig.healthSector.shortName,
+      code: config.categoryConfig.healthSector.code,
       categoryOptions: uniqueValues.hsectors.map(name => ({
         name,
         shortName: name.substring(0, 50),
@@ -152,11 +172,11 @@ function generateCategoryStructures(uniqueValues) {
   }
   
   // Reporting Period Type category
-  if (uniqueValues.reportingPeriods.length > 0) {
+  if (uniqueValues.reportingPeriods && uniqueValues.reportingPeriods.length > 0) {
     categories.push({
-      name: 'Reporting Period Type',
-      shortName: 'Report Period Type',
-      code: 'REPORTING_PERIOD_TYPE',
+      name: config.categoryConfig.reportingPeriodType.name,
+      shortName: config.categoryConfig.reportingPeriodType.shortName,
+      code: config.categoryConfig.reportingPeriodType.code,
       categoryOptions: uniqueValues.reportingPeriods.map(name => ({
         name,
         shortName: name.substring(0, 50),
@@ -169,14 +189,14 @@ function generateCategoryStructures(uniqueValues) {
 }
 
 // Generate data element structures
-function generateDataElementStructures(uniqueValues) {
+function generateDataElementStructures(uniqueValues, config) {
   return uniqueValues.indicators.map(name => ({
     name,
     shortName: name.substring(0, 50),
     code: generateCodeFromName(name),
-    valueType: 'INTEGER',
-    aggregationType: 'SUM',
-    domainType: 'AGGREGATE'
+    valueType: 'INTEGER',      // Keep hardcoded for now
+    aggregationType: 'SUM',    // Keep hardcoded for now  
+    domainType: 'AGGREGATE'    // Keep hardcoded for now
   }));
 }
 

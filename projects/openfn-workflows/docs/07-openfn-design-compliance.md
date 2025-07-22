@@ -133,15 +133,6 @@ workflows:
 
 **DHIS2 Pattern Compliance**: Following the exact structure from the original OpenFn setup.
 
-### ✅ **7. Adaptor Usage Compliance**
-
-We use the correct adaptors for each operation:
-
-| Operation | Adaptor | Version | DHIS2 Pattern |
-|-----------|---------|---------|---------------|
-| SFTP Operations | `@openfn/language-sftp` | `2.0.14-custom-enhanced` | N/A |
-| Data Processing | `@openfn/language-common` | `2.4.0` | ✅ Standard |
-| DHIS2 Upload | `@openfn/language-dhis2` | `6.3.4` | ✅ Official DHIS2 adaptor |
 
 ### ✅ **8. Credential Management**
 

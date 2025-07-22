@@ -1,7 +1,9 @@
-import axios from 'axios';
-import { Buffer } from 'buffer';
+// Job 4: ProcessAllChunksSequentially  
+// STATE CONTRACT:
+// Input:  { fileName, filePath, chunkSize, totalChunks, totalRows, 
+//          metadataSetupComplete, config, data: { dhis2Mappings } }
+// Output: { fileName, batchProcessingComplete, summary, config, data: {...} }
 
-// Job 4: Process all Excel chunks sequentially using real DHIS2 mappings
 fn(state => {
   const { fileName, totalChunks, chunkSize, filePath, totalRows } = state;
   const { dhis2Mappings } = state.data;
@@ -15,6 +17,18 @@ fn(state => {
   if (!dhis2Mappings) {
     throw new Error('Missing DHIS2 mappings: dhis2Mappings must be provided from metadata setup job');
   }
+  
+  // Extract SFTP configuration from the combined credential
+  // The combined credential contains both DHIS2 and SFTP configuration
+  const { sftpConfiguration } = state.configuration;
+  
+  if (!sftpConfiguration) {
+    throw new Error('Missing SFTP configuration in combined credential. Expected: { sftpConfiguration: { host, username, password, port } }');
+  }
+  
+  console.log('🔧 Using SFTP configuration from combined credential');
+  console.log(`🔧 SFTP Host: ${sftpConfiguration.host}:${sftpConfiguration.port}`);
+  console.log(`🔧 SFTP User: ${sftpConfiguration.username}`);
   
   console.log(`🚀 Job 4: Starting batch processing with real DHIS2 mappings`);
   console.log(`📊 Processing ${totalChunks} chunks of ${chunkSize} rows each`);
@@ -32,58 +46,81 @@ fn(state => {
       number: i + 1,
       size: chunkSize,
       filePath: filePath,
-      dhis2Mappings: dhis2Mappings // Pass mappings to each chunk
+      dhis2Mappings: dhis2Mappings, // Pass mappings to each chunk
+      config: state.config // Pass config to each chunk
     });
   }
   
   console.log(`📦 Created ${chunks.length} chunk configurations`);
   
-  // Initialize processing results array
   return {
-    ...state,
+    fileName,
+    filePath,
+    chunkSize,
+    totalChunks,
+    totalRows,
+    sftpConfiguration,
     chunks,
     chunkResults: [],
     batchProcessingStartTime: new Date().toISOString()
   };
 });
 
-// Process each chunk using the atomic operation with real mappings
 each(
   'chunks[*]',
   processExcelChunkToDHIS2(
-    state => state.data.filePath,
-    state => state.data.index,
-    state => state.data.size,
+    $.data.filePath,
+    $.data.index,
+    $.data.size,
     (chunkData, metadata) => {
       const { dhis2Mappings } = metadata;
       
       // Transform Excel data to DHIS2 dataValueSet format using real mappings
       console.log(`🔄 Transforming ${chunkData.length} rows to DHIS2 format with real UIDs`);
       
+      // Get dynamic column names from config
+      const indicatorColumn = Object.keys(metadata.config.columnMapping).find(col => 
+        metadata.config.columnMapping[col].dataProcessingRole === 'indicator'
+      );
+      const valueColumn = Object.keys(metadata.config.columnMapping).find(col => 
+        metadata.config.columnMapping[col].dataProcessingRole === 'value'
+      );
+      const quarterColumn = Object.keys(metadata.config.columnMapping).find(col => 
+        metadata.config.columnMapping[col].dataProcessingRole === 'period'
+      );
+      const siteColumn = Object.keys(metadata.config.columnMapping).find(col => 
+        metadata.config.columnMapping[col].dataProcessingRole === 'orgUnit'
+      );
+      const hsectorColumn = Object.keys(metadata.config.columnMapping).find(col => 
+        metadata.config.columnMapping[col].dataProcessingRole === 'category'
+      );
+      
+      console.log(`🔧 Using dynamic columns: ${indicatorColumn}, ${valueColumn}, ${quarterColumn}, ${siteColumn}, ${hsectorColumn}`);
+      
       // Extract common fields for the dataValueSet
       const firstRow = chunkData[0];
-      const period = firstRow?.Quarter ? transformPeriod(firstRow.Quarter) : '';
-      const orgUnit = firstRow?.Site ? dhis2Mappings.orgUnits[firstRow.Site] : null;
+      const period = firstRow?.[quarterColumn] ? transformPeriod(firstRow[quarterColumn]) : '';
+      const orgUnit = firstRow?.[siteColumn] ? dhis2Mappings.orgUnits[firstRow[siteColumn]] : null;
       
-      const dataValues = chunkData.map((row, rowIndex) => {
-        // Map Excel columns to DHIS2 format using real UIDs
-        const indicatorName = row.Indicator_name;
-        const value = row.IndicatorValue;
-        const quarterPeriod = row.Quarter ? transformPeriod(row.Quarter) : period;
-        const siteOrgUnit = row.Site ? dhis2Mappings.orgUnits[row.Site] : orgUnit;
-        const dataElement = row.Indicator_name ? dhis2Mappings.dataElements[row.Indicator_name] : null;
-        const categoryOptionCombo = row.hsector ? dhis2Mappings.categories[row.hsector] : null;
+              const dataValues = chunkData.map((row, rowIndex) => {
+          // Map Excel columns to DHIS2 format using real UIDs and dynamic column names
+          const indicatorName = row[indicatorColumn];
+          const value = row[valueColumn];
+          const quarterPeriod = row[quarterColumn] ? transformPeriod(row[quarterColumn]) : period;
+          const siteOrgUnit = row[siteColumn] ? dhis2Mappings.orgUnits[row[siteColumn]] : orgUnit;
+          const dataElement = row[indicatorColumn] ? dhis2Mappings.dataElements[row[indicatorColumn]] : null;
+          const categoryOptionCombo = row[hsectorColumn] ? dhis2Mappings.categories[row[hsectorColumn]] : null;
         
-        // Log missing mappings for debugging
-        if (!dataElement) {
-          console.log(`⚠️  Row ${rowIndex + 1}: No data element mapping for '${indicatorName}'`);
-        }
-        if (!siteOrgUnit) {
-          console.log(`⚠️  Row ${rowIndex + 1}: No org unit mapping for '${row.Site}'`);
-        }
-        if (!categoryOptionCombo) {
-          console.log(`⚠️  Row ${rowIndex + 1}: No category mapping for '${row.hsector}'`);
-        }
+                  // Log missing mappings for debugging
+          if (!dataElement) {
+            console.log(`⚠️  Row ${rowIndex + 1}: No data element mapping for '${indicatorName}'`);
+          }
+          if (!siteOrgUnit) {
+            console.log(`⚠️  Row ${rowIndex + 1}: No org unit mapping for '${row[siteColumn]}'`);
+          }
+          if (!categoryOptionCombo) {
+            console.log(`⚠️  Row ${rowIndex + 1}: No category mapping for '${row[hsectorColumn]}'`);
+          }
         
         // Skip invalid rows but log them
         if (!dataElement || !siteOrgUnit || !value || value === '') {
@@ -91,7 +128,7 @@ each(
           return null;
         }
         
-        console.log(`📊 Row ${rowIndex + 1}: ${indicatorName} = ${value} (${row.Site}, ${quarterPeriod})`);
+        console.log(`📊 Row ${rowIndex + 1}: ${indicatorName} = ${value} (${row[siteColumn]}, ${quarterPeriod})`);
         
         return {
           dataElement: dataElement,
@@ -138,9 +175,10 @@ fn(state => {
   console.log(`📊 Total data values uploaded: ${totalDataValuesUploaded}`);
   
   return {
-    ...state,
+    fileName: state.fileName,
     batchProcessingComplete: true,
     batchProcessingEndTime: new Date().toISOString(),
+    config: state.config,
     summary: {
       fileName: state.fileName,
       totalChunksProcessed: results.length,
@@ -151,9 +189,7 @@ fn(state => {
       processingStartTime: state.batchProcessingStartTime,
       processingEndTime: new Date().toISOString()
     },
-    // Keep the last successful result as the main data
-    data: results.length > 0 ? results[results.length - 1] : {},
-    references: results
+    data: results.length > 0 ? results[results.length - 1] : {}
   };
 });
 

@@ -1,5 +1,9 @@
-// Job 3: Check and Setup DHIS2 Metadata
-// Creates actual DHIS2 metadata objects and generates real UID mappings
+// Job 3: CheckAndSetupMetadata
+// STATE CONTRACT:
+// Input:  { fileName, filePath, chunkSize, totalChunks, totalRows, 
+//          metadataParsed, config, data: { uniqueValues, dhis2Structures } }
+// Output: { fileName, filePath, chunkSize, totalChunks, totalRows, 
+//          metadataSetupComplete, config, data: { dhis2Mappings } }
 
 fn(async state => {
   console.log('🏗️ Job 3: Setting up DHIS2 metadata...');
@@ -14,6 +18,7 @@ fn(async state => {
   console.log(`   • Organization Units: ${dhis2Structures.orgUnits.length}`);
   console.log(`   • Categories: ${dhis2Structures.categories.length}`);
   console.log(`   • Data Elements: ${dhis2Structures.dataElements.length}`);
+  console.log(`   • Max org unit levels: ${state.config.maxLevels}`);
   
   try {
     // Create organization units in hierarchical order
@@ -34,19 +39,18 @@ fn(async state => {
     console.log(`   • Data Elements: ${Object.keys(dataElementMappings).length} mappings`);
     
     return {
-      ...state,
+      fileName: state.fileName,
+      filePath: state.filePath,
+      chunkSize: state.chunkSize,
+      totalChunks: state.totalChunks,
+      totalRows: state.totalRows,
       metadataSetupComplete: true,
+      config: state.config,
       data: {
-        ...state.data,
         dhis2Mappings: {
           orgUnits: orgUnitMappings,
           categories: categoryMappings,
           dataElements: dataElementMappings
-        },
-        metadataCreated: {
-          orgUnits: Object.keys(orgUnitMappings).length,
-          categories: Object.keys(categoryMappings).length,
-          dataElements: Object.keys(dataElementMappings).length
         }
       }
     };
@@ -69,7 +73,7 @@ async function createOrganizationUnits(orgUnitStructures, state) {
   });
   
   // Create organization units level by level
-  for (let level = 1; level <= 5; level++) {
+  for (let level = 1; level <= state.config.maxLevels; level++) {
     if (!levels[level]) continue;
     
     console.log(`🏢 Creating Level ${level} organization units...`);
