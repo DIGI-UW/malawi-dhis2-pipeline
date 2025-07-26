@@ -6,7 +6,7 @@
 // Master configuration - single source of truth for entire workflow
 const MASTER_CONFIG = {
   // === JOB 1: FILE DISCOVERY ===
-  targetFile: 'ART_data_long_format.xlsx',
+  targetFile: 'ART_short.xlsx',
   targetFilePattern: null,
   directory: '/data/excel-files',
   

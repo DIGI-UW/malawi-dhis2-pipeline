@@ -128,8 +128,8 @@ Lightning.Setup.setup_user(
       name: \"combined-sftp-dhis2-credential\", 
       schema: \"dhis2\", 
       body: %{
-        username: \"${DHIS2_USERNAME:-admin}\", 
-        password: \"${DHIS2_PASSWORD:-district}\", 
+        username: \"openfn_integration\", 
+        password: \"OpenFn@2024!\", 
         hostUrl: \"${DHIS2_URL:-http://dhis2:8080}\", 
         sftpConfiguration: %{
           host: \"172.17.0.1\", 

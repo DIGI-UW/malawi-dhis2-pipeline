@@ -1,3 +1,6 @@
-projects/*
-bin/*
+.git
+projects
+bin
 *.bkp
+openfn_*_logs.txt
+tmp.json

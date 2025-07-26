@@ -2,7 +2,7 @@
 // STATE CONTRACT:
 // Input:  { fileName, filePath, targetFileFound, noFilesToProcess, config }
 // Output: { fileName, filePath, chunkSize, totalChunks, totalRows, 
-//          metadataParsed, data: { uniqueValues, dhis2Structures }, config }
+//          metadataParsed, data: { uniqueValues, orgUnitParentMap, dhis2Structures }, config }
 
 // Get Excel metadata with unique values and generate DHIS2 structures
 fn(state => {
@@ -39,6 +39,13 @@ fn(state => {
     console.log(`   • Chunk size: ${metadata.chunkSize} rows`);
     console.log(`   • Total chunks: ${metadata.totalChunks}`);
     
+    // Log organizational unit parent mappings
+    if (metadata.orgUnitParentMap && Object.keys(metadata.orgUnitParentMap).length > 0) {
+      console.log(`📊 Organizational unit parent mappings collected: ${Object.keys(metadata.orgUnitParentMap).length} relationships`);
+    } else {
+      console.log('⚠️  No organizational unit parent mappings found');
+    }
+    
     // Check if unique values were collected
     if (!metadata.uniqueValues) {
       console.log('⚠️  No unique values found in metadata - using basic processing');
@@ -54,13 +61,14 @@ fn(state => {
         config,
         data: {
           uniqueValues: {},
+          orgUnitParentMap: metadata.orgUnitParentMap || {},
           dhis2Structures: { orgUnits: [], categories: [], dataElements: [] }
         }
       };
     }
     
-    // Generate DHIS2 metadata structures from unique values using config
-    const dhis2Structures = generateDHIS2Structures(metadata.uniqueValues, config);
+    // Generate DHIS2 metadata structures from unique values and hierarchy using config
+    const dhis2Structures = generateDHIS2Structures(metadata.uniqueValues, config, metadata.orgUnitParentMap);
     
     console.log('🏗️ Generated DHIS2 metadata structures:');
     console.log(`   • Organization Units: ${dhis2Structures.orgUnits.length} total`);
@@ -78,6 +86,7 @@ fn(state => {
       config,
       data: {
         uniqueValues: metadata.uniqueValues,
+        orgUnitParentMap: metadata.orgUnitParentMap || {},
         dhis2Structures
       }
     };
@@ -85,28 +94,38 @@ fn(state => {
 });
 
 // Helper function to generate DHIS2 metadata structures
-function generateDHIS2Structures(uniqueValues, config) {
+function generateDHIS2Structures(uniqueValues, config, orgUnitParentMap = null) {
   return {
-    orgUnits: generateOrgUnitStructures(uniqueValues, config),
+    orgUnits: generateOrgUnitStructures(uniqueValues, config, orgUnitParentMap),
     categories: generateCategoryStructures(uniqueValues, config),
     dataElements: generateDataElementStructures(uniqueValues, config)
   };
 }
 
 // Generate organization unit structures (5-level hierarchy)
-function generateOrgUnitStructures(uniqueValues, config) {
+function generateOrgUnitStructures(uniqueValues, config, orgUnitParentMap = null) {
   const orgUnits = [];
   
   // Level 1: Country (from config)
-  orgUnits.push({
+  const countryOrgUnit = {
     name: config.countryConfig.name,
     shortName: config.countryConfig.shortName,
     code: config.countryConfig.code,
     level: 1,
     parent: null
-  });
+  };
+  orgUnits.push(countryOrgUnit);
   
-  // Level 2: Regions
+  if (orgUnitParentMap && Object.keys(orgUnitParentMap).length > 0) {
+    console.log('✅ Using organizational unit parent mappings from Excel data');
+    console.log(`📊 Found ${Object.keys(orgUnitParentMap).length} parent-child relationships`);
+  } else {
+    console.log('⚠️  No organizational unit parent mappings available - using fallback approach');
+    orgUnitParentMap = {};
+  }
+  
+  // Level 2: Regions (all belong to country)
+  if (uniqueValues.regions) {
   uniqueValues.regions.forEach(name => {
     orgUnits.push({
       name,
@@ -116,42 +135,54 @@ function generateOrgUnitStructures(uniqueValues, config) {
       parent: config.countryConfig.name
     });
   });
+  }
   
   // Level 3: Zones
+  if (uniqueValues.zones) {
   uniqueValues.zones.forEach(name => {
+      const parent = orgUnitParentMap[name] || 'UNKNOWN_REGION';
     orgUnits.push({
       name,
       shortName: name.substring(0, 50),
       code: generateCodeFromName(name),
       level: 3,
-      parent: 'TBD' // Will be resolved during metadata creation
+        parent
+      });
     });
-  });
+  }
   
   // Level 4: Districts
+  if (uniqueValues.districts) {
   uniqueValues.districts.forEach(name => {
+      const parent = orgUnitParentMap[name] || 'UNKNOWN_ZONE';
     orgUnits.push({
       name,
       shortName: name.substring(0, 50),
       code: generateCodeFromName(name),
       level: 4,
-      parent: 'TBD' // Will be resolved during metadata creation
+        parent
+      });
     });
-  });
+  }
   
   // Level 5: Sites
+  if (uniqueValues.sites) {
   uniqueValues.sites.forEach(name => {
+      const parent = orgUnitParentMap[name] || 'UNKNOWN_DISTRICT';
     orgUnits.push({
       name,
       shortName: name.substring(0, 50),
       code: generateCodeFromName(name),
       level: 5,
-      parent: 'TBD' // Will be resolved during metadata creation
+        parent
+      });
     });
-  });
+  }
   
   return orgUnits;
 }
+
+
 
 // Generate category structures
 function generateCategoryStructures(uniqueValues, config) {
