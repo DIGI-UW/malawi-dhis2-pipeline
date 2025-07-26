@@ -1,4 +1,4 @@
-name: excel-sheet-dhis2
+name: excel-sheet-dhis2-clean
 description: Excel Sheet to DHIS2 Large File Processing Pipeline with Chunked Architecture
 collections: null
 credentials:
@@ -14,20 +14,19 @@ workflows:
     jobs:
       CheckSFTPFiles:
         name: Check SFTP for New or Updated Files
-        adaptor: '@openfn/language-sftp@2.0.14-custom-enhanced'
+        adaptor: '@openfn/language-sftp@2.0.17-custom'
         credential: sftp-credential
         body:
           path: ./jobs/check-sftp-files.js
       DownloadAndChunkExcel:
         name: Download and Chunk Excel File
-        adaptor: '@openfn/language-sftp@2.0.14-custom-enhanced'
+        adaptor: '@openfn/language-sftp@2.0.17-custom'
         credential: sftp-credential
         body:
           path: ./jobs/download-and-chunk-excel.js
       ProcessExcelChunk:
         name: Process Excel Chunk
         adaptor: '@openfn/language-common@2.4.0'
-        credential: null
         body:
           path: ./jobs/process-excel-chunk.js
       GenerateDHIS2Batch:
@@ -79,10 +78,6 @@ workflows:
         type: cron
         cron_expression: "*/5 * * * *"
         enabled: true
-      # Manual trigger for testing
-      manual-excel-processing:
-        type: webhook
-        enabled: true
         
     edges:
       # Cron-triggered workflow
@@ -91,12 +86,7 @@ workflows:
         target_job: CheckSFTPFiles
         condition_type: always
         enabled: true
-      # Manual trigger for testing
-      manualTriggerToDownloadAndChunk:
-        source_trigger: manual-excel-processing
-        target_job: DownloadAndChunkExcel
-        condition_type: always
-        enabled: true
+
       # Job flow after file check
       CheckSFTPFilesToDownloadAndChunk:
         source_job: CheckSFTPFiles
@@ -104,52 +94,79 @@ workflows:
         condition_type: on_job_success
         condition_expression: "state.newFilesFound === true"
         enabled: true
+        
       # Job flow after download and chunking
       DownloadAndChunkToProcessChunk:
         source_job: DownloadAndChunkExcel
         target_job: ProcessExcelChunk
         condition_type: on_job_success
+        condition_expression: "state.chunks && state.chunks.length > 0 && !state.allChunksProcessed"
         enabled: true
+        
+      # Skip to file tracking if all chunks are processed
+      DownloadAndChunkToUpdateFileTracking:
+        source_job: DownloadAndChunkExcel
+        target_job: UpdateFileTracking
+        condition_type: on_job_success
+        condition_expression: "state.allChunksProcessed === true || state.workflowComplete === true"
+        enabled: true
+        
       # Job flow after chunk processing
       ProcessChunkToGenerateBatch:
         source_job: ProcessExcelChunk
         target_job: GenerateDHIS2Batch
         condition_type: on_job_success
         enabled: true
+        
       # Job flow to DHIS2 upload
       GenerateBatchToUploadBatch:
         source_job: GenerateDHIS2Batch
         target_job: UploadDHIS2Batch
         condition_type: on_job_success
         enabled: true
+        
       # Job flow after upload
       UploadBatchToConsolidateResults:
         source_job: UploadDHIS2Batch
         target_job: ConsolidateResults
         condition_type: on_job_success
         enabled: true
-      # Update tracking after consolidation
+        
+      # Loop back to process next chunk (OpenFN best practice)
+      ConsolidateResultsToDownloadAndChunk:
+        source_job: ConsolidateResults
+        target_job: DownloadAndChunkExcel
+        condition_type: on_job_success
+        condition_expression: "state.continueProcessing === true && !state.workflowComplete"
+        enabled: true
+        
+      # Complete workflow when all chunks are processed
       ConsolidateResultsToUpdateFileTracking:
         source_job: ConsolidateResults
         target_job: UpdateFileTracking
         condition_type: on_job_success
+        condition_expression: "state.workflowComplete === true"
         enabled: true
-      # Monitoring jobs (can be triggered from various points)
+        
+      # Monitoring jobs (optional)
       UploadBatchToTrackChunkState:
         source_job: UploadDHIS2Batch
         target_job: TrackChunkState
         condition_type: on_job_success
-        enabled: true
-      # Retry logic
+        enabled: false # Disable for now to keep workflow simple
+        
+      # Retry logic (optional)
       TrackChunkStateToRetryFailedChunks:
         source_job: TrackChunkState
         target_job: RetryFailedChunks
         condition_type: on_job_success
         condition_expression: "state.failedChunks && state.failedChunks.length > 0"
-        enabled: true
-      # Dashboard monitoring
+        enabled: false # Disable for now to keep workflow simple
+        
+      # Dashboard monitoring (optional)
       ConsolidateResultsToMonitoringDashboard:
         source_job: ConsolidateResults
         target_job: MonitoringDashboard
         condition_type: on_job_success
-        enabled: true 
+        condition_expression: "state.workflowComplete === true"
+        enabled: false # Disable for now to keep workflow simple 

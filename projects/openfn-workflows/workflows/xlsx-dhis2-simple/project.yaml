@@ -12,37 +12,37 @@ workflows:
     name: Excel Sheet to DHIS2 Workflow (Simple)
     jobs:
       "1-check-sftp-files":
-        name: "1. Check SFTP for New Files"
+        name: "Check SFTP for New Files"
         adaptor: '@openfn/language-sftp@2.0.14-custom-enhanced'
         credential: sftp-credential
         body:
           path: ./jobs/1-check-sftp-files.js
       "2-download-and-chunk":
-        name: "2. Download and Chunk Excel File"
+        name: "Download and Chunk Excel File"
         adaptor: '@openfn/language-sftp@2.0.14-custom-enhanced'
         credential: sftp-credential
         body:
           path: ./jobs/2-download-and-chunk.js
       "3-process-chunks":
-        name: "3. Process Excel Chunks"
+        name: "Process Excel Chunks"
         adaptor: '@openfn/language-sftp@2.0.14-custom-enhanced'
         credential: sftp-credential
         body:
           path: ./jobs/3-process-chunks.js
       "4-generate-batch":
-        name: "4. Generate DHIS2 Batch"
+        name: "Generate DHIS2 Batch"
         adaptor: '@openfn/language-common@2.4.0'
         credential: null
         body:
           path: ./jobs/4-generate-batch.js
       "5-upload-batch":
-        name: "5. Upload DHIS2 Batch"
+        name: "Upload DHIS2 Batch"
         adaptor: '@openfn/language-dhis2@6.3.4'
         credential: dhis2-credential
         body:
           path: ./jobs/5-upload-batch.js
       "6-consolidate-results":
-        name: "6. Consolidate Results"
+        name: "Consolidate Results"
         adaptor: '@openfn/language-common@2.4.0'
         credential: null
         body:

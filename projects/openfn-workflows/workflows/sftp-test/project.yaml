@@ -17,11 +17,11 @@ workflows:
     jobs:
       ListFiles:
         name: List SFTP Files
-        adaptor: '@openfn/language-sftp@2.0.14-custom-enhanced'
+        adaptor: '@openfn/language-sftp@2.0.17-custom'
         enabled: true
         credential: sftp-test-credential  # References the credential defined above
         body:
-          path: ./jobs/list-files-fixed.js
+          path: ./jobs/list-files.js
     
     triggers:
       manual:

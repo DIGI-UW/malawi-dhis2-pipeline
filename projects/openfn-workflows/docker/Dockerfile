@@ -60,7 +60,7 @@ ENV DRY_RUN="false"
 
 # Add environment variable to identify this as having the official package fix
 ENV OFFICIAL_SFTP_ADAPTOR=true
-ENV SFTP_ADAPTOR_VERSION=2.0.14-official-fixed
+ENV SFTP_ADAPTOR_VERSION=2.0.17-custom
 
 # Simple healthcheck - just check if the process is running
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \

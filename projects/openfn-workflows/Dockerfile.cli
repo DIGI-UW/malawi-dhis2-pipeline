@@ -57,7 +57,7 @@ RUN echo '#!/bin/bash' > /usr/local/bin/run-workflow && \
 ENV CUSTOM_SFTP_ADAPTOR=true
 ENV CUSTOM_DHIS2_ADAPTOR=true
 ENV CUSTOM_HTTP_ADAPTOR=true
-ENV SFTP_ADAPTOR_VERSION=2.0.14-custom-uri-fixed
+ENV SFTP_ADAPTOR_VERSION=2.0.17-custom
 
 # Default command
 CMD ["bash"] 

@@ -43,5 +43,5 @@ USER lightning
 
 # Add environment variables to identify this as the custom URI-fixed package with local adaptors
 ENV CUSTOM_SFTP_ADAPTOR=true
-ENV SFTP_ADAPTOR_VERSION=2.0.14-custom-enhanced
+ENV SFTP_ADAPTOR_VERSION=2.0.17-custom
 ENV LOCAL_ADAPTORS_ENABLED=true 
