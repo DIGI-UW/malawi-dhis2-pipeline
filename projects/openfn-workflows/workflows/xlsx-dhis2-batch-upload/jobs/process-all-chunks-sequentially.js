@@ -408,6 +408,18 @@ executeWithSftp(
       console.log(`⚠️  Failed chunks: ${failedChunks.map(c => c.chunkIndex + 1).join(', ')}`);
     }
     
+    // Update filesIndex to mark this file as processed
+    const filesIndex = { ...(state.filesIndex || {}) };
+    if (state.fileName) {
+      const existing = filesIndex[state.fileName] || {};
+      filesIndex[state.fileName] = {
+        ...existing,
+        path: existing.path || state.filePath,
+        processed: true,
+        lastProcessedAt: new Date().toISOString()
+      };
+    }
+
     return {
       fileName: state.fileName,
       batchProcessingComplete: true,
@@ -420,6 +432,7 @@ executeWithSftp(
         processingStartTime: state.batchProcessingStartTime,
         processingEndTime: new Date().toISOString()
       },
+      filesIndex,
       data: results.length > 0 ? results[results.length - 1] : {}
     };
   })

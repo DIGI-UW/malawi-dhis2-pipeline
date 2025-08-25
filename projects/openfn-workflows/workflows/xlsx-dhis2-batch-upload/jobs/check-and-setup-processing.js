@@ -6,7 +6,7 @@
 // Master configuration - single source of truth for entire workflow
 const MASTER_CONFIG = {
   // === JOB 1: FILE DISCOVERY ===
-  targetFile: 'ART_short.xlsx',
+  targetFile: 'ART_data_long_format.xlsx',
   targetFilePattern: null,
   directory: '/data/excel-files',
   
@@ -99,7 +99,8 @@ list('/data/excel-files', null, state => {
       targetFileFound: false,
       fileName: null,
       filePath: null,
-      config
+      config,
+      filesIndex: state.filesIndex || {}
     };
   }
   
@@ -132,7 +133,8 @@ list('/data/excel-files', null, state => {
       targetFileFound: false,
       fileName: null,
       filePath: null,
-      config
+      config,
+      filesIndex: state.filesIndex || {}
     };
   }
   
@@ -143,6 +145,8 @@ list('/data/excel-files', null, state => {
     noFilesToProcess: false,
     fileName: matchedFileName,
     filePath: `${searchDirectory}/${matchedFileName}`,
-    config
+    config,
+    // Preserve filesIndex passed from Scan job
+    filesIndex: state.filesIndex || {}
   };
 }); 

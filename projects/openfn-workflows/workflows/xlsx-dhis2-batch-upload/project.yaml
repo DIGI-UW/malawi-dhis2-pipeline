@@ -15,6 +15,12 @@ workflows:
   ExcelSheetToDHIS2BatchUploadWorkflow:
     name: Excel Sheet to DHIS2 Batch Upload Workflow
     jobs:
+      ScanSftpForChanges:
+        name: Scan SFTP for new/updated ART Excel files
+        adaptor: '@openfn/language-sftp@2.0.17-custom'
+        credential: sftp-credential
+        body:
+          path: ./jobs/scan-sftp-for-changes.js
       CheckForTargetFile:
         name: Check for Target Excel File
         adaptor: '@openfn/language-sftp@2.0.17-custom'
@@ -48,11 +54,19 @@ workflows:
         enabled: true
         
     edges:
-      # Stage 1: Check for files
-      cronFileCheckToCheckForTargetFile:
+      # Stage 1: Scan SFTP and decide next file to process
+      cronFileCheckToScanSftpForChanges:
         source_trigger: cron-file-check
-        target_job: CheckForTargetFile
+        target_job: ScanSftpForChanges
         condition_type: always
+        enabled: true
+
+      # Stage 1b: Proceed to file check if a candidate was found
+      ScanToCheckForTargetFile:
+        source_job: ScanSftpForChanges
+        target_job: CheckForTargetFile
+        condition_type: on_job_success
+        condition_expression: "state.hasFileToProcess === true"
         enabled: true
 
       # Stage 2: Parse metadata and generate DHIS2 structures if target file found

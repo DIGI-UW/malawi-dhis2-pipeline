@@ -1,0 +1,7 @@
+name: malawi-sftp
+description: SFTP Excel to DHIS2 HIV Indicators Pipeline with Cron and Webhook Triggers
+workflows:
+  ExtractedWorkflow:
+    name: HIV Indicators SFTP to DHIS2 Workflow
+    # Jobs and triggers would need manual reconstruction
+    # This is a starting point for manual editing

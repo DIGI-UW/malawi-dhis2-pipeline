@@ -59,6 +59,7 @@ fn(state => {
         totalRows: metadata.totalRows,
         metadataParsed: true,
         config,
+        filesIndex: state.filesIndex || {},
         data: {
           uniqueValues: {},
           orgUnitParentMap: metadata.orgUnitParentMap || {},
@@ -84,6 +85,7 @@ fn(state => {
       totalRows: metadata.totalRows,
       metadataParsed: true,
       config,
+      filesIndex: state.filesIndex || {},
       data: {
         uniqueValues: metadata.uniqueValues,
         orgUnitParentMap: metadata.orgUnitParentMap || {},

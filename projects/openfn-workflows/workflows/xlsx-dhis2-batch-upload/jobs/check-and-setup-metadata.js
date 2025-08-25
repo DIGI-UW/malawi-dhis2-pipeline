@@ -112,6 +112,7 @@ fn(async state => {
       totalRows: state.totalRows,
       metadataSetupComplete: true,
       config: state.config,
+      filesIndex: state.filesIndex || {},
       data: {
         dhis2Mappings: {
           orgUnits: orgUnitMappings,
