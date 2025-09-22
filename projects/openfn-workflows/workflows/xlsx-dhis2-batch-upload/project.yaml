@@ -16,7 +16,7 @@ workflows:
     name: Excel Sheet to DHIS2 Batch Upload Workflow
     jobs:
       ScanSftpForChanges:
-        name: Scan SFTP for new/updated ART Excel files
+        name: Scan SFTP for new or updated ART Excel files
         adaptor: '@openfn/language-sftp@2.0.17-custom'
         credential: sftp-credential
         body:
