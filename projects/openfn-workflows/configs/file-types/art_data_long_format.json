@@ -85,6 +85,36 @@
       "defaultValue": 0
     }
   ],
+  "uniqueValueCollectors": {
+    "sites": { "targetField": "orgUnit" },
+    "indicators": { "targetField": "dataElement" },
+    "quarters": { "targetField": "period" },
+    "hsectors": { "targetField": "categoryOptions.hsector" },
+    "reportingPeriods": { "targetField": "categoryOptions.reportingPeriodType" },
+    "regions": { "targetField": "Region" },
+    "zones": { "targetField": "Zone" },
+    "districts": { "targetField": "District" }
+  },
+  "orgUnitHierarchy": [
+    { "childField": "orgUnit", "parentField": "District" },
+    { "childField": "District", "parentField": "Zone" },
+    { "childField": "Zone", "parentField": "Region" }
+  ],
+  "builders": {
+    "orgUnits": {
+      "levels": [
+        { "level": 2, "uniqueValueKey": "regions", "parentKey": "root" },
+        { "level": 3, "uniqueValueKey": "zones", "parentKey": "Region" },
+        { "level": 4, "uniqueValueKey": "districts", "parentKey": "Zone" },
+        { "level": 5, "uniqueValueKey": "sites", "parentKey": "District" }
+      ]
+    },
+    "categories": [
+      { "name": "Health Sector", "shortName": "Health Sector", "code": "HEALTH_SECTOR", "uniqueValueKey": "hsectors" },
+      { "name": "Reporting Period Type", "shortName": "Report Period Type", "code": "REPORTING_PERIOD_TYPE", "uniqueValueKey": "reportingPeriods" }
+    ],
+    "dataElements": { "uniqueValueKey": "indicators" }
+  },
   "aggregation": {
     "enabled": false,
     "groupBy": ["orgUnit", "dataElement", "period", "categoryOptions"],

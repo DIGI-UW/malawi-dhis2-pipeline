@@ -1,0 +1,107 @@
+name: upload-indicator-files-to-dhis2
+description: Ingest indicator files (XLSX & CSV) from SFTP, prepare DHIS2 metadata, and upload data values with resumable state management
+collections: null
+credentials:
+  sftp-credential:
+    name: "sftp-test-credential"
+    owner: "root@openhim.org"
+  dhis2-credential:
+    name: "dhis2-credential"
+    owner: "root@openhim.org"
+  combined-credential:
+    name: "combined-sftp-dhis2-credential"
+    owner: "root@openhim.org"
+workflows:
+  UploadIndicatorFilesToDHIS2Workflow:
+    name: Upload Indicator Files to DHIS2 Workflow
+    concurrency: 1
+    jobs:
+      ScanSftpForChanges:
+        name: Discover indicator files and manage workflow lock
+        adaptor: '@openfn/language-sftp@2.1.0-custom'
+        credential: sftp-credential
+        body:
+          path: ./jobs/01-scan-sftp-for-changes.js
+      CheckForTargetFile:
+        name: Select next file and load file-type configuration
+        adaptor: '@openfn/language-sftp@2.1.0-custom'
+        credential: sftp-credential
+        body:
+          path: ./jobs/02-check-and-setup-processing.js
+      ParseExcelMetadata:
+        name: Parse file metadata and build DHIS2 structures
+        adaptor: '@openfn/language-sftp@2.1.0-custom'
+        credential: sftp-credential
+        body:
+          path: ./jobs/03-parse-excel-metadata.js
+      CheckAndSetupMetadata:
+        name: Ensure DHIS2 metadata exists per file config
+        adaptor: '@openfn/language-dhis2@7.1.3-custom'
+        credential: dhis2-credential
+        body:
+          path: ./jobs/04-check-and-setup-metadata.js
+      ProcessAllChunksSequentially:
+        name: Stream chunks to DHIS2 with resume support
+        adaptor: '@openfn/language-dhis2@7.1.3-custom'
+        credential: combined-credential
+        body:
+          path: ./jobs/05-process-all-chunks-sequentially.js
+          
+    triggers:
+      # Cron trigger - runs every 5 minutes for file monitoring
+      cron-file-check:
+        type: cron
+        cron_expression: "*/5 * * * *"
+        enabled: true
+        # Optional runtime params read by Job 01/02 (documented here for discoverability)
+        params:
+          directory: "/data/excel-files"
+          targetFilePatterns:
+            - "^ART_data.*\\.(xlsx|csv)(\\.csv)?$"
+          fileTypesEnabled: ["xlsx", "csv"]
+          processingMode: "incremental"
+          timeWindowMonths: 3
+          maxConcurrentFiles: 1
+          maxChunkSize: 5000
+          lockTtlSeconds: 600
+          dryRun: false
+        
+    edges:
+      # Stage 1: Scan SFTP and decide next file to process
+      cronFileCheckToScanSftpForChanges:
+        source_trigger: cron-file-check
+        target_job: ScanSftpForChanges
+        condition_type: always
+        enabled: true
+
+      # Stage 1b: Proceed to file check if a candidate was found
+      ScanToCheckForTargetFile:
+        source_job: ScanSftpForChanges
+        target_job: CheckForTargetFile
+        condition_type: on_job_success
+        condition_expression: "state.hasFileToProcess === true"
+        enabled: true
+
+      # Stage 2: Parse metadata and generate DHIS2 structures if target file found
+      CheckForTargetFileToParseExcelMetadata:
+        source_job: CheckForTargetFile
+        target_job: ParseExcelMetadata
+        condition_type: on_job_success
+        condition_expression: "state.targetFileFound === true && !state.noFilesToProcess"
+        enabled: true
+
+      # Stage 3: Setup DHIS2 metadata if metadata parsed successfully
+      ParseExcelMetadataToCheckAndSetupMetadata:
+        source_job: ParseExcelMetadata
+        target_job: CheckAndSetupMetadata
+        condition_type: on_job_success
+        condition_expression: "state.metadataParsed === true && state.totalChunks > 0"
+        enabled: true
+
+      # Stage 4: Process chunks if metadata setup completed
+      CheckAndSetupMetadataToProcessAllChunksSequentially:
+        source_job: CheckAndSetupMetadata
+        target_job: ProcessAllChunksSequentially
+        condition_type: on_job_success
+        condition_expression: "state.metadataSetupComplete === true"
+        enabled: true 
