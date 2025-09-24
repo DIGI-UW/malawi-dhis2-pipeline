@@ -124,31 +124,6 @@ malawi-dhis2-pipeline/
 # Expected output: instant version 2.x.x
 ```
 
-### Method 2: Manual Download
-
-```bash
-# Download instant CLI v2 for Linux
-curl -L https://github.com/openhie/instant-v2/releases/latest/download/instant-linux -o instant
-chmod +x instant
-
-# Option 1: Use locally
-# ./instant <command>
-
-# Option 2: Install system-wide
-sudo mv instant /usr/local/bin/
-instant --version
-```
-
-### Method 3: Install via npm
-
-```bash
-# Install globally via npm
-npm install -g @openhie/instant-v2-cli
-
-# Verify installation
-instant --version
-```
-
 ## Environment Configuration
 
 ### Create Environment File
