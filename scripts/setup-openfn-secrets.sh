@@ -13,6 +13,7 @@ required_secrets=(
   dhis2_admin_password
   dhis2_password
   postgres_password
+  openfn_db_user_password
 )
 
 print() { echo -e "$1"; }
@@ -79,9 +80,22 @@ for name in "${required_secrets[@]}"; do
 
   value=""
   if $FROM_ENV; then
-    # map snake to env: openfn_api_key -> OPENFN_API_KEY
+    # Primary mapping: snake_case secret name -> UPPERCASE env var
+    # Example: openfn_api_key -> OPENFN_API_KEY
     env_name=$(echo "$name" | tr '[:lower:]' '[:upper:]')
     value="${!env_name-}"
+
+    # Fallback mappings for secrets whose env var names differ
+    # This allows running in dev without swarm secrets by deriving
+    # the secret value from existing package env vars.
+    if [[ -z "$value" ]]; then
+      case "$name" in
+        # openfn_db_user_password should default from OPENFN_POSTGRESQL_PASSWORD
+        openfn_db_user_password)
+          value="${OPENFN_POSTGRESQL_PASSWORD-}"
+          ;;
+      esac
+    fi
   fi
 
   if [[ -z "$value" ]]; then
@@ -107,6 +121,7 @@ print "  Skipped: ${#skipped[@]}" >/dev/null || true
 print "\nNext steps:"
 print "  - Redeploy OpenFn: ./instant package up -n openfn -d"
 print "  - Verify: docker service ps openfn_openfn && docker service ps openfn_worker"
+
 
 
 

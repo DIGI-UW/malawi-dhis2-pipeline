@@ -394,6 +394,86 @@ config::substitute_env_vars() {
     echo "$config_with_env" >>"${FILE_PATH}"
 }
 
+# Ensures that external secrets declared in a docker compose file exist in Docker Swarm.
+# If a secret is missing, it attempts to create it from an environment variable.
+# By default, it maps a secret name to an env var by uppercasing the name. Some
+# secrets have bespoke mappings which are handled explicitly below.
+#
+# Arguments:
+# - $1 : the path to the compose file to inspect (eg. /path/docker-compose.yml)
+#
+config::ensure_external_secrets_existence() {
+    local -r compose_file_to_check="${1:?$(missing_param "ensure_external_secrets_existence" "compose_file_to_check")}"
+
+    if ! command -v yq >/dev/null 2>&dev/null; then
+        log error "yq is required but not installed. Cannot ensure external secrets."
+        return 1
+    fi
+
+    # Ensure swarm is initialized before attempting to create secrets
+    if ! docker info >/dev/null 2>&1 || ! docker info 2>/dev/null | grep -q "Swarm: active"; then
+        log info "Swarm is not active. Initializing..."
+        docker swarm init >/dev/null 2>&1 || true
+    fi
+
+    # Pull list of external secrets defined in the compose file
+    local secrets=()
+    mapfile -t secrets < <(yq '... comments="" | .secrets | with_entries(select(.value.external == true)) | keys | .[]' "${compose_file_to_check}" 2>/dev/null)
+
+    if [[ $? -ne 0 ]]; then
+        log error "Failed to parse compose file for secrets: ${compose_file_to_check}"
+        return 1
+    fi
+
+    if [[ -z "${secrets[*]}" ]]; then
+        log debug "No external secrets defined in compose file"
+        return 0
+    fi
+
+    log info "Ensuring external secrets exist..."
+    local secrets_created=0
+
+    for secret_name in "${secrets[@]}"; do
+        # Skip if already exists
+        if docker secret ls -qf name="^${secret_name}$" 2>/dev/null | grep -q .; then
+            log info "✅ Secret exists: ${secret_name}"
+            continue
+        fi
+
+        # Determine env var mapping for this secret
+        local env_var_name
+        env_var_name=$(echo "${secret_name}" | tr '[:lower:]' '[:upper:]')
+
+        case "${secret_name}" in
+            # openfn_db_user_password should be sourced from OPENFN_POSTGRESQL_PASSWORD when present
+            openfn_db_user_password)
+                env_var_name="OPENFN_POSTGRESQL_PASSWORD"
+                ;;
+        esac
+
+        local value="${!env_var_name-}"
+        if [[ -z "${value}" ]]; then
+            log warn "⚠️  Missing env var for secret '${secret_name}' (expected ${env_var_name}); skipping creation"
+            continue
+        fi
+
+        log info "Creating secret '${secret_name}' from env var ${env_var_name}..."
+        if printf '%s' "${value}" | docker secret create "${secret_name}" - >/dev/null 2>&1; then
+            log info "➕ Created secret: ${secret_name}"
+            secrets_created=$((secrets_created + 1))
+        else
+            log error "❌ Failed to create secret: ${secret_name}"
+            return 1
+        fi
+    done
+
+    # Give swarm a moment to propagate newly created secrets
+    if [[ ${secrets_created} -gt 0 ]]; then
+        log info "Waiting for Docker Swarm to propagate ${secrets_created} secret(s)..."
+        sleep 2
+    fi
+}
+
 # Modify a variable to contain the necessary `--config-rm` and `--config-add` arguments to update a service's
 # configs based off newly created docker configs for a provided folder. The modified variable must then be
 # used in a `docker service update` command, like follows:

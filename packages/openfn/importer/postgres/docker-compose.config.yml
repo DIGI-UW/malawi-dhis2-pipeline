@@ -43,14 +43,14 @@ configs:
     name: package.json-${package_json_DIGEST:?err}
     labels:
       name: openfn
-
+  create-db.js:
+    file: ./create-db.js
+    name: create_db.js
+    labels:
+      name: openfn
 secrets:
   postgres_password:
     external: true
   openfn_db_user_password:
     external: true
-  create-db.js:
-    file: ./create-db.js
-    name: create_db.js-${create_db_js_DIGEST:?err}
-    labels:
-      name: openfn
+

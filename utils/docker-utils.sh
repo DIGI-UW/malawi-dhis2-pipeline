@@ -363,6 +363,9 @@ docker::deploy_config_importer() {
         return 0
     fi
 
+    # Ensure external secrets exist for this compose file, creating from env vars when possible
+    config::ensure_external_secrets_existence "$CONFIG_COMPOSE_PATH"
+
     log info "Configs do not exist, deploying config importer $SERVICE_NAME ..."
     (
         if [[ ! -f "$CONFIG_COMPOSE_PATH" ]]; then
