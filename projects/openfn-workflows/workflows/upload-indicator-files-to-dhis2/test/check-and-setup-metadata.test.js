@@ -1,6 +1,6 @@
 const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
-const { createOrganizationUnitsLogic } = require('../jobs/check-and-setup-metadata');
+const { createOrganizationUnitsLogic } = require('../jobs/04-check-and-setup-metadata');
 
 chai.use(chaiAsPromised);
 const { expect } = chai;

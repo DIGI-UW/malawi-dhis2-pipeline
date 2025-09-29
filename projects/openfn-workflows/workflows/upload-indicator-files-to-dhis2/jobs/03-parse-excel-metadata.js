@@ -99,16 +99,23 @@ async function parseCsvMetadata(state, filePath, fileTypeConfig, metadataMapping
   const uniqueValueSets = {};
   const orgUnitParentMap = {};
   let dataRowCount = 0;
-  const hash = createHash();
+  const hash = createFnv1a();
+  const parserOptions = {
+    relax_column_count: true,
+    relax_column_count_more: true,
+    relax_column_count_less: true,
+    skip_empty_lines: true,
+    bom: true
+  };
 
-  const metaState = await getCsvMetadata(filePath, fileTypeConfig.chunkSize || 5000)({ ...state });
+  const metaState = await getCsvMetadata(filePath, fileTypeConfig.chunkSize || 5000, parserOptions)({ ...state });
   // We need headers and unique values; read the whole file once via CSV chunk index 0..n
   const totalRows = metaState.data.totalRows || 0;
   const chunkSize = fileTypeConfig.chunkSize || 5000;
   const totalChunks = Math.ceil(totalRows / chunkSize);
 
   for (let i = 0; i < totalChunks; i++) {
-    const chunkState = await getCsvChunk(filePath, i, chunkSize)({ ...state });
+    const chunkState = await getCsvChunk(filePath, i, chunkSize, parserOptions)({ ...state });
     const rows = chunkState.chunkData || [];
     rows.forEach((row, index) => {
       const normalizedRow = {};
@@ -117,7 +124,8 @@ async function parseCsvMetadata(state, filePath, fileTypeConfig, metadataMapping
         normalizedRow[normalizedHeader] = row[header];
       });
 
-      if (i === 0 && index === headerRowIndex) {
+      // Capture headers once from the first parsed data row
+      if (columnHeaders.size === 0) {
         Object.keys(normalizedRow).forEach(header => columnHeaders.add(header));
       }
 
@@ -149,7 +157,7 @@ async function parseCsvMetadata(state, filePath, fileTypeConfig, metadataMapping
       map[header] = header;
       return map;
     }, {}),
-    hash: hash.digest('hex')
+    hash: hash.digest()
   };
 }
 
@@ -263,11 +271,30 @@ function buildDataElements(config, uniqueValues, metadataMappings) {
   }));
 }
 
-function createHash() {
-  return crypto.createHash('sha256');
+// Lightweight FNV-1a hasher (32-bit) suitable for sandboxed runtime
+function createFnv1a() {
+  let hash = 0x811c9dc5; // FNV offset basis
+  return {
+    update(str) {
+      const s = String(str);
+      for (let i = 0; i < s.length; i++) {
+        hash ^= s.charCodeAt(i);
+        // multiply by FNV prime (0x01000193) with overflow in 32-bit
+        hash = (hash >>> 0) * 0x01000193 >>> 0;
+      }
+    },
+    digest() {
+      // Return 8-char zero-padded hex
+      return (hash >>> 0).toString(16).padStart(8, '0');
+    }
+  };
 }
 
 function generateCodeFromName(name) {
+  // Prefer adaptor util if present; fallback to local
+  const util = (globalThis && globalThis.util) || {};
+  const fn = util.generateCodeFromName;
+  if (typeof fn === 'function') return fn(name);
   return String(name)
     .toUpperCase()
     .replace(/[^A-Z0-9]/g, '_')

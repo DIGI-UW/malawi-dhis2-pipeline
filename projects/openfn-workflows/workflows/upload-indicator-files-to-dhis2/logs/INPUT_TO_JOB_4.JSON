@@ -1,0 +1,299 @@
+{
+  "chunkSize": 5000,
+  "config": {
+    "directory": "/data",
+    "fileTypesEnabled": [
+      "csv"
+    ],
+    "lockTtlSeconds": 600,
+    "pruneProcessedAfterDays": 30,
+    "targetFile": "samples/pepfar/PEPFAR_TxCURR_2025_Q2_Cleaned_v3_20250805160300.csv",
+    "targetFilePattern": null,
+    "targetFilePatterns": [
+      "^PEPFAR_TxCURR.*\\.(csv)(\\.csv)?$"
+    ]
+  },
+  "data": {
+    "dhis2Mappings": {
+      "categories": {},
+      "categoryOptionCombos": {},
+      "dataElements": {},
+      "dataSetId": null,
+      "orgUnits": {
+        "Malawi": "om2KpTmymgc"
+      }
+    },
+    "dhis2Structures": {
+      "categories": [],
+      "dataElements": [
+        {
+          "aggregationType": "SUM",
+          "code": "TX_CURR",
+          "domainType": "AGGREGATE",
+          "name": "TX_CURR",
+          "shortName": "TX_CURR",
+          "valueType": "INTEGER"
+        }
+      ],
+      "orgUnits": []
+    },
+    "orgUnitParentMap": {},
+    "uniqueValues": {
+      "indicators": [
+        "TX_CURR"
+      ],
+      "sites": [
+        "Kamuzu Academy Clinic",
+        "Kavuzi Cummock Health Centre",
+        "Area 25 Urban Health Centre",
+        "Chitekesa Health Centre",
+        "Dedza District Hospital",
+        "Bangwe Health Centre",
+        "Jalasi Health Centre",
+        "Jenda Health Centre",
+        "Kasinje Health Centre",
+        "Liuzi Health Centre",
+        "Mangochi District Hospital",
+        "Mlangeni Health Centre",
+        "Mtwalo Health Centre",
+        "Mzimba District Hospital",
+        "Ndamera Health Centre",
+        "Ndirande Urban Health Centre",
+        "Nsanje District Hospital",
+        "Zomba Central Hospital",
+        "Kachere Private Clinic",
+        "Central Health Clinic Area 47",
+        "Area 18 Urban Health Centre"
+      ]
+    }
+  },
+  "fileName": "samples/pepfar/PEPFAR_TxCURR_2025_Q2_Cleaned_v3_20250805160300.csv",
+  "filePath": "/data/samples/pepfar/PEPFAR_TxCURR_2025_Q2_Cleaned_v3_20250805160300.csv",
+  "fileType": "csv",
+  "fileTypeConfig": {
+    "builders": {
+      "dataElements": {
+        "aggregationType": "SUM",
+        "domainType": "AGGREGATE",
+        "uniqueValueKey": "indicators",
+        "valueType": "INTEGER"
+      }
+    },
+    "columnMappings": {
+      "facility": {
+        "required": true,
+        "sourceColumns": [
+          "Facility",
+          "facility",
+          "Health Facility",
+          "Site",
+          "site",
+          "Site Name"
+        ],
+        "targetField": "orgUnit"
+      },
+      "hsector": {
+        "required": false,
+        "sourceColumns": [
+          "hsector",
+          "Health Sector"
+        ],
+        "targetField": "categoryOptions.hsector"
+      },
+      "indicator": {
+        "required": true,
+        "sourceColumns": [
+          "Indicator",
+          "indicator",
+          "Indicator Name",
+          "Data Element",
+          "TX_CURR",
+          "TX_CURR_MMD"
+        ],
+        "targetField": "dataElement"
+      },
+      "period": {
+        "format": "YYYYMM",
+        "required": true,
+        "sourceColumns": [
+          "Period",
+          "period",
+          "Month",
+          "Quarter",
+          "Reporting Period",
+          "Date_Submitted"
+        ],
+        "targetField": "period"
+      },
+      "reportingPeriodType": {
+        "required": false,
+        "sourceColumns": [
+          "reportingPeriodType",
+          "Reporting Period Type"
+        ],
+        "targetField": "categoryOptions.reportingPeriodType"
+      },
+      "value": {
+        "dataType": "numeric",
+        "required": true,
+        "sourceColumns": [
+          "Value",
+          "value",
+          "Count",
+          "Total",
+          "Result",
+          "tx_curr"
+        ],
+        "targetField": "value"
+      }
+    },
+    "description": "Configuration for processing ART supervision data in long format",
+    "dhis2Builder": "default",
+    "displayName": "ART Data Long Format",
+    "filePatterns": [
+      "*ART*data*long*.xlsx",
+      "*ART*data*long*.csv",
+      "ART_data_long_format.xlsx"
+    ],
+    "fileType": "art_data_long_format",
+    "headerMap": {
+      "Date_Submitted": "Date_Submitted",
+      "age_group": "age_group",
+      "facility": "facility",
+      "indicator": "indicator",
+      "sex": "sex",
+      "site_id": "site_id",
+      "tx_curr": "tx_curr"
+    },
+    "sheetConfig": {
+      "dataStartRow": 2,
+      "headerRow": 1,
+      "targetSheet": 0
+    },
+    "uniqueValueCollectors": {
+      "hsectors": {
+        "targetField": "categoryOptions.hsector"
+      },
+      "indicators": {
+        "targetField": "dataElement"
+      },
+      "reportingPeriods": {
+        "targetField": "categoryOptions.reportingPeriodType"
+      },
+      "sites": {
+        "targetField": "orgUnit"
+      }
+    }
+  },
+  "fileTypeConfigKey": "art_data_long_format",
+  "filesIndex": {
+    "samples/pepfar/PEPFAR_TxCURRMMD_2025_Q2_Cleaned_v3_20250805160300.csv": {
+      "fileType": "csv",
+      "fileTypeConfigKey": "art_data_long_format",
+      "lastProcessedAt": null,
+      "lastSeenAt": "2025-09-27T05:57:51.573Z",
+      "mtime": 1758758600000,
+      "path": "/data/samples/pepfar/PEPFAR_TxCURRMMD_2025_Q2_Cleaned_v3_20250805160300.csv",
+      "processed": false,
+      "size": 79459,
+      "status": "pending"
+    },
+    "samples/pepfar/PEPFAR_TxCURR_2025_Q2_Cleaned_v3_20250805160300.csv": {
+      "chunkSize": 5000,
+      "dhis2Mappings": {
+        "categories": {},
+        "categoryOptionCombos": {},
+        "dataElements": {},
+        "dataSetId": null,
+        "orgUnits": {
+          "Malawi": "om2KpTmymgc"
+        }
+      },
+      "dhis2Structures": {
+        "categories": [],
+        "dataElements": [
+          {
+            "aggregationType": "SUM",
+            "code": "TX_CURR",
+            "domainType": "AGGREGATE",
+            "name": "TX_CURR",
+            "shortName": "TX_CURR",
+            "valueType": "INTEGER"
+          }
+        ],
+        "orgUnits": []
+      },
+      "fileType": "csv",
+      "fileTypeConfigKey": "art_data_long_format",
+      "hash": "a4589238",
+      "headerMap": {
+        "Date_Submitted": "Date_Submitted",
+        "age_group": "age_group",
+        "facility": "facility",
+        "indicator": "indicator",
+        "sex": "sex",
+        "site_id": "site_id",
+        "tx_curr": "tx_curr"
+      },
+      "inflight": {
+        "chunkSize": 5000,
+        "dhis2Structures": {
+          "categories": [],
+          "dataElements": [
+            {
+              "aggregationType": "SUM",
+              "code": "TX_CURR",
+              "domainType": "AGGREGATE",
+              "name": "TX_CURR",
+              "shortName": "TX_CURR",
+              "valueType": "INTEGER"
+            }
+          ],
+          "orgUnits": []
+        },
+        "hash": "a4589238",
+        "headerMap": {
+          "Date_Submitted": "Date_Submitted",
+          "age_group": "age_group",
+          "facility": "facility",
+          "indicator": "indicator",
+          "sex": "sex",
+          "site_id": "site_id",
+          "tx_curr": "tx_curr"
+        },
+        "orgUnitParentMap": {},
+        "startedAt": "2025-09-27T05:57:52.575Z",
+        "totalChunks": 1,
+        "updatedAt": "2025-09-27T05:57:53.885Z"
+      },
+      "lastProcessedAt": "2025-09-27T05:57:56.703Z",
+      "lastSeenAt": "2025-09-27T05:57:51.573Z",
+      "mtime": 1758758600000,
+      "orgUnitParentMap": {},
+      "path": "/data/samples/pepfar/PEPFAR_TxCURR_2025_Q2_Cleaned_v3_20250805160300.csv",
+      "processed": false,
+      "size": 150042,
+      "status": "metadata-ready",
+      "totalChunks": 1
+    }
+  },
+  "hasFileToProcess": true,
+  "lock": {
+    "acquiredAt": "2025-09-27T05:57:51.446Z",
+    "expiresAt": "2025-09-27T06:07:51.446Z",
+    "key": "workflow-lock",
+    "owner": "openfn-e0f3f05f99e6a"
+  },
+  "metadataMappings": {},
+  "metadataParsed": true,
+  "metadataSetupComplete": true,
+  "totalChunks": 1,
+  "totalRows": 780,
+  "workflow-owner": "openfn-e0f3f05f99e6a",
+  "workflowLock": {
+    "acquiredAt": "2025-09-27T05:57:51.446Z",
+    "expiresAt": "2025-09-27T06:07:51.446Z",
+    "key": "workflow-lock",
+    "owner": "openfn-e0f3f05f99e6a"
+  }
+}

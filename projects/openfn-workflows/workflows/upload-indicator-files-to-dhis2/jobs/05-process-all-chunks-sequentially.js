@@ -4,9 +4,6 @@
  * Workflow position: 5/5 (final processing + cleanup). Native state tracks progress/resume info.
  */
 
-// No external imports; rely on adaptor operations provided by the runtime
-import { getExcelChunk, execute as executeWithSftp } from '@openfn/language-sftp';
-import { create as dhis2Create } from '@openfn/language-dhis2';
 
 executeWithSftp(
   fn(async state => {
@@ -20,6 +17,9 @@ executeWithSftp(
 
     console.log(`🚀 Job 4: Starting batch processing (${fileType})`);
     console.log(`📊 Total chunks: ${totalChunks}, chunk size: ${chunkSize}`);
+
+    // Preserve DHIS2 configuration explicitly for later upload calls
+    state.__dhis2Config = state.configuration;
 
     await updateIndex(state, fileName, {
       status: 'processing',
@@ -35,13 +35,15 @@ executeWithSftp(
         number: i + 1,
         size: chunkSize,
         filePath,
+        fileName,
         totalChunks,
         fileType,
         dhis2Mappings,
         fileTypeConfig: state.fileTypeConfig,
         metadataMappings: state.metadataMappings,
         config: state.config,
-        configuration: state.configuration
+        configuration: state.configuration,
+        dhis2Config: state.__dhis2Config
       });
     }
 
@@ -50,97 +52,201 @@ executeWithSftp(
     state.batchProcessingStartTime = new Date().toISOString();
     state.data = {
       ...state.data,
-      chunks
+        chunks
     };
 
     return state;
   }),
 
   each('chunks[*]', fn(async state => {
-    const chunk = state.data;
+      const chunk = state.data;
     const { index, filePath, size, totalChunks, fileType, dhis2Mappings, fileTypeConfig, metadataMappings } = chunk;
+      
+      console.log(`📦 Processing chunk ${index + 1}/${totalChunks}`);
+    
+    // Determine dataset periodType from DHIS2 (fallback to config)
+    const cfgForDhis = chunk.dhis2Config || state.__dhis2Config || state.configuration;
+    let datasetPeriodType = (fileTypeConfig && fileTypeConfig.dhis2Config && fileTypeConfig.dhis2Config.periodType) || null;
+    try {
+      if (dhis2Mappings && dhis2Mappings.dataSetId) {
+        const dsState = await get(`dataSets/${dhis2Mappings.dataSetId}`, { fields: 'id,periodType,openFuturePeriods' })({
+          ...state,
+          configuration: cfgForDhis
+        });
+        datasetPeriodType = dsState?.data?.periodType || datasetPeriodType;
+        const ofp = dsState?.data?.openFuturePeriods;
+        if (datasetPeriodType) console.log(`   ℹ️ Using dataset periodType=${datasetPeriodType}${ofp !== undefined ? ", openFuturePeriods=" + ofp : ''}`);
+      }
+    } catch (e) {
+      // best-effort only
+    }
+    if (!datasetPeriodType) datasetPeriodType = 'Monthly';
 
-    console.log(`📦 Processing chunk ${index + 1}/${totalChunks}`);
-
+    // Determine period derivation strategy
+    const periodSource = (fileTypeConfig && fileTypeConfig.dhis2Config && fileTypeConfig.dhis2Config.periodSource) || 'filename';
+    const fixedPeriodRaw = (fileTypeConfig && fileTypeConfig.dhis2Config && fileTypeConfig.dhis2Config.fixedPeriod) || null;
+    const filename = state.fileName || chunk.fileName || '';
+    let derivedPeriod = null;
+    if (periodSource === 'fixed' && fixedPeriodRaw) {
+      derivedPeriod = String(fixedPeriodRaw);
+    } else if (periodSource === 'filename') {
+      try {
+        // Default pattern: ..._<YYYY>_Q<q>_...
+        const m = filename.match(/_(\d{4})_Q([1-4])_/i);
+        if (m) derivedPeriod = `${m[1]}Q${m[2]}`;
+      } catch (_) {}
+    }
+    const overridePeriod = derivedPeriod ? normalizePeriodForPeriodType(derivedPeriod, datasetPeriodType) : null;
+    if (overridePeriod) {
+      console.log(`   ℹ️ Using override period from ${periodSource}: ${overridePeriod} (dataset periodType=${datasetPeriodType})`);
+    }
+    // Period consistency check
+    try {
+      if (periodSource === 'fixed' && fixedPeriodRaw) {
+        const fromFilename = (state.fileName || '').match(/_(\d{4})_Q([1-4])_/i);
+        if (fromFilename) {
+          const fnPeriod = `${fromFilename[1]}Q${fromFilename[2]}`;
+          if (normalizePeriodForPeriodType(fnPeriod, datasetPeriodType) !== overridePeriod) {
+            console.log(`   ⚠️ Period mismatch: fixed=${overridePeriod}, filename=${fnPeriod}`);
+          }
+        }
+      }
+    } catch (_) {}
+    
     let records;
+    const headerMapFromIndex = (state.filesIndex && state.fileName && state.filesIndex[state.fileName] && state.filesIndex[state.fileName].headerMap) || {};
+    const headerMap = (chunk.fileTypeConfig && chunk.fileTypeConfig.headerMap) || headerMapFromIndex || {};
     if (fileType === 'xlsx') {
       const chunkState = await getExcelChunk(filePath, index, size)(state);
       records = normalizeXlsxChunk(chunkState.chunkData, fileTypeConfig);
     } else if (fileType === 'csv') {
       const csvState = await getCsvChunk(filePath, index, size)({ ...state, configuration: state.configuration });
-      records = csvState.chunkData.map(row => {
-        const normalized = {};
-        Object.keys(row).forEach(header => {
-          const normalizedHeader = normalizeHeader(header, chunk.fileTypeConfig?.headerMap || {});
-          normalized[normalizedHeader] = row[header];
-        });
-        return normalized;
-      });
+      records = csvState.chunkData.map(row => applyHeaderMap(row, headerMap));
     } else {
       throw new Error(`Unsupported fileType '${fileType}' in chunk processing`);
     }
 
     if (!records || records.length === 0) {
       console.log('   ⚠️ Chunk empty; skipping upload');
-      return {
-        chunkIndex: index,
-        uploadSuccess: true,
-        rowsProcessed: 0,
-        dataValuesUploaded: 0,
+          return {
+            chunkIndex: index,
+            uploadSuccess: true,
+            rowsProcessed: 0,
+            dataValuesUploaded: 0,
         message: 'Empty chunk'
       };
     }
 
-    const dataValues = buildDataValues(records, fileTypeConfig, dhis2Mappings, metadataMappings);
+    const useCodeSchemeForValues = !dhis2Mappings.dataElements || Object.keys(dhis2Mappings.dataElements).length === 0;
+    const useNameOrgUnitsForValues = !dhis2Mappings.orgUnits || Object.keys(dhis2Mappings.orgUnits).length === 0;
+    // Drop rows that look like headers even after normalization
+    const headerGuarded = records.filter(r => !isHeaderLikeRow(r, fileTypeConfig, headerMap));
+    const dataValues = buildDataValues(
+      headerGuarded,
+      fileTypeConfig,
+      dhis2Mappings,
+      metadataMappings,
+      { useCodeScheme: useCodeSchemeForValues, useNameOrgUnits: useNameOrgUnitsForValues, headerMap, periodType: datasetPeriodType, overridePeriod }
+    );
+    try {
+      const samplePeriods = Array.from(new Set(dataValues.slice(0, 50).map(v => v.period))).slice(0, 3);
+      console.log(`   ℹ️ Sample mapped periods: ${samplePeriods.join(', ')}`);
+    } catch (_) {}
     if (dataValues.length === 0) {
+      // Log first 3 mapped rows to help troubleshooting
+      try {
+        const preview = records.slice(0, 3).map(r => mapColumns(r, fileTypeConfig.columnMappings || {}, metadataMappings, { headerMap }));
+        console.log('   🔎 Preview first 3 mapped rows:', JSON.stringify(preview, null, 2));
+        console.log('   🔎 dhis2Mappings summary:', {
+          de: Object.keys(dhis2Mappings.dataElements || {}).length,
+          ou: Object.keys(dhis2Mappings.orgUnits || {}).length,
+          coc: Object.keys(dhis2Mappings.categoryOptionCombos || {}).length,
+          dataSetId: dhis2Mappings.dataSetId || null
+        });
+      } catch (e) {}
       console.log('   ⚠️ No valid data values built');
-      return {
-        chunkIndex: index,
-        uploadSuccess: true,
+          return {
+            chunkIndex: index,
+            uploadSuccess: true,
         rowsProcessed: records.length,
-        dataValuesUploaded: 0,
+            dataValuesUploaded: 0,
         message: 'No valid data values'
       };
     }
 
-    const payload = {
-      dataValues,
-      dataSet: dhis2Mappings.dataSetId || undefined
+    // If data elements are unmapped, attempt a code-based upload path
+    const useCodeScheme = !dhis2Mappings.dataElements || Object.keys(dhis2Mappings.dataElements).length === 0;
+    // Prefer UID scheme if we have orgUnit mappings
+    const haveOrgUnitUIDs = dhis2Mappings.orgUnits && Object.keys(dhis2Mappings.orgUnits).length > 0;
+    const useNameOrgUnits = !haveOrgUnitUIDs;
+    const payload = { dataValues, dataSet: dhis2Mappings.dataSetId || undefined };
+    // Build upload options via query params (safer than embedding in path)
+    const uploadQuery = {
+      importStrategy: 'CREATE_AND_UPDATE',
+      skipExistingCheck: true,
+      ...(useCodeScheme ? { dataElementIdScheme: 'CODE' } : {}),
+      ...(useNameOrgUnits ? { orgUnitIdScheme: 'NAME' } : { orgUnitIdScheme: 'UID' })
     };
 
-    const uploadState = await dhis2Create('dataValueSets?importStrategy=CREATE_AND_UPDATE&skipExistingCheck=true', payload)({
-      configuration: chunk.configuration || state.configuration,
-      data: payload
-    });
+    try {
+      const uploadState = await create('dataValueSets', payload, { query: uploadQuery })({
+        ...state,
+        configuration: cfgForDhis,
+        data: payload
+      });
 
-    await updateIndex(state, state.fileName, {
-      lastSuccessfulChunk: index,
-      lastChunkUploadedAt: new Date().toISOString()
-    });
-
-    return {
-      chunkIndex: index,
-      uploadSuccess: true,
-      rowsProcessed: records.length,
-      dataValuesUploaded: dataValues.length,
-      dhis2Response: uploadState?.data || uploadState?.response || uploadState,
-      message: `Uploaded ${dataValues.length} data values`
-    };
+      await updateIndex(state, state.fileName, {
+        lastSuccessfulChunk: index,
+        lastChunkUploadedAt: new Date().toISOString()
+      });
+          
+          return {
+            chunkIndex: index,
+            uploadSuccess: true,
+        rowsProcessed: records.length,
+        dataValuesUploaded: dataValues.length,
+        dhis2Response: uploadState?.data || uploadState?.response || uploadState,
+        message: `Uploaded ${dataValues.length} data values`
+      };
+    } catch (error) {
+      // Condense DHIS2 conflicts for readability
+      let condensed = {};
+      try {
+        const body = error?.body || error?.data || {};
+        const conflicts = body?.response?.conflicts || [];
+        const byCode = conflicts.reduce((acc, c) => {
+          const code = c.errorCode || 'UNKNOWN';
+          const count = Array.isArray(c.indexes) ? c.indexes.length : 1;
+          acc[code] = (acc[code] || 0) + count;
+          return acc;
+        }, {});
+        condensed = { error: error?.message, codes: byCode, sample: conflicts[0] ? { errorCode: conflicts[0].errorCode, object: conflicts[0].object, property: conflicts[0].property, value: conflicts[0].value } : undefined };
+      } catch (_) {}
+      console.log(`   ⚠️ Upload failed (condensed): ${JSON.stringify(condensed)}`);
+          return {
+            chunkIndex: index,
+            uploadSuccess: false,
+        rowsProcessed: records.length,
+            dataValuesUploaded: 0,
+        dhis2Error: condensed,
+        message: 'Upload failed with conflicts'
+      };
+    }
   })),
 
   fn(async state => {
     const results = state.references || [];
     const successfulChunks = results.filter(r => r.uploadSuccess);
     const failedChunks = results.filter(r => !r.uploadSuccess);
-
+    
     const totalRowsProcessed = results.reduce((sum, r) => sum + (r.rowsProcessed || 0), 0);
     const totalDataValuesUploaded = results.reduce((sum, r) => sum + (r.dataValuesUploaded || 0), 0);
-
+    
     console.log(`✅ Job 4 Complete: ${successfulChunks.length}/${results.length} chunks succeeded`);
     if (failedChunks.length > 0) {
       console.log(`⚠️  Failed chunks: ${failedChunks.map(c => c.chunkIndex + 1).join(', ')}`);
     }
-
+    
     await updateIndex(state, state.fileName, {
       summary: {
         totalChunks: results.length,
@@ -157,7 +263,8 @@ executeWithSftp(
     state.workflowLock = null;
     state.lock = null;
 
-    state.batchProcessingComplete = failedChunks.length === 0;
+    const hadAnyValues = totalDataValuesUploaded > 0;
+    state.batchProcessingComplete = failedChunks.length === 0 && hadAnyValues;
     state.summary = {
       totalChunks: results.length,
       successfulChunks: successfulChunks.length,
@@ -169,6 +276,9 @@ executeWithSftp(
     delete state.chunks;
     delete state.chunkResults;
 
+    if (!hadAnyValues) {
+      throw new Error('No data values uploaded');
+    }
     return state;
   })
 );
@@ -194,34 +304,90 @@ function normalizeXlsxChunk(chunkData, fileTypeConfig) {
 
 // removed readCsvChunk; CSV handled via adaptor getCsvChunk()
 
-function buildDataValues(records, fileTypeConfig, dhis2Mappings, metadataMappings) {
+function buildDataValues(records, fileTypeConfig, dhis2Mappings, metadataMappings, options = {}) {
   const values = [];
   const mappings = fileTypeConfig.columnMappings || {};
+  const useCodeScheme = Boolean(options.useCodeScheme);
+  const useNameOrgUnits = Boolean(options.useNameOrgUnits);
+  const headerMap = options.headerMap || {};
+  const periodType = (fileTypeConfig && fileTypeConfig.dhis2Config && fileTypeConfig.dhis2Config.periodType) || 'Monthly';
+  const overridePeriod = options.overridePeriod || null;
 
   for (const record of records) {
-    const mappedRow = mapColumns(record, mappings, metadataMappings, {
-      headerMap: fileTypeConfig.headerMap || {}
-    });
+    const mappedRow = mapColumns(record, mappings, metadataMappings, { headerMap });
 
+    // Skip rows that look like headers or lack required fields
+    if (isHeaderMappedRow(mappedRow)) continue;
     const orgUnitName = mappedRow.orgUnit;
-    const dataElementCode = generateCodeFromName(mappedRow.dataElement);
+    // Prefer explicit code mapping if present; fallback to generated code from name
+    const dataElementCode = mappedRow.dataElementCode || getCodeFromName(mappedRow.dataElement);
     const categoryKey = [mappedRow.categoryOptions?.hsector, mappedRow.categoryOptions?.reportingPeriodType]
       .filter(Boolean)
       .join('+');
 
-    const dataElement = dhis2Mappings.dataElements[dataElementCode];
-    const orgUnit = dhis2Mappings.orgUnits[orgUnitName];
-    const categoryOptionCombo = dhis2Mappings.categoryOptionCombos[categoryKey] || dhis2Mappings.categoryOptionCombos[`hsector:${mappedRow.categoryOptions?.hsector}`] || dhis2Mappings.categoryOptionCombos[categoryKey];
+    const mappedDataElement = dhis2Mappings.dataElements?.[dataElementCode] || dhis2Mappings.dataElements?.[getCodeFromName(mappedRow.dataElement)];
+    const mappedOrgUnit = dhis2Mappings.orgUnits?.[orgUnitName] || dhis2Mappings.orgUnits?.[getCodeFromName(orgUnitName)];
+    const dataElement = mappedDataElement || (useCodeScheme ? dataElementCode : undefined);
+    const orgUnit = mappedOrgUnit || (useNameOrgUnits ? orgUnitName : undefined);
+    const categoryOptionCombo = (dhis2Mappings.categoryOptionCombos?.[categoryKey]
+      || dhis2Mappings.categoryOptionCombos?.[`hsector:${mappedRow.categoryOptions?.hsector}`]
+      || dhis2Mappings.categoryOptionCombos?.[categoryKey]) || 'HllvX50cXC0';
 
     if (!dataElement || !orgUnit) {
       continue;
     }
 
+    // Handle period transformation - if it's a timestamp, extract YYYYMM
+    let period = mappedRow.period;
+    console.log(`   🔍 Period debug: "${period}" (type: ${typeof period})`);
+    if (period && typeof period === 'string' && (period.includes('T') || period.includes(' '))) {
+      // It's a timestamp, extract YYYYMM
+      const date = new Date(period);
+      if (!isNaN(date.getTime())) {
+        const year = date.getUTCFullYear();
+        const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+        period = `${year}${month}`;
+        console.log(`   🔄 Period transformed: ${mappedRow.period} → ${period}`);
+      } else {
+        console.log(`   ⚠️ Period looks like timestamp but couldn't parse: ${period}`);
+      }
+    } else {
+      console.log(`   ℹ️ Period doesn't look like timestamp: ${period}`);
+    }
+    
+    // If this is a PEPFAR MMD file-type, emit up to three rows for durations
+    if (String(fileTypeConfig?.fileType || '').startsWith('pepfar_tx_mmd_csv')) {
+      const durations = [
+        { key: 'mmd_lt3', label: '<3 months' },
+        { key: 'mmd_3to5', label: '3-5 months' },
+        { key: 'mmd_ge6', label: '>=6 months' }
+      ];
+      for (const d of durations) {
+        const val = mappedRow[d.key];
+        if (val !== undefined && val !== null && String(val).trim() !== '') {
+          const normalizedForDataset = normalizePeriodForPeriodType(overridePeriod || normalizePeriod(period), periodType);
+          const cocKey = `mmdDuration:${d.label}`;
+          const coc = dhis2Mappings.categoryOptionCombos?.[cocKey]
+            || dhis2Mappings.categoryOptionCombos?.[`mmd:${d.label}`]
+            || categoryOptionCombo;
+          values.push({
+            dataElement,
+            period: normalizedForDataset,
+            orgUnit,
+            categoryOptionCombo: coc,
+            value: String(val)
+          });
+        }
+      }
+      continue;
+    }
+
+    const normalizedForDataset = normalizePeriodForPeriodType(overridePeriod || normalizePeriod(period), periodType);
     values.push({
       dataElement,
-      period: mappedRow.period,
+      period: normalizedForDataset,
       orgUnit,
-      categoryOptionCombo: categoryOptionCombo || 'HllvX50cXC0',
+      categoryOptionCombo,
       value: mappedRow.value !== undefined && mappedRow.value !== null ? String(mappedRow.value) : '0'
     });
   }
@@ -232,14 +398,13 @@ function buildDataValues(records, fileTypeConfig, dhis2Mappings, metadataMapping
 function normalizeHeader(header, headerMap = {}) {
   return headerMap[header] || headerMap[header?.toLowerCase?.()] || header;
 }
-
-function generateCodeFromName(name) {
-  return String(name || '')
-    .toUpperCase()
-    .replace(/[^A-Z0-9]/g, '_')
-    .replace(/_+/g, '_')
-    .replace(/^_|_$/g, '')
-    .substring(0, 50);
+function applyHeaderMap(row, headerMap = {}) {
+  const normalized = {};
+  Object.keys(row || {}).forEach(header => {
+    const normalizedHeader = normalizeHeader(header, headerMap);
+    normalized[normalizedHeader] = row[header];
+  });
+  return normalized;
 }
 
 function mapColumns(record, mappings, metadataMappings, options = {}) {
@@ -268,6 +433,75 @@ function mapColumns(record, mappings, metadataMappings, options = {}) {
   return out;
 }
 
+function normalizePeriod(p) {
+  // Delegated to adaptor util; fallback kept in case state.environment lacks util
+  const util = (globalThis && globalThis.util) || {};
+  const fn = util.normalizePeriod;
+  if (typeof fn === 'function') return fn(p);
+  if (!p) return p;
+  const s = String(p);
+  const yyyymm = s.match(/^(\d{6})$/);
+  if (yyyymm) return yyyymm[1];
+  const iso = Date.parse(s);
+  if (!Number.isNaN(iso)) {
+    const d = new Date(iso);
+    const y = d.getUTCFullYear();
+    const m = String(d.getUTCMonth() + 1).padStart(2, '0');
+    return `${y}${m}`;
+  }
+  const q = s.match(/^(\d{4})Q([1-4])$/i);
+  if (q) {
+    const year = q[1];
+    const quarter = Number(q[2]);
+    const month = (quarter - 1) * 3 + 1;
+    return `${year}${String(month).padStart(2, '0')}`;
+  }
+  return s;
+}
+
+// Ensure period string matches dataset periodType (e.g., Quarterly expects YYYYQn)
+function normalizePeriodForPeriodType(period, periodType) {
+  const s = String(period || '').trim();
+  if (!s) return s;
+  const pt = String(periodType || 'Monthly').toLowerCase();
+
+  if (pt === 'quarterly') {
+    // If already in YYYYQn format, return as is
+    const q = s.match(/^(\d{4})Q([1-4])$/i);
+    if (q) return `${q[1]}Q${q[2]}`.toUpperCase();
+    // If monthly YYYYMM, convert to quarter code
+    const m = s.match(/^(\d{4})(\d{2})$/);
+    if (m) {
+      const year = m[1];
+      const month = Number(m[2]);
+      const quarter = Math.floor((month - 1) / 3) + 1;
+      return `${year}Q${quarter}`;
+    }
+    // If ISO date, convert to quarter
+    const t = Date.parse(s);
+    if (!Number.isNaN(t)) {
+      const d = new Date(t);
+      const year = d.getUTCFullYear();
+      const quarter = Math.floor(d.getUTCMonth() / 3) + 1;
+      return `${year}Q${quarter}`;
+    }
+  }
+  // Default: return as-is (Monthly, etc.)
+  return s;
+}
+
+function getCodeFromName(name) {
+  const util = (globalThis && globalThis.util) || {};
+  const fn = util.generateCodeFromName;
+  if (typeof fn === 'function') return fn(name);
+  return String(name || '')
+    .toUpperCase()
+    .replace(/[^A-Z0-9]/g, '_')
+    .replace(/_+/g, '_')
+    .replace(/^_|_$/g, '')
+    .substring(0, 50);
+}
+
 async function updateIndex(state, fileName, patch) {
   const filesIndex = state.filesIndex || {};
   filesIndex[fileName] = {
@@ -275,4 +509,33 @@ async function updateIndex(state, fileName, patch) {
     ...patch
   };
   state.filesIndex = filesIndex;
+} 
+
+// Guard: detect header-like rows from raw records
+function isHeaderLikeRow(record, fileTypeConfig, headerMap = {}) {
+  const headers = Object.keys(headerMap || {});
+  if (headers.length === 0) return false;
+  const normalized = {};
+  Object.keys(record || {}).forEach(k => {
+    const mapped = normalizeHeader(k, headerMap || {});
+    normalized[mapped] = record[k];
+  });
+  const sample = {
+    facility: 'facility',
+    dataElement: 'indicator',
+    period: 'Date_Submitted',
+  };
+  const looksLikeHeader =
+    (String(normalized.facility || '').trim().toLowerCase() === sample.facility) ||
+    (String(normalized.dataElement || '').trim().toLowerCase() === sample.dataElement) ||
+    (String(normalized.period || '').trim() === sample.period);
+  return looksLikeHeader;
+}
+
+// Guard: detect header-like rows after mapping
+function isHeaderMappedRow(mappedRow) {
+  const facilityIsHeader = String(mappedRow.orgUnit || '').trim().toLowerCase() === 'facility';
+  const indicatorIsHeader = String(mappedRow.dataElement || '').trim().toLowerCase() === 'indicator';
+  const periodIsHeader = String(mappedRow.period || '').trim() === 'Date_Submitted';
+  return facilityIsHeader || indicatorIsHeader || periodIsHeader;
 } 

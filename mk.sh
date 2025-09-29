@@ -14,8 +14,8 @@
 ./instant package init -n database-postgres -d
 
 
-#./instant package destroy -n dhis2-instance
-# ./instant package init -n dhis2-instance -d --env-file .env
+./instant package destroy -n dhis2-instance
+./instant package init -n dhis2-instance -d 
 # ./instant package up -n dhis2-instance -d --env-file .env
 # ./instant package down -n dhis2-instance -d --env-file .env
 

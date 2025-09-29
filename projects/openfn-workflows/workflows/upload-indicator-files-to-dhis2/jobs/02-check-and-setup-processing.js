@@ -7,7 +7,6 @@
 // Input:  { config, lock, filesIndex, fileName?, filePath?, fileType?, fileTypeConfigKey?, ... }
 // Output: { targetFileFound, fileName, filePath, fileType, fileTypeConfig, metadataMappings, config, filesIndex }
 
-// No external imports; inline minimal file-type configs and helpers
 const FILE_TYPE_CONFIGS = {
   art_data_long_format: {
     fileType: 'art_data_long_format',
@@ -16,149 +15,243 @@ const FILE_TYPE_CONFIGS = {
     filePatterns: ['*ART*data*long*.xlsx', '*ART*data*long*.csv', 'ART_data_long_format.xlsx'],
     sheetConfig: { targetSheet: 0, headerRow: 1, dataStartRow: 2 },
     columnMappings: {
-      facility: { sourceColumns: ['Facility','facility','Health Facility','Site'], targetField: 'orgUnit', required: true },
-      indicator: { sourceColumns: ['Indicator','indicator','Indicator Name','Data Element'], targetField: 'dataElement', required: true },
-      value: { sourceColumns: ['Value','value','Count','Total','Result'], targetField: 'value', required: true, dataType: 'numeric' },
-      period: { sourceColumns: ['Period','period','Month','Quarter','Reporting Period'], targetField: 'period', required: true, format: 'YYYYMM' },
+      facility: { sourceColumns: ['Facility','facility','Health Facility','Site','site','Site Name'], targetField: 'orgUnit', required: true },
+      indicator: { sourceColumns: ['Indicator','indicator','Indicator Name','Data Element','TX_CURR','TX_CURR_MMD'], targetField: 'dataElement', required: true },
+      value: { sourceColumns: ['Value','value','Count','Total','Result','tx_curr'], targetField: 'value', required: true, dataType: 'numeric' },
+      period: { sourceColumns: ['Period','period','Month','Quarter','Reporting Period','Date_Submitted'], targetField: 'period', required: true, format: 'YYYYMM' },
+      hsector: { sourceColumns: ['hsector','Health Sector'], targetField: 'categoryOptions.hsector', required: false },
+      reportingPeriodType: { sourceColumns: ['reportingPeriodType','Reporting Period Type'], targetField: 'categoryOptions.reportingPeriodType', required: false }
+    },
+    headerMap: {
+      site_id: 'site_id',
+      facility: 'facility',
+      indicator: 'indicator',
+      sex: 'sex',
+      age_group: 'age_group',
+      Date_Submitted: 'Date_Submitted',
+      tx_curr: 'tx_curr'
+    },
+    uniqueValueCollectors: {
+      sites: { targetField: 'orgUnit' },
+      indicators: { targetField: 'dataElement' },
+      reportingPeriods: { targetField: 'categoryOptions.reportingPeriodType' },
+      hsectors: { targetField: 'categoryOptions.hsector' }
+    },
+    builders: { dataElements: { uniqueValueKey: 'indicators', valueType: 'INTEGER', aggregationType: 'SUM', domainType: 'AGGREGATE' } },
+    dhis2Builder: 'default',
+    dhis2Config: {
+      periodType: 'Quarterly',
+      periodSource: 'filename',
+      openFuturePeriods: 4
+    }
+  },
+  pepfar_tx_curr_csv: {
+    fileType: 'pepfar_tx_curr_csv',
+    displayName: 'PEPFAR TxCURR CSV',
+    description: 'PEPFAR CSV for TX_CURR indicator',
+    filePatterns: ['^PEPFAR_TxCURR_.*\\.(csv)(\\.csv)?$'],
+    columnMappings: {
+      facility: { sourceColumns: ['facility','Facility','Health Facility','Site','site','Site Name'], targetField: 'orgUnit', required: true },
+      indicator: { sourceColumns: ['indicator','Indicator','TX_CURR'], targetField: 'dataElement', required: true },
+      sex: { sourceColumns: ['sex','Sex'], targetField: 'categoryOptions.sex', required: false },
+      age_group: { sourceColumns: ['age_group','Age Group','Age'], targetField: 'categoryOptions.ageGroup', required: false },
+      Date_Submitted: { sourceColumns: ['Date_Submitted'], targetField: 'period', required: true },
+      value: { sourceColumns: ['tx_curr','Value','value'], targetField: 'value', required: true, dataType: 'numeric' }
+    },
+    headerMap: {
+      site_id: 'site_id',
+      facility: 'facility',
+      indicator: 'indicator',
+      sex: 'sex',
+      age_group: 'age_group',
+      Date_Submitted: 'Date_Submitted',
+      tx_curr: 'tx_curr'
+    },
+    dhis2Config: {
+      periodType: 'Quarterly',
+      periodSource: 'filename',
+      openFuturePeriods: 4
+    }
+  },
+  pepfar_tx_mmd_csv: {
+    fileType: 'pepfar_tx_mmd_csv',
+    displayName: 'PEPFAR TxCURR MMD CSV',
+    description: 'PEPFAR CSV for TX_CURR_MMD indicator (MMD durations)',
+    filePatterns: ['^PEPFAR_TxCURRMMD_.*\\.(csv)(\\.csv)?$'],
+    columnMappings: {
+      facility: { sourceColumns: ['facility','Facility','Health Facility','Site','site','Site Name'], targetField: 'orgUnit', required: true },
+      indicator: { sourceColumns: ['indicator','Indicator','TX_CURR_MMD'], targetField: 'dataElement', required: true },
+      sex: { sourceColumns: ['sex','Sex'], targetField: 'categoryOptions.sex', required: false },
+      age_group: { sourceColumns: ['age_group','Age Group','Age'], targetField: 'categoryOptions.ageGroup', required: false },
+      Date_Submitted: { sourceColumns: ['Date_Submitted'], targetField: 'period', required: true },
+      mmd_lt3: { sourceColumns: ['# of clients on <3 months of ARVs'], targetField: 'mmd_lt3', required: false, dataType: 'numeric' },
+      mmd_3to5: { sourceColumns: ['# of clients on 3 - 5 months of ARVs'], targetField: 'mmd_3to5', required: false, dataType: 'numeric' },
+      mmd_ge6: { sourceColumns: ['# of clients on >= 6 months of ARVs'], targetField: 'mmd_ge6', required: false, dataType: 'numeric' }
+    },
+    headerMap: {
+      site_id: 'site_id',
+      facility: 'facility',
+      indicator: 'indicator',
+      sex: 'sex',
+      age_group: 'age_group',
+      Date_Submitted: 'Date_Submitted',
+      '# of clients on <3 months of ARVs': '# of clients on <3 months of ARVs',
+      '# of clients on 3 - 5 months of ARVs': '# of clients on 3 - 5 months of ARVs',
+      '# of clients on >= 6 months of ARVs': '# of clients on >= 6 months of ARVs'
+    },
+    dhis2Config: {
+      periodType: 'Quarterly',
+      periodSource: 'filename',
+      openFuturePeriods: 4
+    }
+  },
+  pepfar_tx_ml_csv: {
+    fileType: 'pepfar_tx_ml_csv',
+    displayName: 'PEPFAR TxML CSV',
+    description: 'PEPFAR CSV for TX_ML indicator',
+    filePatterns: ['^PEPFAR_TxML_.*\\.(csv)(\\.csv)?$'],
+    columnMappings: {
+      facility: { sourceColumns: ['facility','Facility','Health Facility','Site','site','Site Name'], targetField: 'orgUnit', required: true },
+      indicator: { sourceColumns: ['indicator','Indicator','TX_ML'], targetField: 'dataElement', required: true },
+      sex: { sourceColumns: ['sex','Sex'], targetField: 'categoryOptions.sex', required: false },
+      age_group: { sourceColumns: ['age_group','Age Group','Age'], targetField: 'categoryOptions.ageGroup', required: false },
+      Date_Submitted: { sourceColumns: ['Date_Submitted'], targetField: 'period', required: true },
+      value: { sourceColumns: ['value','Value'], targetField: 'value', required: true, dataType: 'numeric' }
+    },
+    headerMap: {
+      site_id: 'site_id',
+      facility: 'facility',
+      indicator: 'indicator',
+      sex: 'sex',
+      age_group: 'age_group',
+      Date_Submitted: 'Date_Submitted'
+    },
+    dhis2Config: {
+      periodType: 'Quarterly',
+      periodSource: 'filename',
+      openFuturePeriods: 4
+    }
+  },
+  pepfar_tx_new_csv: {
+    fileType: 'pepfar_tx_new_csv',
+    displayName: 'PEPFAR TxNEW CSV',
+    description: 'PEPFAR CSV for TX_NEW indicator',
+    filePatterns: ['^PEPFAR_TxNEW_.*\\.(csv)(\\.csv)?$'],
+    columnMappings: {
+      facility: { sourceColumns: ['facility','Facility','Health Facility','Site','site','Site Name'], targetField: 'orgUnit', required: true },
+      indicator: { sourceColumns: ['indicator','Indicator','TX_NEW'], targetField: 'dataElement', required: true },
+      sex: { sourceColumns: ['sex','Sex'], targetField: 'categoryOptions.sex', required: false },
+      age_group: { sourceColumns: ['age_group','Age Group','Age'], targetField: 'categoryOptions.ageGroup', required: false },
+      Date_Submitted: { sourceColumns: ['Date_Submitted'], targetField: 'period', required: true },
+      value: { sourceColumns: ['value','Value'], targetField: 'value', required: true, dataType: 'numeric' }
+    },
+    headerMap: {
+      site_id: 'site_id',
+      facility: 'facility',
+      indicator: 'indicator',
+      sex: 'sex',
+      age_group: 'age_group',
+      Date_Submitted: 'Date_Submitted'
+    },
+    dhis2Config: {
+      periodType: 'Quarterly',
+      periodSource: 'filename',
+      openFuturePeriods: 4
+    }
+  },
+  pepfar_tx_rtt_csv: {
+    fileType: 'pepfar_tx_rtt_csv',
+    displayName: 'PEPFAR TxRTT CSV',
+    description: 'PEPFAR CSV for TX_RTT indicator',
+    filePatterns: ['^PEPFAR_TxRTT_.*\\.(csv)(\\.csv)?$'],
+    columnMappings: {
+      facility: { sourceColumns: ['facility','Facility','Health Facility','Site','site','Site Name'], targetField: 'orgUnit', required: true },
+      indicator: { sourceColumns: ['indicator','Indicator','TX_RTT'], targetField: 'dataElement', required: true },
+      sex: { sourceColumns: ['sex','Sex'], targetField: 'categoryOptions.sex', required: false },
+      age_group: { sourceColumns: ['age_group','Age Group','Age'], targetField: 'categoryOptions.ageGroup', required: false },
+      Date_Submitted: { sourceColumns: ['Date_Submitted'], targetField: 'period', required: true },
+      value: { sourceColumns: ['value','Value'], targetField: 'value', required: true, dataType: 'numeric' }
+    },
+    headerMap: {
+      site_id: 'site_id',
+      facility: 'facility',
+      indicator: 'indicator',
+      sex: 'sex',
+      age_group: 'age_group',
+      Date_Submitted: 'Date_Submitted'
+    },
+    dhis2Config: {
+      periodType: 'Quarterly',
+      periodSource: 'filename',
+      openFuturePeriods: 4
+    }
+  },
+  moh_direct_queries: {
+    fileType: 'moh_direct_queries',
+    displayName: 'MoH Direct Queries Reports',
+    description: 'Mapping for MoH direct query reports (quarterly)',
+    filePatterns: ['*Direct*Queries*.xlsx', '*MoH*Reports*.xlsx', 'Direct Queries - Q1 2025 MoH Reports.xlsx'],
+    sheetConfig: { targetSheet: 0, headerRow: 1, dataStartRow: 2 },
+    columnMappings: {
+      orgUnit: { sourceColumns: ['Facility','facility','Health Facility','Site','Facility Name'], targetField: 'orgUnit', required: true },
+      dataElement: { sourceColumns: ['Indicator','indicator','Query','Data Element','Measure'], targetField: 'dataElement', required: true },
+      value: { sourceColumns: ['Value','value','Result','Count','Total'], targetField: 'value', required: true, dataType: 'numeric' },
+      period: { sourceColumns: ['Period','period','Quarter','Month','Reporting Period'], targetField: 'period', required: true, format: 'flexible' }
     },
     headerMap: {},
+    uniqueValueCollectors: {
+      sites: { targetField: 'orgUnit' },
+      indicators: { targetField: 'dataElement' }
+    },
     builders: { dataElements: { uniqueValueKey: 'indicators', valueType: 'INTEGER', aggregationType: 'SUM', domainType: 'AGGREGATE' } },
-    dhis2Builder: 'default'
+    dhis2Builder: 'default',
+    dhis2Config: {
+      periodType: 'Quarterly',
+      periodSource: 'filename',
+      openFuturePeriods: 4
+    }
   }
 };
 
 function loadFileTypeConfigs() { return FILE_TYPE_CONFIGS; }
 function loadMetadataMappings() { return {}; }
-function matchFileToConfig(fileName, configs) {
-  const name = String(fileName || '');
-  for (const key of Object.keys(configs)) {
-    const cfg = configs[key];
-    const patterns = (cfg.filePatterns || []).map(p => new RegExp('^' + p
-      .replace(/[-/\\^$+?.()|[\]{}]/g, '\\$&')
-      .replace(/\*/g, '.*') + '$', 'i'));
-    if (patterns.some(rx => rx.test(name))) return cfg;
-  }
-  return null;
-}
 
-const MASTER_CONFIG = {
-  directory: '/data/excel-files',
-  chunkSize: 5000,
-  maxLevels: 5,
-  fileTypeConfigKey: null,
-  columnMapping: {}
-};
-
-list('/data/excel-files', null, async state => {
+fn(async state => {
   console.log('📁 Job 1: Selecting target indicator file...');
 
   const params = state.params || {};
   const previousConfig = state.config || {};
-  const config = {
-    ...MASTER_CONFIG,
-    ...previousConfig,
-    ...params,
-    directory: params.directory || previousConfig.directory || MASTER_CONFIG.directory
+  const config = { ...previousConfig, ...params };
+
+  // Trust Job 0 selection
+  const selectedName = state.fileName || config.targetFile || null;
+  const selectedPath = state.filePath || null;
+  const selectedType = state.fileType || (selectedName ? inferFileType(selectedName) : null);
+  const selectedKey = state.fileTypeConfigKey || null;
+
+  if (!selectedName || !selectedPath || !selectedType || !selectedKey) {
+    throw new Error('Missing file selection from Job 0. Ensure Job 0 ran and set fileName, filePath, fileType, and fileTypeConfigKey.');
+  }
+
+  // Load canonical FILE_TYPE_CONFIGS defined in this job only (mapping/schema)
+  const fileTypeConfigs = loadFileTypeConfigs();
+  const fileTypeConfig = fileTypeConfigs[selectedKey];
+  if (!fileTypeConfig) {
+    throw new Error(`Unknown fileTypeConfigKey '${selectedKey}' from Job 0.`);
+  }
+
+  const metadataMappings = loadMetadataMappings();
+  
+  return { 
+    ...state,
+    fileName: selectedName,
+    filePath: selectedPath,
+    fileType: selectedType,
+    fileTypeConfigKey: selectedKey,
+    fileTypeConfig,
+    metadataMappings,
   };
-
-  const fileTypeConfigs = loadFileTypeConfigs({ params, config });
-  const metadataMappings = loadMetadataMappings({ params, config });
-
-  const filesIndex = { ...(state.filesIndex || {}) };
-
-  const searchDirectory = config.directory;
-  console.log(`🔧 Configuration:`);
-  console.log(`   • Search directory: ${searchDirectory}`);
-  console.log(`   • Chunk size: ${config.chunkSize}`);
-  console.log(`   • Max levels: ${config.maxLevels}`);
-
-  const allFiles = Array.isArray(state.data) ? state.data : [];
-  const candidateFiles = allFiles
-    .map(file => (typeof file === 'string' ? { name: file } : file))
-    .filter(file => {
-      const filename = file?.name;
-      if (!filename) return false;
-      const lower = filename.toLowerCase();
-      return lower.endsWith('.xlsx') || lower.endsWith('.csv') || lower.endsWith('.csv.csv');
-    })
-    .map(file => {
-      const name = file.name;
-      const match = fileTypeConfigs ? matchFileToConfig(name, fileTypeConfigs) : null;
-      return {
-        name,
-        path: `${searchDirectory}/${name}`,
-        fileType: inferFileType(name),
-        fileTypeConfigKey: match ? (match.fileType || match.fileTypeId) : null,
-        fileTypeConfig: match
-      };
-    })
-    .filter(file => file.fileTypeConfigKey);
-
-  console.log(`📄 Found ${candidateFiles.length} candidate files (.xlsx/.csv)`);
-
-  if (candidateFiles.length === 0) {
-    console.log('📭 No indicator files matched configured patterns');
-    return {
-      noFilesToProcess: true,
-      targetFileFound: false,
-      fileName: null,
-      filePath: null,
-      config,
-      filesIndex,
-      metadataMappings
-    };
-  }
-
-  let targetFile = null;
-  if (config.targetFile) {
-    targetFile = candidateFiles.find(file => file.name === config.targetFile);
-  } else if (config.targetFilePattern) {
-    const pattern = new RegExp(config.targetFilePattern, 'i');
-    targetFile = candidateFiles.find(file => pattern.test(file.name));
-  }
-
-  if (!targetFile) {
-    targetFile = candidateFiles[0];
-  }
-
-  if (!targetFile) {
-    console.log('❌ No candidate file selected after filtering');
-    return {
-      noFilesToProcess: true,
-      targetFileFound: false,
-      fileName: null,
-      filePath: null,
-      config,
-      filesIndex,
-      metadataMappings
-    };
-  }
-
-  console.log(`✅ Selected file: ${targetFile.name} (type=${targetFile.fileType})`);
-
-  const mergedConfig = {
-    ...config,
-    fileTypeConfigKey: targetFile.fileTypeConfigKey,
-    chunkSize: targetFile.fileTypeConfig?.chunkSize || config.chunkSize,
-    columnMapping: targetFile.fileTypeConfig?.columnMappings || config.columnMapping
-  };
-
-  state.targetFileFound = true;
-  state.noFilesToProcess = false;
-  state.fileName = targetFile.name;
-  state.filePath = targetFile.path;
-  state.fileType = targetFile.fileType;
-  state.fileTypeConfig = targetFile.fileTypeConfig;
-  state.metadataMappings = metadataMappings;
-  state.config = mergedConfig;
-  state.filesIndex = filesIndex;
-
-  // Trim transient listing data to keep inherited state lean
-  delete state.data;
-  delete state.references;
-
-  return state;
-});
+}); 
 
 function inferFileType(name) {
   const lower = String(name || '').toLowerCase();

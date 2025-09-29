@@ -52,13 +52,13 @@ workflows:
       cron-file-check:
         type: cron
         cron_expression: "*/5 * * * *"
-        enabled: true
+        enabled: false
         # Optional runtime params read by Job 01/02 (documented here for discoverability)
         params:
-          directory: "/data/excel-files"
+          directory: "/data"
           targetFilePatterns:
-            - "^ART_data.*\\.(xlsx|csv)(\\.csv)?$"
-          fileTypesEnabled: ["xlsx", "csv"]
+            - "^PEPFAR_TxCURR.*\\.(csv)(\\.csv)?$"
+          fileTypesEnabled: ["csv"]
           processingMode: "incremental"
           timeWindowMonths: 3
           maxConcurrentFiles: 1

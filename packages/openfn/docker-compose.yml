@@ -5,7 +5,18 @@ services:
     # 1. Executes the Lightning.Release.migrate() function to handle database migrations.
     # 2. Starts the Lightning application using the /app/bin/lightning start command.
     command: >
-      sh -c "/app/bin/lightning eval 'Lightning.Release.migrate()' && /app/bin/lightning start"
+      sh -lc '
+        export_from_secret() { var="$1"; path="$2"; [ -f "$path" ] && export "$var"="$(cat "$path")" || true; };
+        export_from_secret SECRET_KEY_BASE /run/secrets/openfn_secret_key_base;
+        export_from_secret PRIMARY_ENCRYPTION_KEY /run/secrets/openfn_primary_encryption_key;
+        export_from_secret WORKER_RUNS_PRIVATE_KEY /run/secrets/openfn_worker_runs_private_key;
+        export_from_secret WORKER_SECRET /run/secrets/openfn_worker_secret;
+        export_from_secret OPENFN_API_KEY /run/secrets/openfn_api_key;
+        export_from_secret OPENFN_ADMIN_PASSWORD /run/secrets/openfn_admin_password;
+        export_from_secret DATABASE_URL /run/secrets/openfn_database_url;
+        export_from_secret DHIS2_ADMIN_PASSWORD /run/secrets/dhis2_admin_password;
+        export_from_secret DHIS2_PASSWORD /run/secrets/dhis2_password;
+        /app/bin/lightning eval "Lightning.Release.migrate()" && /app/bin/lightning start'
     deploy:
       resources:
         limits:
@@ -27,6 +38,16 @@ services:
       - KAFKA_TRIGGERS_ENABLED=${OPENFN_KAFKA_TRIGGERS_ENABLED}
       - LOCAL_ADAPTORS=${LOCAL_ADAPTORS}
       - OPENFN_ADAPTORS_REPO=${OPENFN_ADAPTORS_REPO}
+    secrets:
+      - openfn_secret_key_base
+      - openfn_primary_encryption_key
+      - openfn_worker_runs_private_key
+      - openfn_worker_secret
+      - openfn_api_key
+      - openfn_admin_password
+      - openfn_database_url
+      - dhis2_admin_password
+      - dhis2_password
     healthcheck:
       test: '${DOCKER_WEB_HEALTHCHECK_TEST:-curl localhost:4000/health_check}'
       interval: '10s'
@@ -54,7 +75,15 @@ services:
       - NODE_ENV=production
       - LOCAL_ADAPTORS=${LOCAL_ADAPTORS}
       - OPENFN_ADAPTORS_REPO=${OPENFN_ADAPTORS_REPO}
-    command: [ 'pnpm', '-C', 'packages/ws-worker', 'start:prod', '-l', 'ws://openfn:${URL_PORT-4000}/worker' ]
+    command: >
+      sh -lc '
+        export_from_secret() { var="$1"; path="$2"; [ -f "$path" ] && export "$var"="$(cat "$path")" || true; };
+        export_from_secret WORKER_SECRET /run/secrets/openfn_worker_secret;
+        export_from_secret WORKER_RUNS_PRIVATE_KEY /run/secrets/openfn_worker_runs_private_key;
+        pnpm -C packages/ws-worker start:prod -l ws://openfn:${URL_PORT-4000}/worker'
+    secrets:
+      - openfn_worker_secret
+      - openfn_worker_runs_private_key
     networks:
       - kafka_public
       - openfn_public
@@ -78,4 +107,24 @@ networks:
     name: dhis2_public
     external: true
   
+
+secrets:
+  openfn_secret_key_base:
+    external: true
+  openfn_primary_encryption_key:
+    external: true
+  openfn_worker_runs_private_key:
+    external: true
+  openfn_worker_secret:
+    external: true
+  openfn_api_key:
+    external: true
+  openfn_admin_password:
+    external: true
+  openfn_database_url:
+    external: true
+  dhis2_admin_password:
+    external: true
+  dhis2_password:
+    external: true
 

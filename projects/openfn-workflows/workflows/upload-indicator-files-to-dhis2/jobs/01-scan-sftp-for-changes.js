@@ -15,7 +15,7 @@
 const LOCK_KEY = 'workflow-lock';
 const WORKFLOW_OWNER_KEY = 'workflow-owner';
 
-const FILE_TYPE_CONFIGS = {
+const FILE_SELECTION_RULES = {
   art_data_long_format: {
     fileType: 'art_data_long_format',
     displayName: 'ART Data Long Format',
@@ -438,9 +438,15 @@ execute(fn(async state => {
   const params = state.params || {};
   const baseConfig = state.config || {};
   const config = {
-    directory: '/data/excel-files',
-    targetFilePatterns: ['^ART_data.*\\.(xlsx|csv)(\\.csv)?$'],
-    fileTypesEnabled: ['xlsx', 'csv'],
+    directory: '/data',
+    targetFilePatterns: [
+      '^PEPFAR_TxCURR_.*\\.(csv)(\\.csv)?$',
+      '^PEPFAR_TxCURRMMD_.*\\.(csv)(\\.csv)?$',
+      '^PEPFAR_TxML_.*\\.(csv)(\\.csv)?$',
+      '^PEPFAR_TxNEW_.*\\.(csv)(\\.csv)?$',
+      '^PEPFAR_TxRTT_.*\\.(csv)(\\.csv)?$'
+    ],
+    fileTypesEnabled: ['csv'],
     lockTtlSeconds: 600,
     pruneProcessedAfterDays: 30,
     ...baseConfig,
@@ -482,13 +488,14 @@ execute(fn(async state => {
     state.filesIndex = filesIndex;
   }
 
-  const fileTypeConfigs = FILE_TYPE_CONFIGS; // already inlined
-  console.log(`   • Loaded ${Object.keys(fileTypeConfigs).length} file-type configs`);
+  const fileTypeConfigs = FILE_SELECTION_RULES; // selection rules only
+  console.log(`   • Loaded ${Object.keys(fileTypeConfigs).length} file selection rules`);
 
-  const directory = config.directory;
+  // Normalize directory to avoid trailing slash
+  const directory = String(config.directory || '/data').replace(/\/+$/, '');
   const patternStrings = Array.isArray(config.targetFilePatterns) && config.targetFilePatterns.length > 0
     ? config.targetFilePatterns
-    : ['^ART_data.*\\.(xlsx|csv)(\\.csv)?$'];
+    : ['^PEPFAR_TxCURR.*\\.(csv)(\\.csv)?$'];
   const patterns = patternStrings.map(p => new RegExp(p, 'i'));
 
   console.log(`   • Directory: ${directory}`);
@@ -501,17 +508,37 @@ execute(fn(async state => {
 
     const normalize = f => {
       if (typeof f === 'string') {
-        return { name: f, size: null, mtime: null };
+        return { name: f, size: null, mtime: null, type: null };
       }
       const mtime = f.mtime || f.modifyTime || f.modTime || f.date || null;
       const size = f.size || f.length || null;
       const name = f.name || String(f.filename || '');
-      return { name, size, mtime };
+      const type = f.type || null; // 'd' denotes directory in ssh2-sftp-client
+      return { name, size, mtime, type };
     };
 
-    const files = entries
-      .map(normalize)
-      .filter(f => f.name && patterns.some(rx => rx.test(f.name)))
+    const joinPath = (dir, name) => `${String(dir).replace(/\/+$/, '')}/${String(name).replace(/^\/+/, '')}`;
+
+    // Build list including multiple levels of subdirectories under /data (bounded depth=3)
+    async function listRecursive(basePath, depth, acc, parentNamePrefix = '') {
+      if (depth < 0) return acc;
+      const lsState = await list(basePath, null)(listingState);
+      const items = (Array.isArray(lsState.data) ? lsState.data : []).map(normalize);
+      for (const it of items) {
+        const name = parentNamePrefix ? `${parentNamePrefix}/${it.name}` : it.name;
+        acc.push({ ...it, name });
+        if (it.type === 'd') {
+          const nextPath = joinPath(basePath, it.name);
+          await listRecursive(nextPath, depth - 1, acc, name);
+        }
+      }
+      return acc;
+    }
+
+    let allEntries = await listRecursive(directory, 3, []);
+
+    const files = allEntries
+      .filter(f => f.name && patterns.some(rx => rx.test(String(f.name).split('/').pop())))
       .map(file => ({
         ...file,
         fileType: inferFileType(file.name),
@@ -533,6 +560,10 @@ execute(fn(async state => {
       const notProcessed = existing.processed !== true;
       const fileChanged = changedSize || changedMtime;
 
+      // Require explicit file-type config match; no fallback
+      const resolvedFileTypeConfig = file.fileTypeConfig || null;
+      const resolvedFileTypeConfigKey = resolvedFileTypeConfig ? (resolvedFileTypeConfig.fileType || resolvedFileTypeConfig.fileTypeId) : (existing.fileTypeConfigKey || null);
+
       nextFilesIndex[key] = {
         path: `${directory}/${file.name}`,
         lastSeenAt: nowIso,
@@ -542,11 +573,11 @@ execute(fn(async state => {
         status: notProcessed || fileChanged ? 'pending' : existing.status || 'completed',
         lastProcessedAt: existing.lastProcessedAt || null,
         fileType: file.fileType,
-        fileTypeConfigKey: file.fileTypeConfig ? (file.fileTypeConfig.fileType || file.fileTypeConfig.fileTypeId) : existing.fileTypeConfigKey || null
+        fileTypeConfigKey: resolvedFileTypeConfigKey
       };
 
-      if (!file.fileTypeConfig) {
-        console.warn(`   ⚠️ No file-type config matched for ${file.name}`);
+      if (!resolvedFileTypeConfigKey) {
+        console.warn(`   ⚠️ No file-type config matched for ${file.name} and no CSV fallback available`);
         continue;
       }
 
@@ -554,7 +585,7 @@ execute(fn(async state => {
       if (isCandidate) {
         candidates.push({
           name: file.name,
-          path: `${directory}/${file.name}`,
+          path: joinPath(directory, file.name),
           size: file.size,
           mtime: file.mtime,
           fileType: file.fileType,
@@ -601,7 +632,37 @@ execute(fn(async state => {
       inflight: {
         ...(nextFilesIndex[nextFile.name]?.inflight || {}),
         startedAt: new Date().toISOString()
-      }
+  },
+  pepfar_tx_curr_csv: {
+    fileType: 'pepfar_tx_curr_csv',
+    displayName: 'PEPFAR TxCURR CSV',
+    description: 'PEPFAR CSV for TX_CURR indicator',
+    filePatterns: ['^PEPFAR_TxCURR_.*\\.(csv)(\\.csv)?$']
+  },
+  pepfar_tx_mmd_csv: {
+    fileType: 'pepfar_tx_mmd_csv',
+    displayName: 'PEPFAR TxCURR MMD CSV',
+    description: 'PEPFAR CSV for TX_CURR_MMD indicator (MMD durations)',
+    filePatterns: ['^PEPFAR_TxCURRMMD_.*\\.(csv)(\\.csv)?$']
+  },
+  pepfar_tx_ml_csv: {
+    fileType: 'pepfar_tx_ml_csv',
+    displayName: 'PEPFAR TxML CSV',
+    description: 'PEPFAR CSV for TX_ML indicator',
+    filePatterns: ['^PEPFAR_TxML_.*\\.(csv)(\\.csv)?$']
+  },
+  pepfar_tx_new_csv: {
+    fileType: 'pepfar_tx_new_csv',
+    displayName: 'PEPFAR TxNEW CSV',
+    description: 'PEPFAR CSV for TX_NEW indicator',
+    filePatterns: ['^PEPFAR_TxNEW_.*\\.(csv)(\\.csv)?$']
+  },
+  pepfar_tx_rtt_csv: {
+    fileType: 'pepfar_tx_rtt_csv',
+    displayName: 'PEPFAR TxRTT CSV',
+    description: 'PEPFAR CSV for TX_RTT indicator',
+    filePatterns: ['^PEPFAR_TxRTT_.*\\.(csv)(\\.csv)?$']
+  }
     };
     nextFilesIndex[nextFile.name] = marked;
 
