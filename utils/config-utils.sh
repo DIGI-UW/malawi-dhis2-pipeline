@@ -405,28 +405,63 @@ config::substitute_env_vars() {
 config::ensure_external_secrets_existence() {
     local -r compose_file_to_check="${1:?$(missing_param "ensure_external_secrets_existence" "compose_file_to_check")}"
 
-    if ! command -v yq >/dev/null 2>&dev/null; then
-        log error "yq is required but not installed. Cannot ensure external secrets."
-        return 1
-    fi
-
     # Ensure swarm is initialized before attempting to create secrets
     if ! docker info >/dev/null 2>&1 || ! docker info 2>/dev/null | grep -q "Swarm: active"; then
         log info "Swarm is not active. Initializing..."
         docker swarm init >/dev/null 2>&1 || true
     fi
 
-    # Pull list of external secrets defined in the compose file
+    # Parse external secrets from compose file using grep/awk (works without yq)
+    # 1) Look for top-level secrets marked as external: true
+    # 2) Also scrape any '/run/secrets/<name>' references in service commands
     local secrets=()
-    mapfile -t secrets < <(yq '... comments="" | .secrets | with_entries(select(.value.external == true)) | keys | .[]' "${compose_file_to_check}" 2>/dev/null)
+    local in_secrets_section=false
+    local current_secret=""
+    
+    while IFS= read -r line; do
+        # Check if we're entering the secrets section
+        if [[ "$line" =~ ^secrets: ]]; then
+            in_secrets_section=true
+            continue
+        fi
+        
+        # Exit secrets section when we hit a top-level key
+        if [[ $in_secrets_section == true ]] && [[ "$line" =~ ^[a-z]+: ]] && [[ ! "$line" =~ ^[[:space:]] ]]; then
+            break
+        fi
+        
+        # Within secrets section, capture secret names and check for external: true
+        if [[ $in_secrets_section == true ]]; then
+            # Match a secret name (indented, ends with colon)
+            if [[ "$line" =~ ^[[:space:]]+([a-z_]+):[[:space:]]*$ ]]; then
+                current_secret="${BASH_REMATCH[1]}"
+            # Check if current secret is marked external
+            elif [[ -n "$current_secret" ]] && [[ "$line" =~ ^[[:space:]]+external:[[:space:]]*true ]]; then
+                secrets+=("$current_secret")
+                current_secret=""
+            fi
+        fi
+    done < "${compose_file_to_check}"
 
-    if [[ $? -ne 0 ]]; then
-        log error "Failed to parse compose file for secrets: ${compose_file_to_check}"
-        return 1
+    # Scrape any secrets referenced via /run/secrets/<name> in commands/env
+    local -a secrets_from_cmd=()
+    mapfile -t secrets_from_cmd < <(grep -oE '/run/secrets/[a-zA-Z0-9_-]+' "${compose_file_to_check}" 2>/dev/null | sed 's#.*/##' | sort -u)
+
+    # Merge lists and de-duplicate
+    if [[ ${#secrets_from_cmd[@]} -gt 0 ]]; then
+        for s in "${secrets_from_cmd[@]}"; do
+            local found=false
+            for existing in "${secrets[@]}"; do
+                if [[ "$existing" == "$s" ]]; then found=true; break; fi
+            done
+            if [[ "$found" == false ]]; then
+                secrets+=("$s")
+            fi
+        done
     fi
 
-    if [[ -z "${secrets[*]}" ]]; then
-        log debug "No external secrets defined in compose file"
+    if [[ ${#secrets[@]} -eq 0 ]]; then
+        log debug "No external or referenced secrets found in compose file"
         return 0
     fi
 
@@ -434,8 +469,8 @@ config::ensure_external_secrets_existence() {
     local secrets_created=0
 
     for secret_name in "${secrets[@]}"; do
-        # Skip if already exists
-        if docker secret ls -qf name="^${secret_name}$" 2>/dev/null | grep -q .; then
+        # Skip if already exists (inspect by exact name)
+        if docker secret inspect "${secret_name}" >/dev/null 2>&1; then
             log info "✅ Secret exists: ${secret_name}"
             continue
         fi
@@ -444,10 +479,41 @@ config::ensure_external_secrets_existence() {
         local env_var_name
         env_var_name=$(echo "${secret_name}" | tr '[:lower:]' '[:upper:]')
 
+        # Map secret names to their corresponding environment variable names
+        # Some secrets have different naming conventions than the default uppercase conversion
         case "${secret_name}" in
-            # openfn_db_user_password should be sourced from OPENFN_POSTGRESQL_PASSWORD when present
             openfn_db_user_password)
                 env_var_name="OPENFN_POSTGRESQL_PASSWORD"
+                ;;
+            openfn_database_url)
+                env_var_name="OPENFN_DATABASE_URL"
+                ;;
+            openfn_secret_key_base)
+                env_var_name="OPENFN_SECRET_KEY_BASE"
+                ;;
+            openfn_primary_encryption_key)
+                env_var_name="OPENFN_PRIMARY_ENCRYPTION_KEY"
+                ;;
+            openfn_worker_runs_private_key)
+                env_var_name="OPENFN_WORKER_RUNS_PRIVATE_KEY"
+                ;;
+            openfn_worker_secret)
+                env_var_name="OPENFN_WORKER_SECRET"
+                ;;
+            openfn_api_key)
+                env_var_name="OPENFN_API_KEY"
+                ;;
+            openfn_admin_password)
+                env_var_name="OPENFN_ADMIN_PASSWORD"
+                ;;
+            dhis2_admin_password)
+                env_var_name="DHIS2_ADMIN_PASSWORD"
+                ;;
+            dhis2_password)
+                env_var_name="DHIS2_PASSWORD"
+                ;;
+            postgres_password)
+                env_var_name="POSTGRES_PASSWORD"
                 ;;
         esac
 
@@ -458,12 +524,20 @@ config::ensure_external_secrets_existence() {
         fi
 
         log info "Creating secret '${secret_name}' from env var ${env_var_name}..."
-        if printf '%s' "${value}" | docker secret create "${secret_name}" - >/dev/null 2>&1; then
+        local create_output
+        create_output=$(printf '%s' "${value}" | docker secret create "${secret_name}" - 2>&1)
+        if [[ $? -eq 0 ]]; then
             log info "➕ Created secret: ${secret_name}"
             secrets_created=$((secrets_created + 1))
         else
             log error "❌ Failed to create secret: ${secret_name}"
-            return 1
+            log error "Docker error: ${create_output}"
+            # If secret already exists, that's not a fatal error
+            if echo "${create_output}" | grep -qi "already exists"; then
+                log warn "Secret already exists, continuing..."
+            else
+                return 1
+            fi
         fi
     done
 

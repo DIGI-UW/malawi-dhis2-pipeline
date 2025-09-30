@@ -178,7 +178,7 @@ OPENFN_MEMORY_LIMIT=1G
 1. **Never commit `.env` to version control**
 2. **Use strong passwords in production**
 3. **Rotate API keys regularly**
-4. **Use Docker secrets for sensitive data in production**
+4. **Docker secrets are automatically created** - The system automatically creates Docker Swarm secrets from environment variables during deployment, ensuring secure credential management without manual setup
 
 ## Building Custom Images
 
@@ -229,10 +229,12 @@ docker inspect openfn-cli-test:latest
 # 1. Validates environment configuration
 # 2. Builds necessary Docker images
 # 3. Initializes the instant project
-# 4. Deploys all services
+# 4. Deploys all services (automatically creates Docker secrets from env vars)
 # 5. Waits for services to be ready
 # 6. Loads OpenFN workflows
 ```
+
+**Note on Secrets**: The deployment process automatically creates all required Docker Swarm secrets from environment variables defined in `packages/openfn/package-metadata.json`. No manual secret setup is required for development. See [OpenFN Secrets Documentation](./secrets-openfn.md) for details.
 
 ### Method 2: Manual Step-by-Step
 
