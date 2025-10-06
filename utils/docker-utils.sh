@@ -326,6 +326,14 @@ docker::deploy_service() {
 
     docker::prepare_config_digests "$DOCKER_COMPOSE_PATH/$DOCKER_COMPOSE_FILE" ${docker_compose_param//-c /}
     docker::ensure_external_networks_existence "$DOCKER_COMPOSE_PATH/$DOCKER_COMPOSE_FILE" ${docker_compose_param//-c /}
+    
+    # Ensure external secrets exist for the main compose file and any additional compose files
+    config::ensure_external_secrets_existence "$DOCKER_COMPOSE_PATH/$DOCKER_COMPOSE_FILE"
+    for optional_compose in ${docker_compose_param//-c /}; do
+        if [[ -f "$optional_compose" ]]; then
+            config::ensure_external_secrets_existence "$optional_compose"
+        fi
+    done
 
     try "docker stack deploy -d \
         -c ${DOCKER_COMPOSE_PATH}/$DOCKER_COMPOSE_FILE \
@@ -363,6 +371,9 @@ docker::deploy_config_importer() {
         return 0
     fi
 
+    # Ensure external secrets exist for this compose file, creating from env vars when possible
+    config::ensure_external_secrets_existence "$CONFIG_COMPOSE_PATH"
+
     log info "Configs do not exist, deploying config importer $SERVICE_NAME ..."
     (
         if [[ ! -f "$CONFIG_COMPOSE_PATH" ]]; then
@@ -387,6 +398,51 @@ docker::deploy_config_importer() {
         log info "Removing stale configs..."
         config::remove_stale_service_configs "$CONFIG_COMPOSE_PATH" "$CONFIG_LABEL"
         overwrite "Removing stale configs... Done"
+
+        # Post-importer validation hook: if this importer was for DHIS2 DB, ensure required extensions exist
+        if [[ "$SERVICE_NAME" == "dhis2-db-init" ]]; then
+            log info "Ensuring pg_trgm and postgis extensions are installed for DHIS2 database..."
+            # Derive env from package env (instant passes these envs into scripts)
+            local dh_host="${DHIS2_DATABASE_HOST:-postgres-1}"
+            local dh_port="${DHIS2_DATABASE_PORT:-5432}"
+            local dh_db="${DHIS2_DATABASE_NAME:-dhis2}"
+            local pg_pass="${POSTGRES_PASSWORD:-${POSTGRESQL_PASSWORD:-}}"
+            if [[ -z "$pg_pass" ]]; then
+                log warn "Postgres password not available in environment; skipping PostGIS enforcement."
+            else
+                # Find the running primary postgres container for exec
+                local pg_cont
+                pg_cont=$(docker ps --filter name=postgres_postgres-1 --format '{{.ID}}' | head -n1)
+                if [[ -z "$pg_cont" ]]; then
+                    log warn "Could not find running postgres container to enforce PostGIS."
+                else
+                    # Helper to ensure an extension exists
+                    ensure_ext() {
+                        local ext_name="$1"
+                        local available
+                        available=$(docker exec -e PGPASSWORD="$pg_pass" "$pg_cont" psql -U postgres -d "$dh_db" -tAc "select name from pg_available_extensions where name='${ext_name}';" 2>/dev/null || true)
+                        if [[ -z "$available" ]]; then
+                            log warn "Extension ${ext_name} not available on server; skipping creation."
+                            return
+                        fi
+                        local installed
+                        installed=$(docker exec -e PGPASSWORD="$pg_pass" "$pg_cont" psql -U postgres -d "$dh_db" -tAc "select extname from pg_extension where extname='${ext_name}';" 2>/dev/null || true)
+                        if [[ -z "$installed" ]]; then
+                            if docker exec -e PGPASSWORD="$pg_pass" "$pg_cont" psql -U postgres -d "$dh_db" -c "CREATE EXTENSION IF NOT EXISTS ${ext_name};" >/dev/null 2>&1; then
+                                log info "${ext_name} extension created successfully."
+                            else
+                                log warn "Failed to create ${ext_name} extension automatically."
+                            fi
+                        else
+                            log info "${ext_name} already installed."
+                        fi
+                    }
+
+                    ensure_ext "pg_trgm"
+                    ensure_ext "postgis"
+                fi
+            fi
+        fi
     ) || {
         log error "Failed to deploy the config importer: $SERVICE_NAME"
         exit 1

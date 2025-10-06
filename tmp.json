@@ -1,0 +1,2296 @@
+
+// state from 2nd into 3rd job
+{
+    "chunkSize": 5000,
+    "data": {
+      "dhis2Structures": {
+        "categories": [],
+        "dataElements": [],
+        "orgUnits": [
+          {
+            "code": "MW",
+            "level": 1,
+            "name": "Malawi",
+            "parent": null,
+            "shortName": "Malawi"
+          }
+        ]
+      },
+      "fileName": "ART_data_long_format.xlsx",
+      "filePath": "/data/excel-files/ART_data_long_format.xlsx",
+      "uniqueValues": {
+        "districts": [],
+        "hsectors": [],
+        "indicators": [],
+        "quarters": [],
+        "regions": [],
+        "reportingPeriods": [],
+        "sites": [],
+        "zones": []
+      }
+    },
+    "fileName": "ART_data_long_format.xlsx",
+    "filePath": "/data/excel-files/ART_data_long_format.xlsx",
+    "metadataParsed": true,
+    "noFilesToProcess": false,
+    "references": [
+      {},
+      {
+        "allFiles": [
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      4222983 Jun  5 23:18 Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 4222983,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      3213595 Jun  5 23:18 Q2FY25_DQ_253_sites.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Q2FY25_DQ_253_sites.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 3213595,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752798132000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001     30236478 Jun 27 19:24 ART_data_long_format.xlsx",
+            "modifyTime": 1751052296000,
+            "name": "ART_data_long_format.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 30236478,
+            "type": "-"
+          }
+        ],
+        "targetFile": "ART_data_long_format.xlsx"
+      },
+      {
+        "allFiles": [
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      4222983 Jun  5 23:18 Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 4222983,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      3213595 Jun  5 23:18 Q2FY25_DQ_253_sites.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Q2FY25_DQ_253_sites.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 3213595,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752798132000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001     30236478 Jun 27 19:24 ART_data_long_format.xlsx",
+            "modifyTime": 1751052296000,
+            "name": "ART_data_long_format.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 30236478,
+            "type": "-"
+          }
+        ],
+        "targetFile": "ART_data_long_format.xlsx"
+      },
+      {
+        "allFiles": [
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      4222983 Jun  5 23:18 Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 4222983,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      3213595 Jun  5 23:18 Q2FY25_DQ_253_sites.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Q2FY25_DQ_253_sites.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 3213595,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752798132000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001     30236478 Jun 27 19:24 ART_data_long_format.xlsx",
+            "modifyTime": 1751052296000,
+            "name": "ART_data_long_format.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 30236478,
+            "type": "-"
+          }
+        ],
+        "targetFile": "ART_data_long_format.xlsx"
+      },
+      {
+        "allFiles": [
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      4222983 Jun  5 23:18 Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 4222983,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      3213595 Jun  5 23:18 Q2FY25_DQ_253_sites.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Q2FY25_DQ_253_sites.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 3213595,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752798132000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001     30236478 Jun 27 19:24 ART_data_long_format.xlsx",
+            "modifyTime": 1751052296000,
+            "name": "ART_data_long_format.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 30236478,
+            "type": "-"
+          }
+        ],
+        "targetFile": "ART_data_long_format.xlsx"
+      },
+      {
+        "allFiles": [
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      4222983 Jun  5 23:18 Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 4222983,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      3213595 Jun  5 23:18 Q2FY25_DQ_253_sites.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Q2FY25_DQ_253_sites.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 3213595,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752798132000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001     30236478 Jun 27 19:24 ART_data_long_format.xlsx",
+            "modifyTime": 1751052296000,
+            "name": "ART_data_long_format.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 30236478,
+            "type": "-"
+          }
+        ],
+        "targetFile": "ART_data_long_format.xlsx"
+      },
+      {
+        "allFiles": [
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      4222983 Jun  5 23:18 Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 4222983,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      3213595 Jun  5 23:18 Q2FY25_DQ_253_sites.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Q2FY25_DQ_253_sites.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 3213595,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752798132000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001     30236478 Jun 27 19:24 ART_data_long_format.xlsx",
+            "modifyTime": 1751052296000,
+            "name": "ART_data_long_format.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 30236478,
+            "type": "-"
+          }
+        ],
+        "targetFile": "ART_data_long_format.xlsx"
+      },
+      {
+        "allFiles": [
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      4222983 Jun  5 23:18 Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 4222983,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      3213595 Jun  5 23:18 Q2FY25_DQ_253_sites.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Q2FY25_DQ_253_sites.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 3213595,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752798132000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001     30236478 Jun 27 19:24 ART_data_long_format.xlsx",
+            "modifyTime": 1751052296000,
+            "name": "ART_data_long_format.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 30236478,
+            "type": "-"
+          }
+        ],
+        "targetFile": "ART_data_long_format.xlsx"
+      },
+      {
+        "allFiles": [
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      4222983 Jun  5 23:18 Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 4222983,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      3213595 Jun  5 23:18 Q2FY25_DQ_253_sites.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Q2FY25_DQ_253_sites.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 3213595,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752798132000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001     30236478 Jun 27 19:24 ART_data_long_format.xlsx",
+            "modifyTime": 1751052296000,
+            "name": "ART_data_long_format.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 30236478,
+            "type": "-"
+          }
+        ],
+        "targetFile": "ART_data_long_format.xlsx"
+      },
+      {
+        "allFiles": [
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      4222983 Jun  5 23:18 Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 4222983,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      3213595 Jun  5 23:18 Q2FY25_DQ_253_sites.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Q2FY25_DQ_253_sites.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 3213595,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752798132000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001     30236478 Jun 27 19:24 ART_data_long_format.xlsx",
+            "modifyTime": 1751052296000,
+            "name": "ART_data_long_format.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 30236478,
+            "type": "-"
+          }
+        ],
+        "targetFile": "ART_data_long_format.xlsx"
+      },
+      {
+        "allFiles": [
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      4222983 Jun  5 23:18 Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 4222983,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      3213595 Jun  5 23:18 Q2FY25_DQ_253_sites.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Q2FY25_DQ_253_sites.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 3213595,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752798132000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001     30236478 Jun 27 19:24 ART_data_long_format.xlsx",
+            "modifyTime": 1751052296000,
+            "name": "ART_data_long_format.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 30236478,
+            "type": "-"
+          }
+        ],
+        "targetFile": "ART_data_long_format.xlsx"
+      },
+      {
+        "allFiles": [
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      4222983 Jun  5 23:18 Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 4222983,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      3213595 Jun  5 23:18 Q2FY25_DQ_253_sites.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Q2FY25_DQ_253_sites.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 3213595,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752798132000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001     30236478 Jun 27 19:24 ART_data_long_format.xlsx",
+            "modifyTime": 1751052296000,
+            "name": "ART_data_long_format.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 30236478,
+            "type": "-"
+          }
+        ],
+        "targetFile": "ART_data_long_format.xlsx"
+      },
+      {
+        "allFiles": [
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      4222983 Jun  5 23:18 Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 4222983,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      3213595 Jun  5 23:18 Q2FY25_DQ_253_sites.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Q2FY25_DQ_253_sites.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 3213595,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752798132000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001     30236478 Jun 27 19:24 ART_data_long_format.xlsx",
+            "modifyTime": 1751052296000,
+            "name": "ART_data_long_format.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 30236478,
+            "type": "-"
+          }
+        ],
+        "targetFile": "ART_data_long_format.xlsx"
+      },
+      {
+        "allFiles": [
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      4222983 Jun  5 23:18 Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 4222983,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      3213595 Jun  5 23:18 Q2FY25_DQ_253_sites.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Q2FY25_DQ_253_sites.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 3213595,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752798132000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001     30236478 Jun 27 19:24 ART_data_long_format.xlsx",
+            "modifyTime": 1751052296000,
+            "name": "ART_data_long_format.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 30236478,
+            "type": "-"
+          }
+        ],
+        "targetFile": "ART_data_long_format.xlsx"
+      },
+      {
+        "allFiles": [
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      4222983 Jun  5 23:18 Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 4222983,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      3213595 Jun  5 23:18 Q2FY25_DQ_253_sites.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Q2FY25_DQ_253_sites.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 3213595,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752798132000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001     30236478 Jun 27 19:24 ART_data_long_format.xlsx",
+            "modifyTime": 1751052296000,
+            "name": "ART_data_long_format.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 30236478,
+            "type": "-"
+          }
+        ],
+        "targetFile": "ART_data_long_format.xlsx"
+      },
+      {
+        "allFiles": [
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      4222983 Jun  5 23:18 Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 4222983,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      3213595 Jun  5 23:18 Q2FY25_DQ_253_sites.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Q2FY25_DQ_253_sites.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 3213595,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752798132000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001     30236478 Jun 27 19:24 ART_data_long_format.xlsx",
+            "modifyTime": 1751052296000,
+            "name": "ART_data_long_format.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 30236478,
+            "type": "-"
+          }
+        ],
+        "targetFile": "ART_data_long_format.xlsx"
+      },
+      {
+        "allFiles": [
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      4222983 Jun  5 23:18 Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 4222983,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      3213595 Jun  5 23:18 Q2FY25_DQ_253_sites.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Q2FY25_DQ_253_sites.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 3213595,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752798132000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001     30236478 Jun 27 19:24 ART_data_long_format.xlsx",
+            "modifyTime": 1751052296000,
+            "name": "ART_data_long_format.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 30236478,
+            "type": "-"
+          }
+        ],
+        "targetFile": "ART_data_long_format.xlsx"
+      },
+      {
+        "allFiles": [
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      4222983 Jun  5 23:18 Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 4222983,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      3213595 Jun  5 23:18 Q2FY25_DQ_253_sites.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Q2FY25_DQ_253_sites.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 3213595,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752798132000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001     30236478 Jun 27 19:24 ART_data_long_format.xlsx",
+            "modifyTime": 1751052296000,
+            "name": "ART_data_long_format.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 30236478,
+            "type": "-"
+          }
+        ],
+        "targetFile": "ART_data_long_format.xlsx"
+      },
+      {
+        "allFiles": [
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      4222983 Jun  5 23:18 Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 4222983,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      3213595 Jun  5 23:18 Q2FY25_DQ_253_sites.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Q2FY25_DQ_253_sites.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 3213595,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752798132000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001     30236478 Jun 27 19:24 ART_data_long_format.xlsx",
+            "modifyTime": 1751052296000,
+            "name": "ART_data_long_format.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 30236478,
+            "type": "-"
+          }
+        ],
+        "targetFile": "ART_data_long_format.xlsx"
+      },
+      {
+        "allFiles": [
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      4222983 Jun  5 23:18 Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 4222983,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      3213595 Jun  5 23:18 Q2FY25_DQ_253_sites.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Q2FY25_DQ_253_sites.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 3213595,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752798132000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001     30236478 Jun 27 19:24 ART_data_long_format.xlsx",
+            "modifyTime": 1751052296000,
+            "name": "ART_data_long_format.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 30236478,
+            "type": "-"
+          }
+        ],
+        "targetFile": "ART_data_long_format.xlsx"
+      },
+      {
+        "allFiles": [
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      4222983 Jun  5 23:18 Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 4222983,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      3213595 Jun  5 23:18 Q2FY25_DQ_253_sites.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Q2FY25_DQ_253_sites.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 3213595,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752798132000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001     30236478 Jun 27 19:24 ART_data_long_format.xlsx",
+            "modifyTime": 1751052296000,
+            "name": "ART_data_long_format.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 30236478,
+            "type": "-"
+          }
+        ],
+        "targetFile": "ART_data_long_format.xlsx"
+      },
+      {
+        "allFiles": [
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      4222983 Jun  5 23:18 Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 4222983,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      3213595 Jun  5 23:18 Q2FY25_DQ_253_sites.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Q2FY25_DQ_253_sites.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 3213595,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752798132000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001     30236478 Jun 27 19:24 ART_data_long_format.xlsx",
+            "modifyTime": 1751052296000,
+            "name": "ART_data_long_format.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 30236478,
+            "type": "-"
+          }
+        ],
+        "targetFile": "ART_data_long_format.xlsx"
+      },
+      {
+        "allFiles": [
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      4222983 Jun  5 23:18 Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 4222983,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      3213595 Jun  5 23:18 Q2FY25_DQ_253_sites.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Q2FY25_DQ_253_sites.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 3213595,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752798132000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001     30236478 Jun 27 19:24 ART_data_long_format.xlsx",
+            "modifyTime": 1751052296000,
+            "name": "ART_data_long_format.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 30236478,
+            "type": "-"
+          }
+        ],
+        "targetFile": "ART_data_long_format.xlsx"
+      }
+    ],
+    "targetFileFound": true,
+    "totalChunks": 210,
+    "totalRows": 1048575
+  }
+
+  // state from 3rd into 4th job:
+
+  {
+    "chunkSize": 5000,
+    "data": {
+      "dhis2Mappings": {
+        "categories": {},
+        "dataElements": {},
+        "orgUnits": {}
+      },
+      "dhis2Structures": {
+        "categories": [],
+        "dataElements": [],
+        "orgUnits": [
+          {
+            "code": "MW",
+            "level": 1,
+            "name": "Malawi",
+            "parent": null,
+            "shortName": "Malawi"
+          }
+        ]
+      },
+      "fileName": "ART_data_long_format.xlsx",
+      "filePath": "/data/excel-files/ART_data_long_format.xlsx",
+      "metadataCreated": {
+        "categories": 0,
+        "dataElements": 0,
+        "orgUnits": 0
+      },
+      "uniqueValues": {
+        "***s": [],
+        "hsectors": [],
+        "indicators": [],
+        "quarters": [],
+        "regions": [],
+        "reportingPeriods": [],
+        "sites": [],
+        "zones": []
+      }
+    },
+    "fileName": "ART_data_long_format.xlsx",
+    "filePath": "/data/excel-files/ART_data_long_format.xlsx",
+    "metadataParsed": true,
+    "metadataSetupComplete": true,
+    "noFilesToProcess": false,
+    "references": [
+      {},
+      {
+        "allFiles": [
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      4222983 Jun  5 23:18 Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 4222983,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      3213595 Jun  5 23:18 Q2FY25_DQ_253_sites.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Q2FY25_DQ_253_sites.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 3213595,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752798132000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001     30236478 Jun 27 19:24 ART_data_long_format.xlsx",
+            "modifyTime": 1751052296000,
+            "name": "ART_data_long_format.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 30236478,
+            "type": "-"
+          }
+        ],
+        "targetFile": "ART_data_long_format.xlsx"
+      },
+      {
+        "allFiles": [
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      4222983 Jun  5 23:18 Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 4222983,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      3213595 Jun  5 23:18 Q2FY25_DQ_253_sites.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Q2FY25_DQ_253_sites.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 3213595,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752798132000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001     30236478 Jun 27 19:24 ART_data_long_format.xlsx",
+            "modifyTime": 1751052296000,
+            "name": "ART_data_long_format.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 30236478,
+            "type": "-"
+          }
+        ],
+        "targetFile": "ART_data_long_format.xlsx"
+      },
+      {
+        "allFiles": [
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      4222983 Jun  5 23:18 Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 4222983,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      3213595 Jun  5 23:18 Q2FY25_DQ_253_sites.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Q2FY25_DQ_253_sites.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 3213595,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752798132000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001     30236478 Jun 27 19:24 ART_data_long_format.xlsx",
+            "modifyTime": 1751052296000,
+            "name": "ART_data_long_format.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 30236478,
+            "type": "-"
+          }
+        ],
+        "targetFile": "ART_data_long_format.xlsx"
+      },
+      {
+        "allFiles": [
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      4222983 Jun  5 23:18 Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 4222983,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      3213595 Jun  5 23:18 Q2FY25_DQ_253_sites.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Q2FY25_DQ_253_sites.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 3213595,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752798132000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001     30236478 Jun 27 19:24 ART_data_long_format.xlsx",
+            "modifyTime": 1751052296000,
+            "name": "ART_data_long_format.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 30236478,
+            "type": "-"
+          }
+        ],
+        "targetFile": "ART_data_long_format.xlsx"
+      },
+      {
+        "allFiles": [
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      4222983 Jun  5 23:18 Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 4222983,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      3213595 Jun  5 23:18 Q2FY25_DQ_253_sites.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Q2FY25_DQ_253_sites.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 3213595,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752798132000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001     30236478 Jun 27 19:24 ART_data_long_format.xlsx",
+            "modifyTime": 1751052296000,
+            "name": "ART_data_long_format.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 30236478,
+            "type": "-"
+          }
+        ],
+        "targetFile": "ART_data_long_format.xlsx"
+      },
+      {
+        "allFiles": [
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      4222983 Jun  5 23:18 Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 4222983,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      3213595 Jun  5 23:18 Q2FY25_DQ_253_sites.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Q2FY25_DQ_253_sites.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 3213595,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752798132000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001     30236478 Jun 27 19:24 ART_data_long_format.xlsx",
+            "modifyTime": 1751052296000,
+            "name": "ART_data_long_format.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 30236478,
+            "type": "-"
+          }
+        ],
+        "targetFile": "ART_data_long_format.xlsx"
+      },
+      {
+        "allFiles": [
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      4222983 Jun  5 23:18 Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 4222983,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      3213595 Jun  5 23:18 Q2FY25_DQ_253_sites.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Q2FY25_DQ_253_sites.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 3213595,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752798132000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001     30236478 Jun 27 19:24 ART_data_long_format.xlsx",
+            "modifyTime": 1751052296000,
+            "name": "ART_data_long_format.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 30236478,
+            "type": "-"
+          }
+        ],
+        "targetFile": "ART_data_long_format.xlsx"
+      },
+      {
+        "allFiles": [
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      4222983 Jun  5 23:18 Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 4222983,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      3213595 Jun  5 23:18 Q2FY25_DQ_253_sites.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Q2FY25_DQ_253_sites.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 3213595,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752798132000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001     30236478 Jun 27 19:24 ART_data_long_format.xlsx",
+            "modifyTime": 1751052296000,
+            "name": "ART_data_long_format.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 30236478,
+            "type": "-"
+          }
+        ],
+        "targetFile": "ART_data_long_format.xlsx"
+      },
+      {
+        "allFiles": [
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      4222983 Jun  5 23:18 Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 4222983,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      3213595 Jun  5 23:18 Q2FY25_DQ_253_sites.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Q2FY25_DQ_253_sites.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 3213595,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752798132000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001     30236478 Jun 27 19:24 ART_data_long_format.xlsx",
+            "modifyTime": 1751052296000,
+            "name": "ART_data_long_format.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 30236478,
+            "type": "-"
+          }
+        ],
+        "targetFile": "ART_data_long_format.xlsx"
+      },
+      {
+        "allFiles": [
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      4222983 Jun  5 23:18 Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 4222983,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      3213595 Jun  5 23:18 Q2FY25_DQ_253_sites.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Q2FY25_DQ_253_sites.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 3213595,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752798132000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001     30236478 Jun 27 19:24 ART_data_long_format.xlsx",
+            "modifyTime": 1751052296000,
+            "name": "ART_data_long_format.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 30236478,
+            "type": "-"
+          }
+        ],
+        "targetFile": "ART_data_long_format.xlsx"
+      },
+      {
+        "allFiles": [
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      4222983 Jun  5 23:18 Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 4222983,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      3213595 Jun  5 23:18 Q2FY25_DQ_253_sites.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Q2FY25_DQ_253_sites.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 3213595,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752798132000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001     30236478 Jun 27 19:24 ART_data_long_format.xlsx",
+            "modifyTime": 1751052296000,
+            "name": "ART_data_long_format.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 30236478,
+            "type": "-"
+          }
+        ],
+        "targetFile": "ART_data_long_format.xlsx"
+      },
+      {
+        "allFiles": [
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      4222983 Jun  5 23:18 Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 4222983,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      3213595 Jun  5 23:18 Q2FY25_DQ_253_sites.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Q2FY25_DQ_253_sites.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 3213595,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752798132000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001     30236478 Jun 27 19:24 ART_data_long_format.xlsx",
+            "modifyTime": 1751052296000,
+            "name": "ART_data_long_format.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 30236478,
+            "type": "-"
+          }
+        ],
+        "targetFile": "ART_data_long_format.xlsx"
+      },
+      {
+        "allFiles": [
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      4222983 Jun  5 23:18 Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 4222983,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      3213595 Jun  5 23:18 Q2FY25_DQ_253_sites.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Q2FY25_DQ_253_sites.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 3213595,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752798132000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001     30236478 Jun 27 19:24 ART_data_long_format.xlsx",
+            "modifyTime": 1751052296000,
+            "name": "ART_data_long_format.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 30236478,
+            "type": "-"
+          }
+        ],
+        "targetFile": "ART_data_long_format.xlsx"
+      },
+      {
+        "allFiles": [
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      4222983 Jun  5 23:18 Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 4222983,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      3213595 Jun  5 23:18 Q2FY25_DQ_253_sites.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Q2FY25_DQ_253_sites.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 3213595,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752798132000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001     30236478 Jun 27 19:24 ART_data_long_format.xlsx",
+            "modifyTime": 1751052296000,
+            "name": "ART_data_long_format.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 30236478,
+            "type": "-"
+          }
+        ],
+        "targetFile": "ART_data_long_format.xlsx"
+      },
+      {
+        "allFiles": [
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      4222983 Jun  5 23:18 Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 4222983,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      3213595 Jun  5 23:18 Q2FY25_DQ_253_sites.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Q2FY25_DQ_253_sites.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 3213595,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752798132000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001     30236478 Jun 27 19:24 ART_data_long_format.xlsx",
+            "modifyTime": 1751052296000,
+            "name": "ART_data_long_format.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 30236478,
+            "type": "-"
+          }
+        ],
+        "targetFile": "ART_data_long_format.xlsx"
+      },
+      {
+        "allFiles": [
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      4222983 Jun  5 23:18 Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 4222983,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      3213595 Jun  5 23:18 Q2FY25_DQ_253_sites.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Q2FY25_DQ_253_sites.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 3213595,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752798132000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001     30236478 Jun 27 19:24 ART_data_long_format.xlsx",
+            "modifyTime": 1751052296000,
+            "name": "ART_data_long_format.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 30236478,
+            "type": "-"
+          }
+        ],
+        "targetFile": "ART_data_long_format.xlsx"
+      },
+      {
+        "allFiles": [
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      4222983 Jun  5 23:18 Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 4222983,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      3213595 Jun  5 23:18 Q2FY25_DQ_253_sites.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Q2FY25_DQ_253_sites.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 3213595,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752798132000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001     30236478 Jun 27 19:24 ART_data_long_format.xlsx",
+            "modifyTime": 1751052296000,
+            "name": "ART_data_long_format.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 30236478,
+            "type": "-"
+          }
+        ],
+        "targetFile": "ART_data_long_format.xlsx"
+      },
+      {
+        "allFiles": [
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      4222983 Jun  5 23:18 Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 4222983,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      3213595 Jun  5 23:18 Q2FY25_DQ_253_sites.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Q2FY25_DQ_253_sites.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 3213595,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752798132000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001     30236478 Jun 27 19:24 ART_data_long_format.xlsx",
+            "modifyTime": 1751052296000,
+            "name": "ART_data_long_format.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 30236478,
+            "type": "-"
+          }
+        ],
+        "targetFile": "ART_data_long_format.xlsx"
+      },
+      {
+        "allFiles": [
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      4222983 Jun  5 23:18 Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 4222983,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      3213595 Jun  5 23:18 Q2FY25_DQ_253_sites.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Q2FY25_DQ_253_sites.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 3213595,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752798132000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001     30236478 Jun 27 19:24 ART_data_long_format.xlsx",
+            "modifyTime": 1751052296000,
+            "name": "ART_data_long_format.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 30236478,
+            "type": "-"
+          }
+        ],
+        "targetFile": "ART_data_long_format.xlsx"
+      },
+      {
+        "allFiles": [
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      4222983 Jun  5 23:18 Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 4222983,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      3213595 Jun  5 23:18 Q2FY25_DQ_253_sites.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Q2FY25_DQ_253_sites.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 3213595,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752798132000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001     30236478 Jun 27 19:24 ART_data_long_format.xlsx",
+            "modifyTime": 1751052296000,
+            "name": "ART_data_long_format.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 30236478,
+            "type": "-"
+          }
+        ],
+        "targetFile": "ART_data_long_format.xlsx"
+      },
+      {
+        "allFiles": [
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      4222983 Jun  5 23:18 Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 4222983,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      3213595 Jun  5 23:18 Q2FY25_DQ_253_sites.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Q2FY25_DQ_253_sites.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 3213595,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752798132000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001     30236478 Jun 27 19:24 ART_data_long_format.xlsx",
+            "modifyTime": 1751052296000,
+            "name": "ART_data_long_format.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 30236478,
+            "type": "-"
+          }
+        ],
+        "targetFile": "ART_data_long_format.xlsx"
+      },
+      {
+        "allFiles": [
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      4222983 Jun  5 23:18 Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Direct Queries - Q1 2025 MoH Reports.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 4222983,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752119774000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001      3213595 Jun  5 23:18 Q2FY25_DQ_253_sites.xlsx",
+            "modifyTime": 1749165506000,
+            "name": "Q2FY25_DQ_253_sites.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 3213595,
+            "type": "-"
+          },
+          {
+            "accessTime": 1752798132000,
+            "group": 1001,
+            "longname": "-rwxr-xr-x    1 1001     1001     30236478 Jun 27 19:24 ART_data_long_format.xlsx",
+            "modifyTime": 1751052296000,
+            "name": "ART_data_long_format.xlsx",
+            "owner": 1001,
+            "rights": {
+              "group": "rx",
+              "other": "rx",
+              "user": "rwx"
+            },
+            "size": 30236478,
+            "type": "-"
+          }
+        ],
+        "targetFile": "ART_data_long_format.xlsx"
+      }
+    ],
+    "targetFileFound": true,
+    "totalChunks": 210,
+    "totalRows": 1048575
+  }

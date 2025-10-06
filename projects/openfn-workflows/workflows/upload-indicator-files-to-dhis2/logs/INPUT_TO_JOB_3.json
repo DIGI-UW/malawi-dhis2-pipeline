@@ -1,0 +1,178 @@
+{
+  "chunkSize": 5000,
+  "config": {
+    "directory": "/data",
+    "fileTypesEnabled": [
+      "csv"
+    ],
+    "lockTtlSeconds": 600,
+    "pruneProcessedAfterDays": 30,
+    "targetFile": "samples/pepfar/PEPFAR_TxCURR_2025_Q2_Cleaned_v3_20250805160300.csv",
+    "targetFilePattern": null,
+    "targetFilePatterns": [
+      "^PEPFAR_TxCURR_.*\\.(csv)(\\.csv)?$"
+    ]
+  },
+  "data": {
+    "dhis2Structures": {
+      "categories": [],
+      "dataElements": [],
+      "orgUnits": []
+    },
+    "orgUnitParentMap": {},
+    "uniqueValues": {}
+  },
+  "fileName": "samples/pepfar/PEPFAR_TxCURR_2025_Q2_Cleaned_v3_20250805160300.csv",
+  "filePath": "/data/samples/pepfar/PEPFAR_TxCURR_2025_Q2_Cleaned_v3_20250805160300.csv",
+  "fileType": "csv",
+  "fileTypeConfig": {
+    "columnMappings": {
+      "Date_Submitted": {
+        "required": true,
+        "sourceColumns": [
+          "Date_Submitted"
+        ],
+        "targetField": "period"
+      },
+      "age_group": {
+        "required": false,
+        "sourceColumns": [
+          "age_group",
+          "Age Group",
+          "Age"
+        ],
+        "targetField": "categoryOptions.ageGroup"
+      },
+      "facility": {
+        "required": true,
+        "sourceColumns": [
+          "facility",
+          "Facility",
+          "Health Facility",
+          "Site",
+          "site",
+          "Site Name"
+        ],
+        "targetField": "orgUnit"
+      },
+      "indicator": {
+        "required": true,
+        "sourceColumns": [
+          "indicator",
+          "Indicator",
+          "TX_CURR"
+        ],
+        "targetField": "dataElement"
+      },
+      "sex": {
+        "required": false,
+        "sourceColumns": [
+          "sex",
+          "Sex"
+        ],
+        "targetField": "categoryOptions.sex"
+      },
+      "value": {
+        "dataType": "numeric",
+        "required": true,
+        "sourceColumns": [
+          "tx_curr",
+          "Value",
+          "value"
+        ],
+        "targetField": "value"
+      }
+    },
+    "description": "PEPFAR CSV for TX_CURR indicator",
+    "dhis2Config": {
+      "openFuturePeriods": 4,
+      "periodSource": "filename",
+      "periodType": "Quarterly"
+    },
+    "displayName": "PEPFAR TxCURR CSV",
+    "filePrefix": "PEPFAR_TxCURR",
+    "fileType": "pepfar_tx_curr_csv",
+    "headerMap": {
+      "Date_Submitted": "Date_Submitted",
+      "age_group": "age_group",
+      "facility": "facility",
+      "indicator": "indicator",
+      "sex": "sex",
+      "site_id": "site_id",
+      "tx_curr": "tx_curr"
+    }
+  },
+  "fileTypeConfigKey": "pepfar_tx_curr_csv",
+  "filesIndex": {
+    "samples/pepfar/PEPFAR_TxCURR_2025_Q2_Cleaned_v3_20250805160300.csv": {
+      "chunkSize": 5000,
+      "dhis2Structures": {
+        "categories": [],
+        "dataElements": [],
+        "orgUnits": []
+      },
+      "fileType": "csv",
+      "fileTypeConfigKey": "pepfar_tx_curr_csv",
+      "hash": "908d2678",
+      "headerMap": {
+        "Date_Submitted": "Date_Submitted",
+        "age_group": "age_group",
+        "facility": "facility",
+        "indicator": "indicator",
+        "sex": "sex",
+        "site_id": "site_id",
+        "tx_curr": "tx_curr"
+      },
+      "inflight": {
+        "chunkSize": 5000,
+        "dhis2Structures": {
+          "categories": [],
+          "dataElements": [],
+          "orgUnits": []
+        },
+        "hash": "908d2678",
+        "headerMap": {
+          "Date_Submitted": "Date_Submitted",
+          "age_group": "age_group",
+          "facility": "facility",
+          "indicator": "indicator",
+          "sex": "sex",
+          "site_id": "site_id",
+          "tx_curr": "tx_curr"
+        },
+        "orgUnitParentMap": {},
+        "startedAt": "2025-10-06T16:23:02.218Z",
+        "totalChunks": 1,
+        "updatedAt": "2025-10-06T16:23:03.577Z"
+      },
+      "lastProcessedAt": null,
+      "lastSeenAt": "2025-10-06T16:23:01.223Z",
+      "mtime": 1758758600000,
+      "orgUnitParentMap": {},
+      "path": "/data/samples/pepfar/PEPFAR_TxCURR_2025_Q2_Cleaned_v3_20250805160300.csv",
+      "processed": false,
+      "size": 150042,
+      "status": "metadata-parsed",
+      "totalChunks": 1
+    }
+  },
+  "hasFileToProcess": true,
+  "lock": {
+    "acquiredAt": "2025-10-06T16:23:01.096Z",
+    "expiresAt": "2025-10-06T16:33:01.096Z",
+    "key": "workflow-lock",
+    "owner": "openfn-f15e60b53922a"
+  },
+  "metadataMappings": {},
+  "metadataParsed": true,
+  "references": [],
+  "totalChunks": 1,
+  "totalRows": 780,
+  "workflow-owner": "openfn-f15e60b53922a",
+  "workflowLock": {
+    "acquiredAt": "2025-10-06T16:23:01.096Z",
+    "expiresAt": "2025-10-06T16:33:01.096Z",
+    "key": "workflow-lock",
+    "owner": "openfn-f15e60b53922a"
+  }
+}

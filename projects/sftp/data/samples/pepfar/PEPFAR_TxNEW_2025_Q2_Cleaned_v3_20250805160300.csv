@@ -1,0 +1,379 @@
+site_id,facility,indicator,sex,age_group,Date_Submitted,cd4_less_than_200,cd4_greater_than_equal_to_200,cd4_unknown_or_not_done
+1075,Kavuzi Cummock Health Centre,TX_NEW,Male,45-49 years,2025-08-26 01:24:06.360130+00:00,0,0,2
+1075,Kavuzi Cummock Health Centre,TX_NEW,Male,All,2025-08-26 01:24:06.360130+00:00,0,0,4
+1075,Kavuzi Cummock Health Centre,TX_NEW,Female,5-9 years,2025-08-26 01:24:06.360130+00:00,0,0,1
+1075,Kavuzi Cummock Health Centre,TX_NEW,FNP,All,2025-08-26 01:24:06.360130+00:00,0,0,2
+1075,Kavuzi Cummock Health Centre,TX_NEW,Male,30-34 years,2025-08-26 01:24:06.360130+00:00,0,0,1
+1075,Kavuzi Cummock Health Centre,TX_NEW,Female,35-39 years,2025-08-26 01:24:06.360130+00:00,0,0,1
+1075,Kavuzi Cummock Health Centre,TX_NEW,Female,30-34 years,2025-08-26 01:24:06.360130+00:00,0,0,1
+1075,Kavuzi Cummock Health Centre,TX_NEW,FP,All,2025-08-26 01:24:06.360130+00:00,0,0,1
+1075,Kavuzi Cummock Health Centre,TX_NEW,Male,50-54 years,2025-08-26 01:24:06.360130+00:00,0,0,1
+site_id,facility,indicator,sex,age_group,Date_Submitted,cd4_less_than_200,cd4_greater_than_equal_to_200,cd4_unknown_or_not_done
+10,Area 25 Urban Health Centre,TX_NEW,Female,30-34 years,2025-08-26 01:24:06.258567+00:00,0,0,18
+10,Area 25 Urban Health Centre,TX_NEW,Male,25-29 years,2025-08-26 01:24:06.258567+00:00,0,0,10
+10,Area 25 Urban Health Centre,TX_NEW,FBF,All,2025-08-26 01:24:06.258567+00:00,0,0,6
+10,Area 25 Urban Health Centre,TX_NEW,Male,30-34 years,2025-08-26 01:24:06.258567+00:00,0,0,12
+10,Area 25 Urban Health Centre,TX_NEW,Male,15-19 years,2025-08-26 01:24:06.258567+00:00,0,0,2
+10,Area 25 Urban Health Centre,TX_NEW,Male,All,2025-08-26 01:24:06.258567+00:00,0,0,82
+10,Area 25 Urban Health Centre,TX_NEW,Male,<1 years,2025-08-26 01:24:06.258567+00:00,0,0,2
+10,Area 25 Urban Health Centre,TX_NEW,Female,60-64 years,2025-08-26 01:24:06.258567+00:00,0,0,2
+10,Area 25 Urban Health Centre,TX_NEW,Male,70-74 years,2025-08-26 01:24:06.258567+00:00,0,0,1
+10,Area 25 Urban Health Centre,TX_NEW,Male,35-39 years,2025-08-26 01:24:06.258567+00:00,0,0,15
+10,Area 25 Urban Health Centre,TX_NEW,Male,45-49 years,2025-08-26 01:24:06.258567+00:00,0,0,5
+10,Area 25 Urban Health Centre,TX_NEW,Female,45-49 years,2025-08-26 01:24:06.258567+00:00,0,0,1
+10,Area 25 Urban Health Centre,TX_NEW,Male,50-54 years,2025-08-26 01:24:06.258567+00:00,0,0,7
+10,Area 25 Urban Health Centre,TX_NEW,FP,All,2025-08-26 01:24:06.258567+00:00,0,0,37
+10,Area 25 Urban Health Centre,TX_NEW,Male,55-59 years,2025-08-26 01:24:06.258567+00:00,0,0,5
+10,Area 25 Urban Health Centre,TX_NEW,Male,40-44 years,2025-08-26 01:24:06.258567+00:00,0,0,11
+10,Area 25 Urban Health Centre,TX_NEW,Female,50-54 years,2025-08-26 01:24:06.258567+00:00,0,0,1
+10,Area 25 Urban Health Centre,TX_NEW,Female,25-29 years,2025-08-26 01:24:06.258567+00:00,0,0,28
+10,Area 25 Urban Health Centre,TX_NEW,Male,20-24 years,2025-08-26 01:24:06.258567+00:00,0,0,7
+10,Area 25 Urban Health Centre,TX_NEW,Male,10-14 years,2025-08-26 01:24:06.258567+00:00,0,0,1
+10,Area 25 Urban Health Centre,TX_NEW,Female,35-39 years,2025-08-26 01:24:06.258567+00:00,0,0,24
+10,Area 25 Urban Health Centre,TX_NEW,Female,40-44 years,2025-08-26 01:24:06.258567+00:00,0,0,7
+10,Area 25 Urban Health Centre,TX_NEW,Male,60-64 years,2025-08-26 01:24:06.258567+00:00,0,0,4
+10,Area 25 Urban Health Centre,TX_NEW,Female,20-24 years,2025-08-26 01:24:06.258567+00:00,0,0,26
+10,Area 25 Urban Health Centre,TX_NEW,FNP,All,2025-08-26 01:24:06.258567+00:00,0,0,73
+10,Area 25 Urban Health Centre,TX_NEW,Female,15-19 years,2025-08-26 01:24:06.258567+00:00,0,0,9
+site_id,facility,indicator,sex,age_group,Date_Submitted,cd4_less_than_200,cd4_greater_than_equal_to_200,cd4_unknown_or_not_done
+115,Chitekesa Health Centre,TX_NEW,Female,15-19 years,2025-08-26 01:24:06.258507+00:00,0,0,1
+115,Chitekesa Health Centre,TX_NEW,Male,40-44 years,2025-08-26 01:24:06.258507+00:00,0,0,1
+115,Chitekesa Health Centre,TX_NEW,Female,45-49 years,2025-08-26 01:24:06.258507+00:00,0,0,1
+115,Chitekesa Health Centre,TX_NEW,Female,30-34 years,2025-08-26 01:24:06.258507+00:00,0,0,1
+115,Chitekesa Health Centre,TX_NEW,FP,All,2025-08-26 01:24:06.258507+00:00,0,0,3
+115,Chitekesa Health Centre,TX_NEW,FNP,All,2025-08-26 01:24:06.258507+00:00,0,0,2
+115,Chitekesa Health Centre,TX_NEW,Male,45-49 years,2025-08-26 01:24:06.258507+00:00,0,0,1
+115,Chitekesa Health Centre,TX_NEW,Female,20-24 years,2025-08-26 01:24:06.258507+00:00,0,0,2
+115,Chitekesa Health Centre,TX_NEW,Male,All,2025-08-26 01:24:06.258507+00:00,0,0,3
+115,Chitekesa Health Centre,TX_NEW,Male,25-29 years,2025-08-26 01:24:06.258507+00:00,0,0,1
+site_id,facility,indicator,sex,age_group,Date_Submitted,cd4_less_than_200,cd4_greater_than_equal_to_200,cd4_unknown_or_not_done
+138,Dedza District Hospital,TX_NEW,FNP,All,2025-08-26 01:24:06.258421+00:00,5,4,46
+138,Dedza District Hospital,TX_NEW,Male,15-19 years,2025-08-26 01:24:06.258421+00:00,0,0,2
+138,Dedza District Hospital,TX_NEW,Male,50-54 years,2025-08-26 01:24:06.258421+00:00,0,0,1
+138,Dedza District Hospital,TX_NEW,Male,30-34 years,2025-08-26 01:24:06.258421+00:00,0,0,6
+138,Dedza District Hospital,TX_NEW,Male,All,2025-08-26 01:24:06.258421+00:00,2,1,57
+138,Dedza District Hospital,TX_NEW,Male,25-29 years,2025-08-26 01:24:06.258421+00:00,0,0,10
+138,Dedza District Hospital,TX_NEW,Male,20-24 years,2025-08-26 01:24:06.258421+00:00,1,0,5
+138,Dedza District Hospital,TX_NEW,Male,45-49 years,2025-08-26 01:24:06.258421+00:00,0,1,6
+138,Dedza District Hospital,TX_NEW,Female,<1 years,2025-08-26 01:24:06.258421+00:00,0,0,2
+138,Dedza District Hospital,TX_NEW,Female,20-24 years,2025-08-26 01:24:06.258421+00:00,3,3,12
+138,Dedza District Hospital,TX_NEW,Male,1-4 years,2025-08-26 01:24:06.258421+00:00,0,0,3
+138,Dedza District Hospital,TX_NEW,Female,35-39 years,2025-08-26 01:24:06.258421+00:00,0,0,8
+138,Dedza District Hospital,TX_NEW,FBF,All,2025-08-26 01:24:06.258421+00:00,0,1,5
+138,Dedza District Hospital,TX_NEW,Male,35-39 years,2025-08-26 01:24:06.258421+00:00,0,0,12
+138,Dedza District Hospital,TX_NEW,Female,50-54 years,2025-08-26 01:24:06.258421+00:00,0,0,1
+138,Dedza District Hospital,TX_NEW,Female,30-34 years,2025-08-26 01:24:06.258421+00:00,2,0,11
+138,Dedza District Hospital,TX_NEW,Female,40-44 years,2025-08-26 01:24:06.258421+00:00,0,3,12
+138,Dedza District Hospital,TX_NEW,Male,5-9 years,2025-08-26 01:24:06.258421+00:00,0,0,1
+138,Dedza District Hospital,TX_NEW,Female,65-69 years,2025-08-26 01:24:06.258421+00:00,0,0,1
+138,Dedza District Hospital,TX_NEW,Male,40-44 years,2025-08-26 01:24:06.258421+00:00,1,0,9
+138,Dedza District Hospital,TX_NEW,FP,All,2025-08-26 01:24:06.258421+00:00,1,2,20
+138,Dedza District Hospital,TX_NEW,Male,55-59 years,2025-08-26 01:24:06.258421+00:00,0,0,1
+138,Dedza District Hospital,TX_NEW,Male,70-74 years,2025-08-26 01:24:06.258421+00:00,0,0,1
+138,Dedza District Hospital,TX_NEW,Female,1-4 years,2025-08-26 01:24:06.258421+00:00,0,0,1
+138,Dedza District Hospital,TX_NEW,Female,15-19 years,2025-08-26 01:24:06.258421+00:00,0,0,8
+138,Dedza District Hospital,TX_NEW,Female,25-29 years,2025-08-26 01:24:06.258421+00:00,1,1,14
+138,Dedza District Hospital,TX_NEW,Female,55-59 years,2025-08-26 01:24:06.258421+00:00,0,0,1
+site_id,facility,indicator,sex,age_group,Date_Submitted,cd4_less_than_200,cd4_greater_than_equal_to_200,cd4_unknown_or_not_done
+16,Bangwe Health Centre,TX_NEW,Male,50-54 years,2025-08-26 01:24:06.258382+00:00,0,0,1
+16,Bangwe Health Centre,TX_NEW,Male,20-24 years,2025-08-26 01:24:06.258382+00:00,0,0,1
+16,Bangwe Health Centre,TX_NEW,FP,All,2025-08-26 01:24:06.258382+00:00,0,0,11
+16,Bangwe Health Centre,TX_NEW,Female,25-29 years,2025-08-26 01:24:06.258382+00:00,0,0,14
+16,Bangwe Health Centre,TX_NEW,Male,45-49 years,2025-08-26 01:24:06.258382+00:00,0,0,9
+16,Bangwe Health Centre,TX_NEW,Male,35-39 years,2025-08-26 01:24:06.258382+00:00,0,0,5
+16,Bangwe Health Centre,TX_NEW,Male,55-59 years,2025-08-26 01:24:06.258382+00:00,0,0,1
+16,Bangwe Health Centre,TX_NEW,Female,35-39 years,2025-08-26 01:24:06.258382+00:00,0,0,6
+16,Bangwe Health Centre,TX_NEW,FNP,All,2025-08-26 01:24:06.258382+00:00,1,2,33
+16,Bangwe Health Centre,TX_NEW,Male,All,2025-08-26 01:24:06.258382+00:00,1,1,45
+16,Bangwe Health Centre,TX_NEW,Female,30-34 years,2025-08-26 01:24:06.258382+00:00,1,1,6
+16,Bangwe Health Centre,TX_NEW,Male,15-19 years,2025-08-26 01:24:06.258382+00:00,0,0,1
+16,Bangwe Health Centre,TX_NEW,Male,60-64 years,2025-08-26 01:24:06.258382+00:00,0,0,1
+16,Bangwe Health Centre,TX_NEW,Female,55-59 years,2025-08-26 01:24:06.258382+00:00,0,0,1
+16,Bangwe Health Centre,TX_NEW,Male,30-34 years,2025-08-26 01:24:06.258382+00:00,0,1,7
+16,Bangwe Health Centre,TX_NEW,Male,40-44 years,2025-08-26 01:24:06.258382+00:00,1,0,8
+16,Bangwe Health Centre,TX_NEW,FBF,All,2025-08-26 01:24:06.258382+00:00,0,0,3
+16,Bangwe Health Centre,TX_NEW,Male,5-9 years,2025-08-26 01:24:06.258382+00:00,0,0,1
+16,Bangwe Health Centre,TX_NEW,Male,10-14 years,2025-08-26 01:24:06.258382+00:00,0,0,1
+16,Bangwe Health Centre,TX_NEW,Female,40-44 years,2025-08-26 01:24:06.258382+00:00,0,0,2
+16,Bangwe Health Centre,TX_NEW,Male,1-4 years,2025-08-26 01:24:06.258382+00:00,0,0,3
+16,Bangwe Health Centre,TX_NEW,Male,25-29 years,2025-08-26 01:24:06.258382+00:00,0,0,4
+16,Bangwe Health Centre,TX_NEW,Male,<1 years,2025-08-26 01:24:06.258382+00:00,0,0,2
+16,Bangwe Health Centre,TX_NEW,Female,20-24 years,2025-08-26 01:24:06.258382+00:00,0,0,12
+16,Bangwe Health Centre,TX_NEW,Female,15-19 years,2025-08-26 01:24:06.258382+00:00,0,1,6
+site_id,facility,indicator,sex,age_group,Date_Submitted,cd4_less_than_200,cd4_greater_than_equal_to_200,cd4_unknown_or_not_done
+193,Jalasi Health Centre,TX_NEW,Male,55-59 years,2025-08-26 01:24:06.320545+00:00,0,0,1
+193,Jalasi Health Centre,TX_NEW,Female,40-44 years,2025-08-26 01:24:06.320545+00:00,0,0,2
+193,Jalasi Health Centre,TX_NEW,Female,20-24 years,2025-08-26 01:24:06.320545+00:00,0,0,4
+193,Jalasi Health Centre,TX_NEW,FP,All,2025-08-26 01:24:06.320545+00:00,0,0,6
+193,Jalasi Health Centre,TX_NEW,Male,All,2025-08-26 01:24:06.320545+00:00,0,0,2
+193,Jalasi Health Centre,TX_NEW,Female,30-34 years,2025-08-26 01:24:06.320545+00:00,0,0,2
+193,Jalasi Health Centre,TX_NEW,Male,35-39 years,2025-08-26 01:24:06.320545+00:00,0,0,1
+193,Jalasi Health Centre,TX_NEW,Female,35-39 years,2025-08-26 01:24:06.320545+00:00,0,0,4
+193,Jalasi Health Centre,TX_NEW,FNP,All,2025-08-26 01:24:06.320545+00:00,0,0,9
+193,Jalasi Health Centre,TX_NEW,Female,25-29 years,2025-08-26 01:24:06.320545+00:00,0,0,3
+site_id,facility,indicator,sex,age_group,Date_Submitted,cd4_less_than_200,cd4_greater_than_equal_to_200,cd4_unknown_or_not_done
+194,Jenda Health Centre,TX_NEW,Male,25-29 years,2025-08-26 01:24:06.321021+00:00,0,0,2
+194,Jenda Health Centre,TX_NEW,Female,1-4 years,2025-08-26 01:24:06.321021+00:00,0,0,1
+194,Jenda Health Centre,TX_NEW,Female,20-24 years,2025-08-26 01:24:06.321021+00:00,0,0,9
+194,Jenda Health Centre,TX_NEW,Male,35-39 years,2025-08-26 01:24:06.321021+00:00,0,0,7
+194,Jenda Health Centre,TX_NEW,Male,40-44 years,2025-08-26 01:24:06.321021+00:00,0,1,5
+194,Jenda Health Centre,TX_NEW,Female,35-39 years,2025-08-26 01:24:06.321021+00:00,0,0,6
+194,Jenda Health Centre,TX_NEW,FBF,All,2025-08-26 01:24:06.321021+00:00,0,0,1
+194,Jenda Health Centre,TX_NEW,FNP,All,2025-08-26 01:24:06.321021+00:00,0,0,23
+194,Jenda Health Centre,TX_NEW,Male,85-89 years,2025-08-26 01:24:06.321021+00:00,0,0,1
+194,Jenda Health Centre,TX_NEW,Male,45-49 years,2025-08-26 01:24:06.321021+00:00,1,0,3
+194,Jenda Health Centre,TX_NEW,Female,10-14 years,2025-08-26 01:24:06.321021+00:00,0,0,1
+194,Jenda Health Centre,TX_NEW,Female,30-34 years,2025-08-26 01:24:06.321021+00:00,0,0,6
+194,Jenda Health Centre,TX_NEW,FP,All,2025-08-26 01:24:06.321021+00:00,0,0,10
+194,Jenda Health Centre,TX_NEW,Female,15-19 years,2025-08-26 01:24:06.321021+00:00,0,0,4
+194,Jenda Health Centre,TX_NEW,Female,25-29 years,2025-08-26 01:24:06.321021+00:00,0,0,6
+194,Jenda Health Centre,TX_NEW,Male,All,2025-08-26 01:24:06.321021+00:00,1,1,18
+194,Jenda Health Centre,TX_NEW,Female,45-49 years,2025-08-26 01:24:06.321021+00:00,0,0,1
+site_id,facility,indicator,sex,age_group,Date_Submitted,cd4_less_than_200,cd4_greater_than_equal_to_200,cd4_unknown_or_not_done
+248,Kasinje Health Centre,TX_NEW,Female,1-4 years,2025-08-26 01:24:06.320314+00:00,0,1,0
+248,Kasinje Health Centre,TX_NEW,Female,15-19 years,2025-08-26 01:24:06.320314+00:00,0,0,2
+248,Kasinje Health Centre,TX_NEW,Female,65-69 years,2025-08-26 01:24:06.320314+00:00,0,1,0
+248,Kasinje Health Centre,TX_NEW,Male,30-34 years,2025-08-26 01:24:06.320314+00:00,0,0,1
+248,Kasinje Health Centre,TX_NEW,Female,25-29 years,2025-08-26 01:24:06.320314+00:00,0,0,1
+248,Kasinje Health Centre,TX_NEW,FP,All,2025-08-26 01:24:06.320314+00:00,0,0,4
+248,Kasinje Health Centre,TX_NEW,Male,All,2025-08-26 01:24:06.320314+00:00,0,1,2
+248,Kasinje Health Centre,TX_NEW,Male,50-54 years,2025-08-26 01:24:06.320314+00:00,0,0,1
+248,Kasinje Health Centre,TX_NEW,Male,25-29 years,2025-08-26 01:24:06.320314+00:00,0,1,0
+248,Kasinje Health Centre,TX_NEW,FNP,All,2025-08-26 01:24:06.320314+00:00,2,3,5
+248,Kasinje Health Centre,TX_NEW,Female,55-59 years,2025-08-26 01:24:06.320314+00:00,1,0,0
+248,Kasinje Health Centre,TX_NEW,Female,35-39 years,2025-08-26 01:24:06.320314+00:00,0,0,3
+248,Kasinje Health Centre,TX_NEW,Female,30-34 years,2025-08-26 01:24:06.320314+00:00,1,1,0
+248,Kasinje Health Centre,TX_NEW,Female,40-44 years,2025-08-26 01:24:06.320314+00:00,0,0,2
+248,Kasinje Health Centre,TX_NEW,Female,20-24 years,2025-08-26 01:24:06.320314+00:00,0,0,1
+248,Kasinje Health Centre,TX_NEW,FBF,All,2025-08-26 01:24:06.320314+00:00,0,0,1
+248,Kasinje Health Centre,TX_NEW,Female,45-49 years,2025-08-26 01:24:06.320314+00:00,0,0,1
+site_id,facility,indicator,sex,age_group,Date_Submitted,cd4_less_than_200,cd4_greater_than_equal_to_200,cd4_unknown_or_not_done
+303,Liuzi Health Centre,TX_NEW,FNP,All,2025-08-26 01:24:06.320970+00:00,0,0,1
+303,Liuzi Health Centre,TX_NEW,Male,All,2025-08-26 01:24:06.320970+00:00,0,0,2
+303,Liuzi Health Centre,TX_NEW,FBF,All,2025-08-26 01:24:06.320970+00:00,0,0,1
+303,Liuzi Health Centre,TX_NEW,Male,30-34 years,2025-08-26 01:24:06.320970+00:00,0,0,1
+303,Liuzi Health Centre,TX_NEW,Male,35-39 years,2025-08-26 01:24:06.320970+00:00,0,0,1
+303,Liuzi Health Centre,TX_NEW,Female,30-34 years,2025-08-26 01:24:06.320970+00:00,0,0,1
+303,Liuzi Health Centre,TX_NEW,Female,25-29 years,2025-08-26 01:24:06.320970+00:00,0,0,1
+site_id,facility,indicator,sex,age_group,Date_Submitted,cd4_less_than_200,cd4_greater_than_equal_to_200,cd4_unknown_or_not_done
+359,Mangochi District Hospital,TX_NEW,Female,50-54 years,2025-08-26 01:24:06.321131+00:00,0,0,4
+359,Mangochi District Hospital,TX_NEW,Female,55-59 years,2025-08-26 01:24:06.321131+00:00,0,0,1
+359,Mangochi District Hospital,TX_NEW,Female,75-79 years,2025-08-26 01:24:06.321131+00:00,0,0,1
+359,Mangochi District Hospital,TX_NEW,Female,5-9 years,2025-08-26 01:24:06.321131+00:00,0,0,2
+359,Mangochi District Hospital,TX_NEW,Male,50-54 years,2025-08-26 01:24:06.321131+00:00,0,0,7
+359,Mangochi District Hospital,TX_NEW,Male,40-44 years,2025-08-26 01:24:06.321131+00:00,0,0,9
+359,Mangochi District Hospital,TX_NEW,Female,10-14 years,2025-08-26 01:24:06.321131+00:00,0,0,1
+359,Mangochi District Hospital,TX_NEW,Male,80-84 years,2025-08-26 01:24:06.321131+00:00,0,0,1
+359,Mangochi District Hospital,TX_NEW,Male,20-24 years,2025-08-26 01:24:06.321131+00:00,0,0,3
+359,Mangochi District Hospital,TX_NEW,Male,25-29 years,2025-08-26 01:24:06.321131+00:00,0,0,8
+359,Mangochi District Hospital,TX_NEW,Male,All,2025-08-26 01:24:06.321131+00:00,0,0,62
+359,Mangochi District Hospital,TX_NEW,Male,35-39 years,2025-08-26 01:24:06.321131+00:00,0,0,8
+359,Mangochi District Hospital,TX_NEW,Female,15-19 years,2025-08-26 01:24:06.321131+00:00,0,0,2
+359,Mangochi District Hospital,TX_NEW,Male,5-9 years,2025-08-26 01:24:06.321131+00:00,0,0,1
+359,Mangochi District Hospital,TX_NEW,Male,30-34 years,2025-08-26 01:24:06.321131+00:00,0,0,9
+359,Mangochi District Hospital,TX_NEW,Female,35-39 years,2025-08-26 01:24:06.321131+00:00,0,0,5
+359,Mangochi District Hospital,TX_NEW,FNP,All,2025-08-26 01:24:06.321131+00:00,0,0,53
+359,Mangochi District Hospital,TX_NEW,Male,45-49 years,2025-08-26 01:24:06.321131+00:00,0,0,4
+359,Mangochi District Hospital,TX_NEW,Female,25-29 years,2025-08-26 01:24:06.321131+00:00,0,0,16
+359,Mangochi District Hospital,TX_NEW,Female,65-69 years,2025-08-26 01:24:06.321131+00:00,0,0,1
+359,Mangochi District Hospital,TX_NEW,FP,All,2025-08-26 01:24:06.321131+00:00,0,0,19
+359,Mangochi District Hospital,TX_NEW,Female,70-74 years,2025-08-26 01:24:06.321131+00:00,0,0,1
+359,Mangochi District Hospital,TX_NEW,Male,70-74 years,2025-08-26 01:24:06.321131+00:00,0,0,2
+359,Mangochi District Hospital,TX_NEW,Female,1-4 years,2025-08-26 01:24:06.321131+00:00,0,0,4
+359,Mangochi District Hospital,TX_NEW,Female,<1 years,2025-08-26 01:24:06.321131+00:00,0,0,2
+359,Mangochi District Hospital,TX_NEW,Female,30-34 years,2025-08-26 01:24:06.321131+00:00,0,0,16
+359,Mangochi District Hospital,TX_NEW,Female,45-49 years,2025-08-26 01:24:06.321131+00:00,0,0,4
+359,Mangochi District Hospital,TX_NEW,Male,1-4 years,2025-08-26 01:24:06.321131+00:00,0,0,4
+359,Mangochi District Hospital,TX_NEW,Female,40-44 years,2025-08-26 01:24:06.321131+00:00,0,0,7
+359,Mangochi District Hospital,TX_NEW,FBF,All,2025-08-26 01:24:06.321131+00:00,0,0,10
+359,Mangochi District Hospital,TX_NEW,Male,15-19 years,2025-08-26 01:24:06.321131+00:00,0,0,3
+359,Mangochi District Hospital,TX_NEW,Male,55-59 years,2025-08-26 01:24:06.321131+00:00,0,0,3
+359,Mangochi District Hospital,TX_NEW,Female,20-24 years,2025-08-26 01:24:06.321131+00:00,0,0,15
+site_id,facility,indicator,sex,age_group,Date_Submitted,cd4_less_than_200,cd4_greater_than_equal_to_200,cd4_unknown_or_not_done
+433,Mlangeni Health Centre,TX_NEW,FNP,All,2025-08-26 01:24:06.334023+00:00,0,0,3
+433,Mlangeni Health Centre,TX_NEW,Female,20-24 years,2025-08-26 01:24:06.334023+00:00,0,0,2
+433,Mlangeni Health Centre,TX_NEW,Male,All,2025-08-26 01:24:06.334023+00:00,0,0,5
+433,Mlangeni Health Centre,TX_NEW,Male,20-24 years,2025-08-26 01:24:06.334023+00:00,0,0,1
+433,Mlangeni Health Centre,TX_NEW,Male,45-49 years,2025-08-26 01:24:06.334023+00:00,0,0,1
+433,Mlangeni Health Centre,TX_NEW,Male,35-39 years,2025-08-26 01:24:06.334023+00:00,0,0,2
+433,Mlangeni Health Centre,TX_NEW,Male,40-44 years,2025-08-26 01:24:06.334023+00:00,0,0,1
+433,Mlangeni Health Centre,TX_NEW,Female,5-9 years,2025-08-26 01:24:06.334023+00:00,0,0,1
+site_id,facility,indicator,sex,age_group,Date_Submitted,cd4_less_than_200,cd4_greater_than_equal_to_200,cd4_unknown_or_not_done
+468,Mtwalo Health Centre,TX_NEW,Male,35-39 years,2025-08-26 01:24:06.334212+00:00,0,0,1
+468,Mtwalo Health Centre,TX_NEW,Male,30-34 years,2025-08-26 01:24:06.334212+00:00,0,0,1
+468,Mtwalo Health Centre,TX_NEW,Female,30-34 years,2025-08-26 01:24:06.334212+00:00,0,0,1
+468,Mtwalo Health Centre,TX_NEW,Female,25-29 years,2025-08-26 01:24:06.334212+00:00,0,0,3
+468,Mtwalo Health Centre,TX_NEW,Female,35-39 years,2025-08-26 01:24:06.334212+00:00,0,0,2
+468,Mtwalo Health Centre,TX_NEW,FP,All,2025-08-26 01:24:06.334212+00:00,0,0,4
+468,Mtwalo Health Centre,TX_NEW,Male,20-24 years,2025-08-26 01:24:06.334212+00:00,0,0,1
+468,Mtwalo Health Centre,TX_NEW,Male,45-49 years,2025-08-26 01:24:06.334212+00:00,0,0,1
+468,Mtwalo Health Centre,TX_NEW,Male,50-54 years,2025-08-26 01:24:06.334212+00:00,0,0,2
+468,Mtwalo Health Centre,TX_NEW,FNP,All,2025-08-26 01:24:06.334212+00:00,0,0,3
+468,Mtwalo Health Centre,TX_NEW,Female,20-24 years,2025-08-26 01:24:06.334212+00:00,0,0,1
+468,Mtwalo Health Centre,TX_NEW,Male,All,2025-08-26 01:24:06.334212+00:00,0,0,7
+468,Mtwalo Health Centre,TX_NEW,Male,25-29 years,2025-08-26 01:24:06.334212+00:00,0,0,1
+site_id,facility,indicator,sex,age_group,Date_Submitted,cd4_less_than_200,cd4_greater_than_equal_to_200,cd4_unknown_or_not_done
+495,Mzimba District Hospital,TX_NEW,Male,40-44 years,2025-08-26 01:24:06.340929+00:00,1,3,1
+495,Mzimba District Hospital,TX_NEW,Male,50-54 years,2025-08-26 01:24:06.340929+00:00,2,0,0
+495,Mzimba District Hospital,TX_NEW,Male,35-39 years,2025-08-26 01:24:06.340929+00:00,2,1,4
+495,Mzimba District Hospital,TX_NEW,Male,45-49 years,2025-08-26 01:24:06.340929+00:00,1,2,1
+495,Mzimba District Hospital,TX_NEW,FBF,All,2025-08-26 01:24:06.340929+00:00,1,3,3
+495,Mzimba District Hospital,TX_NEW,Male,30-34 years,2025-08-26 01:24:06.340929+00:00,3,2,2
+495,Mzimba District Hospital,TX_NEW,Male,All,2025-08-26 01:24:06.340929+00:00,13,10,16
+495,Mzimba District Hospital,TX_NEW,Female,15-19 years,2025-08-26 01:24:06.340929+00:00,2,2,3
+495,Mzimba District Hospital,TX_NEW,Male,55-59 years,2025-08-26 01:24:06.340929+00:00,1,0,0
+495,Mzimba District Hospital,TX_NEW,Female,40-44 years,2025-08-26 01:24:06.340929+00:00,3,5,10
+495,Mzimba District Hospital,TX_NEW,FP,All,2025-08-26 01:24:06.340929+00:00,2,2,2
+495,Mzimba District Hospital,TX_NEW,FNP,All,2025-08-26 01:24:06.340929+00:00,8,14,24
+495,Mzimba District Hospital,TX_NEW,Female,45-49 years,2025-08-26 01:24:06.340929+00:00,0,2,3
+495,Mzimba District Hospital,TX_NEW,Male,25-29 years,2025-08-26 01:24:06.340929+00:00,2,1,0
+495,Mzimba District Hospital,TX_NEW,Female,5-9 years,2025-08-26 01:24:06.340929+00:00,0,0,1
+495,Mzimba District Hospital,TX_NEW,Male,1-4 years,2025-08-26 01:24:06.340929+00:00,0,0,2
+495,Mzimba District Hospital,TX_NEW,Male,65-69 years,2025-08-26 01:24:06.340929+00:00,0,0,2
+495,Mzimba District Hospital,TX_NEW,Female,55-59 years,2025-08-26 01:24:06.340929+00:00,0,1,0
+495,Mzimba District Hospital,TX_NEW,Female,1-4 years,2025-08-26 01:24:06.340929+00:00,0,1,0
+495,Mzimba District Hospital,TX_NEW,Female,25-29 years,2025-08-26 01:24:06.340929+00:00,1,3,3
+495,Mzimba District Hospital,TX_NEW,Female,20-24 years,2025-08-26 01:24:06.340929+00:00,2,3,1
+495,Mzimba District Hospital,TX_NEW,Male,20-24 years,2025-08-26 01:24:06.340929+00:00,1,0,2
+495,Mzimba District Hospital,TX_NEW,Male,60-64 years,2025-08-26 01:24:06.340929+00:00,0,1,0
+495,Mzimba District Hospital,TX_NEW,Male,5-9 years,2025-08-26 01:24:06.340929+00:00,0,0,1
+495,Mzimba District Hospital,TX_NEW,Female,30-34 years,2025-08-26 01:24:06.340929+00:00,1,2,3
+495,Mzimba District Hospital,TX_NEW,Female,35-39 years,2025-08-26 01:24:06.340929+00:00,2,0,5
+495,Mzimba District Hospital,TX_NEW,Male,<1 years,2025-08-26 01:24:06.340929+00:00,0,0,1
+site_id,facility,indicator,sex,age_group,Date_Submitted,cd4_less_than_200,cd4_greater_than_equal_to_200,cd4_unknown_or_not_done
+530,Ndamera Health Centre,TX_NEW,Female,25-29 years,2025-08-26 01:24:06.340735+00:00,1,2,1
+530,Ndamera Health Centre,TX_NEW,Male,15-19 years,2025-08-26 01:24:06.340735+00:00,0,0,1
+530,Ndamera Health Centre,TX_NEW,Female,40-44 years,2025-08-26 01:24:06.340735+00:00,0,2,1
+530,Ndamera Health Centre,TX_NEW,Female,1-4 years,2025-08-26 01:24:06.340735+00:00,0,0,2
+530,Ndamera Health Centre,TX_NEW,Female,45-49 years,2025-08-26 01:24:06.340735+00:00,0,1,0
+530,Ndamera Health Centre,TX_NEW,Male,35-39 years,2025-08-26 01:24:06.340735+00:00,1,1,1
+530,Ndamera Health Centre,TX_NEW,Male,50-54 years,2025-08-26 01:24:06.340735+00:00,1,2,1
+530,Ndamera Health Centre,TX_NEW,Male,10-14 years,2025-08-26 01:24:06.340735+00:00,0,0,1
+530,Ndamera Health Centre,TX_NEW,Female,20-24 years,2025-08-26 01:24:06.340735+00:00,0,3,2
+530,Ndamera Health Centre,TX_NEW,Female,30-34 years,2025-08-26 01:24:06.340735+00:00,0,1,0
+530,Ndamera Health Centre,TX_NEW,Female,35-39 years,2025-08-26 01:24:06.340735+00:00,0,3,1
+530,Ndamera Health Centre,TX_NEW,FP,All,2025-08-26 01:24:06.340735+00:00,0,4,0
+530,Ndamera Health Centre,TX_NEW,Male,30-34 years,2025-08-26 01:24:06.340735+00:00,1,1,2
+530,Ndamera Health Centre,TX_NEW,Male,All,2025-08-26 01:24:06.340735+00:00,3,7,12
+530,Ndamera Health Centre,TX_NEW,Female,55-59 years,2025-08-26 01:24:06.340735+00:00,1,2,0
+530,Ndamera Health Centre,TX_NEW,Male,55-59 years,2025-08-26 01:24:06.340735+00:00,0,1,0
+530,Ndamera Health Centre,TX_NEW,Male,40-44 years,2025-08-26 01:24:06.340735+00:00,0,1,2
+530,Ndamera Health Centre,TX_NEW,Male,5-9 years,2025-08-26 01:24:06.340735+00:00,0,1,0
+530,Ndamera Health Centre,TX_NEW,Male,60-64 years,2025-08-26 01:24:06.340735+00:00,0,0,1
+530,Ndamera Health Centre,TX_NEW,FNP,All,2025-08-26 01:24:06.340735+00:00,2,10,7
+530,Ndamera Health Centre,TX_NEW,Male,<1 years,2025-08-26 01:24:06.340735+00:00,0,0,1
+530,Ndamera Health Centre,TX_NEW,Male,1-4 years,2025-08-26 01:24:06.340735+00:00,0,0,2
+site_id,facility,indicator,sex,age_group,Date_Submitted,cd4_less_than_200,cd4_greater_than_equal_to_200,cd4_unknown_or_not_done
+533,Ndirande Urban Health Centre,TX_NEW,Female,15-19 years,2025-08-26 01:24:06.341558+00:00,0,0,3
+533,Ndirande Urban Health Centre,TX_NEW,Male,65-69 years,2025-08-26 01:24:06.341558+00:00,0,0,1
+533,Ndirande Urban Health Centre,TX_NEW,FBF,All,2025-08-26 01:24:06.341558+00:00,0,0,3
+533,Ndirande Urban Health Centre,TX_NEW,Male,30-34 years,2025-08-26 01:24:06.341558+00:00,0,0,9
+533,Ndirande Urban Health Centre,TX_NEW,Male,35-39 years,2025-08-26 01:24:06.341558+00:00,0,0,6
+533,Ndirande Urban Health Centre,TX_NEW,Female,30-34 years,2025-08-26 01:24:06.341558+00:00,0,0,9
+533,Ndirande Urban Health Centre,TX_NEW,Female,<1 years,2025-08-26 01:24:06.341558+00:00,0,0,1
+533,Ndirande Urban Health Centre,TX_NEW,Female,35-39 years,2025-08-26 01:24:06.341558+00:00,0,0,7
+533,Ndirande Urban Health Centre,TX_NEW,Female,55-59 years,2025-08-26 01:24:06.341558+00:00,0,0,1
+533,Ndirande Urban Health Centre,TX_NEW,Male,All,2025-08-26 01:24:06.341558+00:00,0,0,33
+533,Ndirande Urban Health Centre,TX_NEW,Female,25-29 years,2025-08-26 01:24:06.341558+00:00,0,0,13
+533,Ndirande Urban Health Centre,TX_NEW,Male,<1 years,2025-08-26 01:24:06.341558+00:00,0,0,1
+533,Ndirande Urban Health Centre,TX_NEW,Female,20-24 years,2025-08-26 01:24:06.341558+00:00,0,0,13
+533,Ndirande Urban Health Centre,TX_NEW,FNP,All,2025-08-26 01:24:06.341558+00:00,0,0,35
+533,Ndirande Urban Health Centre,TX_NEW,Male,45-49 years,2025-08-26 01:24:06.341558+00:00,0,0,4
+533,Ndirande Urban Health Centre,TX_NEW,Male,55-59 years,2025-08-26 01:24:06.341558+00:00,0,0,2
+533,Ndirande Urban Health Centre,TX_NEW,FP,All,2025-08-26 01:24:06.341558+00:00,0,0,15
+533,Ndirande Urban Health Centre,TX_NEW,Female,45-49 years,2025-08-26 01:24:06.341558+00:00,0,0,2
+533,Ndirande Urban Health Centre,TX_NEW,Female,1-4 years,2025-08-26 01:24:06.341558+00:00,0,0,1
+533,Ndirande Urban Health Centre,TX_NEW,Male,20-24 years,2025-08-26 01:24:06.341558+00:00,0,0,1
+533,Ndirande Urban Health Centre,TX_NEW,Female,40-44 years,2025-08-26 01:24:06.341558+00:00,0,0,3
+533,Ndirande Urban Health Centre,TX_NEW,Male,1-4 years,2025-08-26 01:24:06.341558+00:00,0,0,2
+533,Ndirande Urban Health Centre,TX_NEW,Male,25-29 years,2025-08-26 01:24:06.341558+00:00,0,0,1
+533,Ndirande Urban Health Centre,TX_NEW,Male,40-44 years,2025-08-26 01:24:06.341558+00:00,0,0,6
+site_id,facility,indicator,sex,age_group,Date_Submitted,cd4_less_than_200,cd4_greater_than_equal_to_200,cd4_unknown_or_not_done
+574,Nsanje District Hospital,TX_NEW,Male,5-9 years,2025-08-26 01:24:06.348080+00:00,0,0,1
+574,Nsanje District Hospital,TX_NEW,Male,65-69 years,2025-08-26 01:24:06.348080+00:00,1,0,0
+574,Nsanje District Hospital,TX_NEW,Female,35-39 years,2025-08-26 01:24:06.348080+00:00,0,0,4
+574,Nsanje District Hospital,TX_NEW,Male,35-39 years,2025-08-26 01:24:06.348080+00:00,0,0,7
+574,Nsanje District Hospital,TX_NEW,FP,All,2025-08-26 01:24:06.348080+00:00,0,0,13
+574,Nsanje District Hospital,TX_NEW,Female,20-24 years,2025-08-26 01:24:06.348080+00:00,0,0,8
+574,Nsanje District Hospital,TX_NEW,Male,50-54 years,2025-08-26 01:24:06.348080+00:00,0,0,4
+574,Nsanje District Hospital,TX_NEW,Female,15-19 years,2025-08-26 01:24:06.348080+00:00,0,0,4
+574,Nsanje District Hospital,TX_NEW,FBF,All,2025-08-26 01:24:06.348080+00:00,0,1,4
+574,Nsanje District Hospital,TX_NEW,Female,10-14 years,2025-08-26 01:24:06.348080+00:00,0,0,1
+574,Nsanje District Hospital,TX_NEW,Male,All,2025-08-26 01:24:06.348080+00:00,2,2,33
+574,Nsanje District Hospital,TX_NEW,Male,20-24 years,2025-08-26 01:24:06.348080+00:00,0,0,2
+574,Nsanje District Hospital,TX_NEW,Male,25-29 years,2025-08-26 01:24:06.348080+00:00,0,2,5
+574,Nsanje District Hospital,TX_NEW,Female,60-64 years,2025-08-26 01:24:06.348080+00:00,1,0,0
+574,Nsanje District Hospital,TX_NEW,Male,40-44 years,2025-08-26 01:24:06.348080+00:00,1,0,5
+574,Nsanje District Hospital,TX_NEW,Female,45-49 years,2025-08-26 01:24:06.348080+00:00,0,0,1
+574,Nsanje District Hospital,TX_NEW,Female,1-4 years,2025-08-26 01:24:06.348080+00:00,0,0,1
+574,Nsanje District Hospital,TX_NEW,FNP,All,2025-08-26 01:24:06.348080+00:00,1,0,25
+574,Nsanje District Hospital,TX_NEW,Female,25-29 years,2025-08-26 01:24:06.348080+00:00,0,0,13
+574,Nsanje District Hospital,TX_NEW,Female,40-44 years,2025-08-26 01:24:06.348080+00:00,0,1,4
+574,Nsanje District Hospital,TX_NEW,Male,45-49 years,2025-08-26 01:24:06.348080+00:00,0,0,3
+574,Nsanje District Hospital,TX_NEW,Male,1-4 years,2025-08-26 01:24:06.348080+00:00,0,0,2
+574,Nsanje District Hospital,TX_NEW,Female,30-34 years,2025-08-26 01:24:06.348080+00:00,0,0,6
+574,Nsanje District Hospital,TX_NEW,Male,60-64 years,2025-08-26 01:24:06.348080+00:00,0,0,1
+574,Nsanje District Hospital,TX_NEW,Male,30-34 years,2025-08-26 01:24:06.348080+00:00,0,0,3
+site_id,facility,indicator,sex,age_group,Date_Submitted,cd4_less_than_200,cd4_greater_than_equal_to_200,cd4_unknown_or_not_done
+689,Zomba Central Hospital,TX_NEW,Female,10-14 years,2025-08-26 01:24:06.349410+00:00,1,1,0
+689,Zomba Central Hospital,TX_NEW,Female,15-19 years,2025-08-26 01:24:06.349410+00:00,2,3,1
+689,Zomba Central Hospital,TX_NEW,Female,20-24 years,2025-08-26 01:24:06.349410+00:00,0,2,1
+689,Zomba Central Hospital,TX_NEW,Female,25-29 years,2025-08-26 01:24:06.349410+00:00,3,8,2
+689,Zomba Central Hospital,TX_NEW,Female,30-34 years,2025-08-26 01:24:06.349410+00:00,1,4,0
+689,Zomba Central Hospital,TX_NEW,Female,35-39 years,2025-08-26 01:24:06.349410+00:00,1,4,0
+689,Zomba Central Hospital,TX_NEW,Female,40-44 years,2025-08-26 01:24:06.349410+00:00,2,1,0
+689,Zomba Central Hospital,TX_NEW,Female,45-49 years,2025-08-26 01:24:06.349410+00:00,2,1,0
+689,Zomba Central Hospital,TX_NEW,Female,50-54 years,2025-08-26 01:24:06.349410+00:00,1,0,0
+689,Zomba Central Hospital,TX_NEW,Female,65-69 years,2025-08-26 01:24:06.349410+00:00,0,1,0
+689,Zomba Central Hospital,TX_NEW,FNP,All,2025-08-26 01:24:06.349410+00:00,13,25,4
+689,Zomba Central Hospital,TX_NEW,Male,10-14 years,2025-08-26 01:24:06.349410+00:00,1,0,0
+689,Zomba Central Hospital,TX_NEW,Male,1-4 years,2025-08-26 01:24:06.349410+00:00,0,0,1
+689,Zomba Central Hospital,TX_NEW,Male,15-19 years,2025-08-26 01:24:06.349410+00:00,0,1,0
+689,Zomba Central Hospital,TX_NEW,Male,20-24 years,2025-08-26 01:24:06.349410+00:00,1,2,0
+689,Zomba Central Hospital,TX_NEW,Male,25-29 years,2025-08-26 01:24:06.349410+00:00,4,1,0
+689,Zomba Central Hospital,TX_NEW,Male,30-34 years,2025-08-26 01:24:06.349410+00:00,3,5,1
+689,Zomba Central Hospital,TX_NEW,Male,35-39 years,2025-08-26 01:24:06.349410+00:00,2,3,0
+689,Zomba Central Hospital,TX_NEW,Male,40-44 years,2025-08-26 01:24:06.349410+00:00,3,3,2
+689,Zomba Central Hospital,TX_NEW,Male,45-49 years,2025-08-26 01:24:06.349410+00:00,4,3,0
+689,Zomba Central Hospital,TX_NEW,Male,50-54 years,2025-08-26 01:24:06.349410+00:00,1,1,0
+689,Zomba Central Hospital,TX_NEW,Male,55-59 years,2025-08-26 01:24:06.349410+00:00,0,1,0
+689,Zomba Central Hospital,TX_NEW,Male,60-64 years,2025-08-26 01:24:06.349410+00:00,0,0,1
+689,Zomba Central Hospital,TX_NEW,Male,65-69 years,2025-08-26 01:24:06.349410+00:00,1,0,0
+689,Zomba Central Hospital,TX_NEW,Male,80-84 years,2025-08-26 01:24:06.349410+00:00,0,1,0
+689,Zomba Central Hospital,TX_NEW,Male,All,2025-08-26 01:24:06.349410+00:00,20,21,5
+site_id,facility,indicator,sex,age_group,Date_Submitted,cd4_less_than_200,cd4_greater_than_equal_to_200,cd4_unknown_or_not_done
+843,Kachere Private Clinic,TX_NEW,Male,40-44 years,2025-08-26 01:24:06.354703+00:00,0,0,2
+843,Kachere Private Clinic,TX_NEW,Male,25-29 years,2025-08-26 01:24:06.354703+00:00,0,0,1
+843,Kachere Private Clinic,TX_NEW,Male,All,2025-08-26 01:24:06.354703+00:00,0,0,5
+843,Kachere Private Clinic,TX_NEW,FNP,All,2025-08-26 01:24:06.354703+00:00,0,0,5
+843,Kachere Private Clinic,TX_NEW,Female,40-44 years,2025-08-26 01:24:06.354703+00:00,0,0,1
+843,Kachere Private Clinic,TX_NEW,Male,35-39 years,2025-08-26 01:24:06.354703+00:00,0,0,1
+843,Kachere Private Clinic,TX_NEW,Female,50-54 years,2025-08-26 01:24:06.354703+00:00,0,0,1
+843,Kachere Private Clinic,TX_NEW,Female,30-34 years,2025-08-26 01:24:06.354703+00:00,0,0,3
+843,Kachere Private Clinic,TX_NEW,Male,45-49 years,2025-08-26 01:24:06.354703+00:00,0,0,1
+site_id,facility,indicator,sex,age_group,Date_Submitted,cd4_less_than_200,cd4_greater_than_equal_to_200,cd4_unknown_or_not_done
+8,Area 18 Urban Health Centre,TX_NEW,FNP,All,2025-08-26 01:24:06.258435+00:00,1,0,45
+8,Area 18 Urban Health Centre,TX_NEW,Female,45-49 years,2025-08-26 01:24:06.258435+00:00,0,0,2
+8,Area 18 Urban Health Centre,TX_NEW,Male,20-24 years,2025-08-26 01:24:06.258435+00:00,0,0,2
+8,Area 18 Urban Health Centre,TX_NEW,Male,55-59 years,2025-08-26 01:24:06.258435+00:00,0,0,3
+8,Area 18 Urban Health Centre,TX_NEW,Male,All,2025-08-26 01:24:06.258435+00:00,0,0,35
+8,Area 18 Urban Health Centre,TX_NEW,FBF,All,2025-08-26 01:24:06.258435+00:00,0,0,3
+8,Area 18 Urban Health Centre,TX_NEW,Female,50-54 years,2025-08-26 01:24:06.258435+00:00,0,0,2
+8,Area 18 Urban Health Centre,TX_NEW,Female,20-24 years,2025-08-26 01:24:06.258435+00:00,0,0,8
+8,Area 18 Urban Health Centre,TX_NEW,Male,25-29 years,2025-08-26 01:24:06.258435+00:00,0,0,6
+8,Area 18 Urban Health Centre,TX_NEW,Male,65-69 years,2025-08-26 01:24:06.258435+00:00,0,0,1
+8,Area 18 Urban Health Centre,TX_NEW,Male,<1 years,2025-08-26 01:24:06.258435+00:00,0,0,2
+8,Area 18 Urban Health Centre,TX_NEW,Female,25-29 years,2025-08-26 01:24:06.258435+00:00,0,0,20
+8,Area 18 Urban Health Centre,TX_NEW,Male,35-39 years,2025-08-26 01:24:06.258435+00:00,0,0,8
+8,Area 18 Urban Health Centre,TX_NEW,Female,40-44 years,2025-08-26 01:24:06.258435+00:00,0,0,6
+8,Area 18 Urban Health Centre,TX_NEW,Male,30-34 years,2025-08-26 01:24:06.258435+00:00,0,0,5
+8,Area 18 Urban Health Centre,TX_NEW,Female,15-19 years,2025-08-26 01:24:06.258435+00:00,0,0,3
+8,Area 18 Urban Health Centre,TX_NEW,Female,65-69 years,2025-08-26 01:24:06.258435+00:00,1,0,0
+8,Area 18 Urban Health Centre,TX_NEW,Female,35-39 years,2025-08-26 01:24:06.258435+00:00,0,0,7
+8,Area 18 Urban Health Centre,TX_NEW,Female,1-4 years,2025-08-26 01:24:06.258435+00:00,0,0,2
+8,Area 18 Urban Health Centre,TX_NEW,Male,45-49 years,2025-08-26 01:24:06.258435+00:00,0,0,2
+8,Area 18 Urban Health Centre,TX_NEW,Female,<1 years,2025-08-26 01:24:06.258435+00:00,0,0,2
+8,Area 18 Urban Health Centre,TX_NEW,Male,50-54 years,2025-08-26 01:24:06.258435+00:00,0,0,2
+8,Area 18 Urban Health Centre,TX_NEW,FP,All,2025-08-26 01:24:06.258435+00:00,0,0,17
+8,Area 18 Urban Health Centre,TX_NEW,Male,40-44 years,2025-08-26 01:24:06.258435+00:00,0,0,4
+8,Area 18 Urban Health Centre,TX_NEW,Female,30-34 years,2025-08-26 01:24:06.258435+00:00,0,0,13

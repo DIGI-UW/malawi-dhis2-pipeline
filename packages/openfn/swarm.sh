@@ -100,10 +100,10 @@ Lightning.Setup.setup_user(
     first_name: \"Test\", 
     last_name: \"User\",
     email: \"${OPENFN_ADMIN_USER}\", 
-    password: \"${OPENFN_ADMIN_PASSWORD}\", 
+    password: System.get_env(\"OPENFN_ADMIN_PASSWORD\"), 
     role: :superuser
   }, 
-  \"${OPENFN_API_KEY}\", 
+  System.get_env(\"OPENFN_API_KEY\"), 
   [
     %{
       name: \"sftp-test-credential\", 
@@ -112,30 +112,32 @@ Lightning.Setup.setup_user(
         host: \"sftp://172.17.0.1\", 
         port: 2225, 
         username: \"${SFTP_TEST_USERNAME:-openfn}\", 
-        password: \"${SFTP_TEST_PASSWORD:-instant101}\"
+        password: (System.get_env(\"SFTP_TEST_PASSWORD\") || \"instant101\")
       }
     }, 
     %{
       name: \"dhis2-credential\", 
       schema: \"dhis2\", 
       body: %{
-        username: \"${DHIS2_USERNAME:-admin}\", 
-        password: \"${DHIS2_PASSWORD:-district}\", 
-        hostUrl: \"${DHIS2_URL:-http://dhis2:8080}\"
+        username: \"${DHIS2_ADMIN_USERNAME:-admin}\", 
+        password: (System.get_env(\"DHIS2_ADMIN_PASSWORD\") || \"district\"), 
+        hostUrl: \"${DHIS2_URL:-http://dhis2:8080}\", 
+        integrationUsername: \"${DHIS2_USERNAME:-openfn_integration}\", 
+        integrationPassword: (System.get_env(\"DHIS2_PASSWORD\") || \"OpenFn@2024!\")
       }
     }, 
     %{
       name: \"combined-sftp-dhis2-credential\", 
       schema: \"dhis2\", 
       body: %{
-        username: \"openfn_integration\", 
-        password: \"OpenFn@2024!\", 
+        username: \"${DHIS2_USERNAME:-openfn_integration}\", 
+        password: (System.get_env(\"DHIS2_PASSWORD\") || \"OpenFn@2024!\"), 
         hostUrl: \"${DHIS2_URL:-http://dhis2:8080}\", 
         sftpConfiguration: %{
           host: \"172.17.0.1\", 
           port: 2225, 
           username: \"${SFTP_TEST_USERNAME:-openfn}\", 
-          password: \"${SFTP_TEST_PASSWORD:-instant101}\"
+          password: (System.get_env(\"SFTP_TEST_PASSWORD\") || \"instant101\")
         }
       }
     }

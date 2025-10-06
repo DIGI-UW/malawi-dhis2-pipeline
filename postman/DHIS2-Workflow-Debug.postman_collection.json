@@ -1,0 +1,807 @@
+{
+  "info": {
+    "name": "DHIS2 Workflow Debug Collection",
+    "description": "Reproduces the simplified OpenFn workflow sequence: create root country OU, integration user, metadata, and test data uploads",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "dhis2_base_url",
+      "value": "http://localhost:8080",
+      "description": "DHIS2 base URL"
+    },
+    {
+      "key": "dhis2_username", 
+      "value": "admin",
+      "description": "DHIS2 username for setup"
+    },
+    {
+      "key": "dhis2_password",
+      "value": "district", 
+      "description": "DHIS2 password for setup"
+    },
+    {
+      "key": "integration_username",
+      "value": "openfn_integration",
+      "description": "Integration user for data uploads"
+    },
+    {
+      "key": "integration_password",
+      "value": "OpenFn@2024!",
+      "description": "Integration user password"
+    },
+    {
+      "key": "country_org_unit_id",
+      "value": "",
+      "description": "Malawi org unit ID (set after creating)"
+    },
+    {
+      "key": "facility_org_unit_id", 
+      "value": "",
+      "description": "Test facility org unit ID (set after creating)"
+    },
+    {
+      "key": "data_element_id",
+      "value": "",
+      "description": "TX_CURR data element ID (set after creating)"
+    },
+    {
+      "key": "superuser_role_id",
+      "value": "yrB6vc5Ip3r",
+      "description": "Superuser role ID (default or set after querying)"
+    }
+  ],
+  "auth": {
+    "type": "basic",
+    "basic": [
+      {
+        "key": "username",
+        "value": "{{dhis2_username}}",
+        "type": "string"
+      },
+      {
+        "key": "password", 
+        "value": "{{dhis2_password}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Ensure base URL has no trailing slash and uses 127.0.0.1 by default",
+          "let base = pm.collectionVariables.get('dhis2_base_url') || pm.environment.get('dhis2_base_url');",
+          "if (!base) { base = 'http://127.0.0.1:8080'; pm.collectionVariables.set('dhis2_base_url', base); }",
+          "base = String(base);",
+          "while (base.endsWith('/')) { base = base.slice(0, -1); }",
+          "if (base.includes('localhost')) { base = base.replace('localhost', '127.0.0.1'); }",
+          "pm.collectionVariables.set('dhis2_base_url', base);",
+          "// Clear potentially stale variables at the start of runs",
+          "pm.collectionVariables.unset('integration_user_id');"
+        ]
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "0. Admin: Who Am I",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{dhis2_base_url}}/api/me?fields=id,username",
+          "host": ["{{dhis2_base_url}}"],
+          "path": ["api", "me"],
+          "query": [
+            { "key": "fields", "value": "id,username" }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "1. Check Root Country Org Unit (Malawi)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{dhis2_base_url}}/api/organisationUnits?filter=code:eq:MW&fields=id,name,code,level",
+          "host": ["{{dhis2_base_url}}"],
+          "path": ["api", "organisationUnits"],
+          "query": [
+            {
+              "key": "filter",
+              "value": "code:eq:MW"
+            },
+            {
+              "key": "fields",
+              "value": "id,name,code,level"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "try {",
+              "  const arr = pm.response.json().organisationUnits || [];",
+              "  if (arr.length > 0 && arr[0].id) { pm.collectionVariables.set('country_org_unit_id', arr[0].id); }",
+              "} catch (e) {}"
+            ]
+          }
+        }
+      ],
+      "response": []
+    },
+    {
+      "name": "2. Create Root Country Org Unit (Malawi)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Malawi\",\n  \"shortName\": \"Malawi\",\n  \"code\": \"MW\",\n  \"openingDate\": \"2020-01-01\"\n}"
+        },
+        "url": {
+          "raw": "{{dhis2_base_url}}/api/organisationUnits",
+          "host": ["{{dhis2_base_url}}"],
+          "path": ["api", "organisationUnits"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "let uid = null;",
+              "if (pm.response.code >= 200 && pm.response.code < 300) {",
+              "  try { const json = pm.response.json(); uid = json && json.response && json.response.uid; } catch (e) {}",
+              "  if (!uid) { const loc = pm.response.headers.get('Location'); if (loc) { const m = loc.match(/[A-Za-z0-9]{11}/); if (m) uid = m[0]; } }",
+              "} else if (pm.response.code === 409) {",
+              "  // Org unit already exists, get it by code",
+              "  pm.sendRequest({",
+              "    url: pm.environment.get('dhis2_base_url') + '/api/organisationUnits?filter=code:eq:MW&fields=id',",
+              "    method: 'GET',",
+              "    header: { 'Authorization': 'Basic ' + btoa(pm.environment.get('dhis2_username') + ':' + pm.environment.get('dhis2_password')) }",
+              "  }, function (err, res) {",
+              "    if (err) { console.error(err); return; }",
+              "    try {",
+              "      const json = res.json();",
+              "      const orgUnits = json.organisationUnits || [];",
+              "      if (orgUnits.length > 0) {",
+              "        pm.collectionVariables.set('country_org_unit_id', orgUnits[0].id);",
+              "        console.log('Resolved existing country_org_unit_id:', orgUnits[0].id);",
+              "      }",
+              "    } catch (e) { console.error('Failed to parse org unit GET response:', e); }",
+              "  });",
+              "}",
+              "if (uid) { pm.collectionVariables.set('country_org_unit_id', uid); }"
+            ]
+          }
+        }
+      ],
+      "response": []
+    },
+    {
+      "name": "2b. Test Upsert Org Unit (Malawi)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{dhis2_base_url}}/api/organisationUnits?filter=code:eq:MW&fields=id,name,code",
+          "host": ["{{dhis2_base_url}}"],
+          "path": ["api", "organisationUnits"],
+          "query": [
+            {
+              "key": "filter",
+              "value": "code:eq:MW"
+            },
+            {
+              "key": "fields",
+              "value": "id,name,code"
+            }
+          ]
+        },
+        "description": "Test the upsert logic - GET first, then POST if not found"
+      },
+      "response": []
+    },
+    {
+      "name": "3. Get Superuser Role",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{dhis2_base_url}}/api/userRoles?filter=name:eq:Superuser&fields=id,name",
+          "host": ["{{dhis2_base_url}}"],
+          "path": ["api", "userRoles"],
+          "query": [
+            {
+              "key": "filter",
+              "value": "name:eq:Superuser"
+            },
+            {
+              "key": "fields",
+              "value": "id,name"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "try {",
+              "  const roles = pm.response.json().userRoles || [];",
+              "  if (roles.length > 0 && roles[0].id) { pm.collectionVariables.set('superuser_role_id', roles[0].id); }",
+              "} catch (e) {}"
+            ]
+          }
+        }
+      ],
+      "response": []
+    },
+    {
+      "name": "3b. Check Integration User (exists?)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{dhis2_base_url}}/api/users?filter=username:eq:{{integration_username}}&fields=id,username,organisationUnits[id,name]",
+          "host": ["{{dhis2_base_url}}"],
+          "path": ["api", "users"],
+          "query": [
+            { "key": "filter", "value": "username:eq:{{integration_username}}" },
+            { "key": "fields", "value": "id,username,organisationUnits[id,name]" }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "try {",
+              "  const u = pm.response.json().users || [];",
+              "  console.log('CHECK USER: Found', u.length, 'users');",
+              "  if (u.length > 0) { ",
+              "    pm.collectionVariables.set('integration_user_id', u[0].id);",
+              "    console.log('CHECK USER: Set integration_user_id to', u[0].id);",
+              "  } else {",
+              "    console.log('CHECK USER: No users found, clearing integration_user_id');",
+              "    pm.collectionVariables.unset('integration_user_id');",
+              "  }",
+              "} catch (e) { console.log('CHECK USER: Error', e); }"
+            ]
+          }
+        }
+      ],
+      "response": []
+    },
+    {
+      "name": "4. Create Integration User",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"openfn_integration\",\n  \"firstName\": \"OpenFn\",\n  \"surname\": \"Integration\",\n  \"email\": \"openfn@openfn.org\",\n  \"userCredentials\": {\n    \"username\": \"openfn_integration\",\n    \"password\": \"OpenFn@2024!\",\n    \"userRoles\": [{ \"id\": \"{{superuser_role_id}}\" }]\n  },\n  \"organisationUnits\": [{ \"id\": \"{{country_org_unit_id}}\" }],\n  \"dataViewOrganisationUnits\": [{ \"id\": \"{{country_org_unit_id}}\" }],\n  \"teiSearchOrganisationUnits\": [{ \"id\": \"{{country_org_unit_id}}\" }]\n}"
+        },
+        "url": {
+          "raw": "{{dhis2_base_url}}/api/users",
+          "host": ["{{dhis2_base_url}}"],
+          "path": ["api", "users"]
+        }
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// If user already exists, skip this request",
+              "const userId = pm.collectionVariables.get('integration_user_id');",
+              "const superuserRoleId = pm.collectionVariables.get('superuser_role_id');",
+              "const countryOrgUnitId = pm.collectionVariables.get('country_org_unit_id');",
+              "console.log('CREATE USER PREREQUEST: integration_user_id =', userId);",
+              "console.log('CREATE USER PREREQUEST: superuser_role_id =', superuserRoleId);",
+              "console.log('CREATE USER PREREQUEST: country_org_unit_id =', countryOrgUnitId);",
+              "if (userId) { ",
+              "  console.log('CREATE USER PREREQUEST: Skipping because user exists');",
+              "  pm.execution.setNextRequest('5. Create Data Element (TX_CURR)'); ",
+              "} else {",
+              "  console.log('CREATE USER PREREQUEST: Proceeding with user creation');",
+              "}"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Log and attempt to capture UID from body or Location header",
+              "try { console.log('CREATE USER STATUS:', pm.response.code); } catch (e) {}",
+              "try { console.log('CREATE USER RESPONSE:', pm.response.text()); } catch (e) {}",
+              "let uid = null;",
+              "if (pm.response.code >= 200 && pm.response.code < 300) {",
+              "  try { const json = pm.response.json(); uid = json && json.response && json.response.uid; } catch (e) {}",
+              "  if (!uid) { const loc = pm.response.headers.get('Location'); if (loc) { const m = loc.match(/[A-Za-z0-9]{11}/); if (m) uid = m[0]; } }",
+              "  if (uid) { pm.collectionVariables.set('integration_user_id', uid); }",
+              "} else if (pm.response.code === 409) {",
+              "  // User already exists, resolve ID via GET",
+              "  pm.sendRequest({",
+              "    url: pm.environment.get('dhis2_base_url') + '/api/users?filter=username:eq:openfn_integration&fields=id',",
+              "    method: 'GET',",
+              "    header: { 'Authorization': 'Basic ' + btoa(pm.environment.get('dhis2_username') + ':' + pm.environment.get('dhis2_password')) }",
+              "  }, function (err, res) {",
+              "    if (err) { console.error(err); return; }",
+              "    try {",
+              "      const json = res.json();",
+              "      const users = json.users || [];",
+              "      if (users.length > 0) {",
+              "        pm.collectionVariables.set('integration_user_id', users[0].id);",
+              "        console.log('Resolved existing integration_user_id:', users[0].id);",
+              "      }",
+              "    } catch (e) { console.error('Failed to parse user GET response:', e); }",
+              "  });",
+              "}"
+            ]
+          }
+        }
+      ],
+      "response": []
+    },
+    {
+      "name": "4a. Resolve Integration User Id",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{dhis2_base_url}}/api/users?filter=username:eq:{{integration_username}}&fields=id",
+          "host": ["{{dhis2_base_url}}"],
+          "path": ["api", "users"],
+          "query": [
+            { "key": "filter", "value": "username:eq:{{integration_username}}" },
+            { "key": "fields", "value": "id" }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "try { const arr = pm.response.json().users || []; if (arr.length>0) pm.collectionVariables.set('integration_user_id', arr[0].id); } catch(e) {}"
+            ]
+          }
+        }
+      ],
+      "response": []
+    },
+    {
+      "name": "4b. Assign Integration User to Country OU",
+      "request": {
+        "method": "PUT",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"id\": \"{{integration_user_id}}\",\n  \"username\": \"{{integration_username}}\",\n  \"firstName\": \"OpenFn\",\n  \"surname\": \"Integration\",\n  \"userCredentials\": {\n    \"username\": \"{{integration_username}}\"\n  },\n  \"organisationUnits\": [{ \"id\": \"{{country_org_unit_id}}\" }],\n  \"dataViewOrganisationUnits\": [{ \"id\": \"{{country_org_unit_id}}\" }],\n  \"teiSearchOrganisationUnits\": [{ \"id\": \"{{country_org_unit_id}}\" }]\n}"
+        },
+        "url": {
+          "raw": "{{dhis2_base_url}}/api/users/{{integration_user_id}}",
+          "host": ["{{dhis2_base_url}}"],
+          "path": ["api", "users", "{{integration_user_id}}"]
+        }
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// If no user id yet, skip this request",
+              "if (!pm.collectionVariables.get('integration_user_id')) { pm.execution.setNextRequest('5. Create Data Element (TX_CURR)'); }"
+            ]
+          }
+        }
+      ],
+      "response": []
+    },
+    {
+      "name": "4c. Integration Who Am I",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{dhis2_base_url}}/api/me?fields=id,username",
+          "host": ["{{dhis2_base_url}}"],
+          "path": ["api", "me"],
+          "query": [
+            { "key": "fields", "value": "id,username" }
+          ]
+        },
+        "auth": {
+          "type": "basic",
+          "basic": [
+            { "key": "username", "value": "{{integration_username}}", "type": "string" },
+            { "key": "password", "value": "{{integration_password}}", "type": "string" }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "5. Create Data Element (TX_CURR)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"TX_CURR\",\n  \"shortName\": \"TX_CURR\",\n  \"code\": \"TX_CURR\",\n  \"valueType\": \"INTEGER\",\n  \"aggregationType\": \"SUM\",\n  \"domainType\": \"AGGREGATE\"\n}"
+        },
+        "url": {
+          "raw": "{{dhis2_base_url}}/api/dataElements",
+          "host": ["{{dhis2_base_url}}"],
+          "path": ["api", "dataElements"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "let uid = null;",
+              "try { const json = pm.response.json(); uid = json && json.response && json.response.uid; } catch (e) {}",
+              "if (!uid) { const loc = pm.response.headers.get('Location'); if (loc) { const m = loc.match(/[A-Za-z0-9]{11}/); if (m) uid = m[0]; } }",
+              "if (uid) { pm.environment.set('data_element_id', uid); }"
+            ]
+          }
+        }
+      ],
+      "response": []
+    },
+    {
+      "name": "6. Create Facility Org Unit (Test Facility)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Test Facility\",\n  \"shortName\": \"Test Facility\",\n  \"code\": \"TEST_FACILITY\",\n  \"openingDate\": \"2020-01-01\",\n  \"parent\": { \"id\": \"{{country_org_unit_id}}\" }\n}"
+        },
+        "url": {
+          "raw": "{{dhis2_base_url}}/api/organisationUnits",
+          "host": ["{{dhis2_base_url}}"],
+          "path": ["api", "organisationUnits"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "5b. Get Data Element (TX_CURR) ID",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{dhis2_base_url}}/api/dataElements?filter=code:eq:TX_CURR&fields=id",
+          "host": ["{{dhis2_base_url}}"],
+          "path": ["api", "dataElements"],
+          "query": [
+            { "key": "filter", "value": "code:eq:TX_CURR" },
+            { "key": "fields", "value": "id" }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "try { const arr = pm.response.json().dataElements || []; if (arr.length>0) pm.collectionVariables.set('data_element_id', arr[0].id); } catch(e) {}"
+            ]
+          }
+        }
+      ],
+      "response": []
+    },
+    {
+      "name": "7. Create Dataset",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Malawi ART Data Set\",\n  \"shortName\": \"ART Data Set\",\n  \"code\": \"MALAWI_ART_DATASET\",\n  \"periodType\": \"Quarterly\",\n  \"dataSetElements\": [\n    {\n      \"dataElement\": {\"id\": \"{{data_element_id}}\"}\n    }\n  ],\n  \"organisationUnits\": [\n    {\"id\": \"{{country_org_unit_id}}\"},\n    {\"id\": \"{{facility_org_unit_id}}\"}\n  ]\n}"
+        },
+        "url": {
+          "raw": "{{dhis2_base_url}}/api/dataSets",
+          "host": ["{{dhis2_base_url}}"],
+          "path": ["api", "dataSets"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "8. Test Upload with Integration User (UID scheme)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"dataValues\": [\n    {\n      \"dataElement\": \"{{data_element_id}}\",\n      \"period\": \"202508\",\n      \"orgUnit\": \"{{facility_org_unit_id}}\",\n      \"categoryOptionCombo\": \"HllvX50cXC0\",\n      \"value\": \"42\"\n    }\n  ]\n}"
+        },
+        "url": {
+          "raw": "{{dhis2_base_url}}/api/dataValueSets?importStrategy=CREATE_AND_UPDATE&skipExistingCheck=true",
+          "host": ["{{dhis2_base_url}}"],
+          "path": ["api", "dataValueSets"],
+          "query": [
+            {
+              "key": "importStrategy",
+              "value": "CREATE_AND_UPDATE"
+            },
+            {
+              "key": "skipExistingCheck",
+              "value": "true"
+            }
+          ]
+        },
+        "auth": {
+          "type": "basic",
+          "basic": [
+            {
+              "key": "username",
+              "value": "{{integration_username}}",
+              "type": "string"
+            },
+            {
+              "key": "password",
+              "value": "{{integration_password}}",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "8b. Test Upload with Admin User (for comparison)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"dataValues\": [\n    {\n      \"dataElement\": \"{{data_element_id}}\",\n      \"period\": \"202508\",\n      \"orgUnit\": \"{{facility_org_unit_id}}\",\n      \"categoryOptionCombo\": \"HllvX50cXC0\",\n      \"value\": \"43\"\n    }\n  ]\n}"
+        },
+        "url": {
+          "raw": "{{dhis2_base_url}}/api/dataValueSets?importStrategy=CREATE_AND_UPDATE&skipExistingCheck=true",
+          "host": ["{{dhis2_base_url}}"],
+          "path": ["api", "dataValueSets"],
+          "query": [
+            {
+              "key": "importStrategy",
+              "value": "CREATE_AND_UPDATE"
+            },
+            {
+              "key": "skipExistingCheck",
+              "value": "true"
+            }
+          ]
+        },
+        "description": "Test upload with admin user to compare permissions"
+      },
+      "response": []
+    },
+    {
+      "name": "9. Test Upload with Integration User (CODE/NAME scheme)",
+      "request": {
+        "method": "POST", 
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"dataValues\": [\n    {\n      \"dataElement\": \"TX_CURR\",\n      \"period\": \"202508\",\n      \"orgUnit\": \"Test Facility\",\n      \"categoryOptionCombo\": \"HllvX50cXC0\",\n      \"value\": \"42\"\n    }\n  ]\n}"
+        },
+        "url": {
+          "raw": "{{dhis2_base_url}}/api/dataValueSets?importStrategy=CREATE_AND_UPDATE&skipExistingCheck=true&dataElementIdScheme=CODE&orgUnitIdScheme=NAME",
+          "host": ["{{dhis2_base_url}}"],
+          "path": ["api", "dataValueSets"],
+          "query": [
+            {
+              "key": "importStrategy",
+              "value": "CREATE_AND_UPDATE"
+            },
+            {
+              "key": "skipExistingCheck",
+              "value": "true"
+            },
+            {
+              "key": "dataElementIdScheme",
+              "value": "CODE"
+            },
+            {
+              "key": "orgUnitIdScheme", 
+              "value": "NAME"
+            }
+          ]
+        },
+        "auth": {
+          "type": "basic",
+          "basic": [
+            {
+              "key": "username",
+              "value": "{{integration_username}}",
+              "type": "string"
+            },
+            {
+              "key": "password",
+              "value": "{{integration_password}}",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "10. Debug: Get Integration User Org Units",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{dhis2_base_url}}/api/me/organisationUnits?fields=id,name,code,level",
+          "host": ["{{dhis2_base_url}}"],
+          "path": ["api", "me", "organisationUnits"],
+          "query": [
+            {
+              "key": "fields",
+              "value": "id,name,code,level"
+            }
+          ]
+        },
+        "auth": {
+          "type": "basic",
+          "basic": [
+            {
+              "key": "username",
+              "value": "{{integration_username}}",
+              "type": "string"
+            },
+            {
+              "key": "password",
+              "value": "{{integration_password}}",
+              "type": "string"
+            }
+          ]
+        },
+        "description": "Check which org units the integration user has access to"
+      },
+      "response": []
+    },
+    {
+      "name": "11. Debug: List All Org Units",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{dhis2_base_url}}/api/organisationUnits?fields=id,name,code,level,parent[id,name]&paging=false",
+          "host": ["{{dhis2_base_url}}"],
+          "path": ["api", "organisationUnits"],
+          "query": [
+            {
+              "key": "fields",
+              "value": "id,name,code,level,parent[id,name]"
+            },
+            {
+              "key": "paging",
+              "value": "false"
+            }
+          ]
+        },
+        "description": "List all org units to see hierarchy structure"
+      },
+      "response": []
+    },
+    {
+      "name": "12. Debug: Test UID Resolution (simplified approach)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Test UID Resolution\",\n  \"shortName\": \"Test UID\",\n  \"code\": \"TEST_UID_RESOLUTION\",\n  \"openingDate\": \"2020-01-01\",\n  \"parent\": { \"id\": \"{{country_org_unit_id}}\" }\n}"
+        },
+        "url": {
+          "raw": "{{dhis2_base_url}}/api/organisationUnits",
+          "host": ["{{dhis2_base_url}}"],
+          "path": ["api", "organisationUnits"]
+        },
+        "description": "Test the simplified UID resolution approach - check response structure"
+      },
+      "response": []
+    },
+    {
+      "name": "13. Debug: Check Response Structure",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{dhis2_base_url}}/api/organisationUnits?filter=code:eq:TEST_UID_RESOLUTION&fields=id,name,code",
+          "host": ["{{dhis2_base_url}}"],
+          "path": ["api", "organisationUnits"],
+          "query": [
+            {
+              "key": "filter",
+              "value": "code:eq:TEST_UID_RESOLUTION"
+            },
+            {
+              "key": "fields",
+              "value": "id,name,code"
+            }
+          ]
+        },
+        "description": "Verify the created org unit and check response structure for UID resolution"
+      },
+      "response": []
+    }
+  ]
+}

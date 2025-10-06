@@ -1,0 +1,18 @@
+{
+  "name": "dhis2-workflow-debug",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Newman runner for DHIS2 Workflow Debug Postman collection",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "test:dhis2": "newman run ./DHIS2-Workflow-Debug.postman_collection.json --reporters cli,junit,json --reporter-junit-export ./report.junit.xml --reporter-json-export ./report.json --timeout 300000 --timeout-request 15000 --delay-request 50 --ignore-redirects --bail",
+    "test:dhis2:env": "newman run ./DHIS2-Workflow-Debug.postman_collection.json -e ./DHIS2-Workflow-Debug.local.postman_environment.json --reporters cli,junit,json --reporter-junit-export ./report.junit.xml --reporter-json-export ./report.json --timeout 300000 --timeout-request 15000 --delay-request 50 --ignore-redirects --bail"
+  },
+  "devDependencies": {
+    "newman": "^6.2.0"
+  }
+}
+
+

@@ -1,0 +1,30 @@
+{
+    "config": {
+      "directory": "/data",
+      "fileTypesEnabled": [
+        "csv"
+      ],
+      "lockTtlSeconds": 600,
+      "pruneProcessedAfterDays": 30,
+      "targetFilePatterns": [
+        "^PEPFAR_TxCURR_.*\\.(csv)(\\.csv)?$"
+      ]
+    },
+    "filesIndex": {
+      "samples/pepfar/PEPFAR_TxCURR_2025_Q2_Cleaned_v3_20250805160300.csv": {
+        "fileType": "csv",
+        "fileTypeConfigKey": null,
+        "lastProcessedAt": null,
+        "lastSeenAt": "2025-10-06T15:59:34.950Z",
+        "mtime": 1758758600000,
+        "path": "/data/samples/pepfar/PEPFAR_TxCURR_2025_Q2_Cleaned_v3_20250805160300.csv",
+        "processed": false,
+        "size": 150042,
+        "status": "pending"
+      }
+    },
+    "hasFileToProcess": false,
+    "lock": null,
+    "workflow-owner": "openfn-9bc3cd922e974",
+    "workflowLock": null
+  }
