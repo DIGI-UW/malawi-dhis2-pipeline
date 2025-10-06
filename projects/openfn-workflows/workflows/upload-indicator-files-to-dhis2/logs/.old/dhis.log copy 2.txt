@@ -1,0 +1,337 @@
+ubuntu@ip-172-31-44-227:~/code/malawi-dhis2-pipeline$ docker logs dhis2_dhis2.1.igla72jjb821kandugchwehns 
+NOTE: Picked up JDK_JAVA_OPTIONS:  --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.io=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.base/java.util.concurrent=ALL-UNNAMED --add-opens=java.rmi/sun.rmi.transport=ALL-UNNAMED
+OpenJDK 64-Bit Server VM warning: Ignoring option PermSize; support was removed in 8.0
+OpenJDK 64-Bit Server VM warning: Ignoring option MaxPermSize; support was removed in 8.0
+26-Sep-2025 22:07:06.836 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Server version name:   Apache Tomcat/9.0.93
+26-Sep-2025 22:07:06.839 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Server built:          Aug 2 2024 21:24:59 UTC
+26-Sep-2025 22:07:06.839 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Server version number: 9.0.93.0
+26-Sep-2025 22:07:06.839 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log OS Name:               Linux
+26-Sep-2025 22:07:06.839 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log OS Version:            6.14.0-1012-aws
+26-Sep-2025 22:07:06.839 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Architecture:          amd64
+26-Sep-2025 22:07:06.839 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Java Home:             /opt/java/openjdk
+26-Sep-2025 22:07:06.839 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log JVM Version:           11.0.24+8
+26-Sep-2025 22:07:06.839 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log JVM Vendor:            Eclipse Adoptium
+26-Sep-2025 22:07:06.839 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log CATALINA_BASE:         /usr/local/tomcat
+26-Sep-2025 22:07:06.840 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log CATALINA_HOME:         /usr/local/tomcat
+26-Sep-2025 22:07:06.856 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: --add-opens=java.base/java.lang=ALL-UNNAMED
+26-Sep-2025 22:07:06.856 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: --add-opens=java.base/java.io=ALL-UNNAMED
+26-Sep-2025 22:07:06.856 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: --add-opens=java.base/java.util=ALL-UNNAMED
+26-Sep-2025 22:07:06.856 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: --add-opens=java.base/java.util.concurrent=ALL-UNNAMED
+26-Sep-2025 22:07:06.856 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: --add-opens=java.rmi/sun.rmi.transport=ALL-UNNAMED
+26-Sep-2025 22:07:06.856 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Djava.util.logging.config.file=/usr/local/tomcat/conf/logging.properties
+26-Sep-2025 22:07:06.857 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager
+26-Sep-2025 22:07:06.857 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Djava.security.egd=file:/dev/./urandom
+26-Sep-2025 22:07:06.857 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Djdk.tls.ephemeralDHKeySize=2048
+26-Sep-2025 22:07:06.857 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Djava.protocol.handler.pkgs=org.apache.catalina.webresources
+26-Sep-2025 22:07:06.857 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Dorg.apache.catalina.security.SecurityListener.UMASK=0027
+26-Sep-2025 22:07:06.857 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Xmx3000m
+26-Sep-2025 22:07:06.857 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Xms1000m
+26-Sep-2025 22:07:06.858 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -XX:PermSize=800m
+26-Sep-2025 22:07:06.858 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -XX:MaxPermSize=1600m
+26-Sep-2025 22:07:06.858 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Ddhis2.home=/opt/dhis2
+26-Sep-2025 22:07:06.858 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Dignore.endorsed.dirs=
+26-Sep-2025 22:07:06.858 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Dcatalina.base=/usr/local/tomcat
+26-Sep-2025 22:07:06.858 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Dcatalina.home=/usr/local/tomcat
+26-Sep-2025 22:07:06.858 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Djava.io.tmpdir=/usr/local/tomcat/temp
+26-Sep-2025 22:07:06.863 INFO [main] org.apache.catalina.core.AprLifecycleListener.lifecycleEvent Loaded Apache Tomcat Native library [1.3.1] using APR version [1.7.2].
+26-Sep-2025 22:07:06.863 INFO [main] org.apache.catalina.core.AprLifecycleListener.lifecycleEvent APR capabilities: IPv6 [true], sendfile [true], accept filters [false], random [true], UDS [true].
+26-Sep-2025 22:07:06.863 INFO [main] org.apache.catalina.core.AprLifecycleListener.lifecycleEvent APR/OpenSSL configuration: useAprConnector [false], useOpenSSL [true]
+26-Sep-2025 22:07:06.865 INFO [main] org.apache.catalina.core.AprLifecycleListener.initializeSSL OpenSSL successfully initialized [OpenSSL 3.0.13 30 Jan 2024]
+26-Sep-2025 22:07:07.240 INFO [main] org.apache.coyote.AbstractProtocol.init Initializing ProtocolHandler ["http-nio-8080"]
+26-Sep-2025 22:07:07.316 INFO [main] org.apache.catalina.startup.Catalina.load Server initialization in [690] milliseconds
+26-Sep-2025 22:07:07.405 INFO [main] org.apache.catalina.core.StandardService.startInternal Starting service [Catalina]
+26-Sep-2025 22:07:07.405 INFO [main] org.apache.catalina.core.StandardEngine.startInternal Starting Servlet engine: [Apache Tomcat/9.0.93]
+26-Sep-2025 22:07:07.412 INFO [main] org.apache.catalina.startup.HostConfig.deployDirectory Deploying web application directory [/usr/local/tomcat/webapps/ROOT]
+26-Sep-2025 22:07:15.859 INFO [main] org.apache.jasper.servlet.TldScanner.scanJars At least one JAR was scanned for TLDs yet contained no TLDs. Enable debug logging for this logger for a complete list of JARs that were scanned but no TLDs were found in them. Skipping unneeded JARs during scanning can improve startup time and JSP compilation time.
+* INFO  2025-09-26T22:07:16,663 Context variable dhis2-home not set (LogOnceLogger.java [main])  
+* INFO  2025-09-26T22:07:16,672 System property dhis2.home points to /opt/dhis2 (LogOnceLogger.java [main])  
+* INFO  2025-09-26T22:07:16,719 File /opt/dhis2/dhis-google-auth.json does not exist (LogOnceLogger.java [main])  
+* INFO  2025-09-26T22:07:16,719 Could not find dhis-google-auth.json (LogOnceLogger.java [main])  
+* INFO  2025-09-26T22:07:18,837 Monitoring metric for key monitoring.api.enabled is disabled (MetricsEnabler.java [main])  
+* INFO  2025-09-26T22:07:19,217 Monitoring metric for key monitoring.dbpool.enabled is disabled (MetricsEnabler.java [main])  
+* INFO  2025-09-26T22:07:19,219 Monitoring metric for key monitoring.uptime.enabled is disabled (MetricsEnabler.java [main])  
+* INFO  2025-09-26T22:07:19,220 Monitoring metric for key monitoring.jvm.enabled is disabled (MetricsEnabler.java [main])  
+* INFO  2025-09-26T22:07:19,221 Monitoring metric for key monitoring.cpu.enabled is disabled (MetricsEnabler.java [main])  
+* INFO  2025-09-26T22:07:19,222 Monitoring metric for key monitoring.hibernate.enabled is disabled (MetricsEnabler.java [main])  
+* INFO  2025-09-26T22:07:22,643 Hibernate configuration loaded: dialect: 'org.hisp.dhis.hibernate.dialect.DhisPostgresDialect', region factory: 'org.hibernate.cache.ehcache.EhCacheRegionFactory', connection pool max size: null (DefaultHibernateConfigurationProvider.java [main])  
+* INFO  2025-09-26T22:07:43,475 Following values were found in SystemSettings: trackerPageSize: 0, eventPageSize: 0, dataValuePageSize: 0 (V2_33_5__Update_job_parameters_with_system_setting_values.java [main])  
+* INFO  2025-09-26T22:07:43,949 Value found in SystemSettings: dataValuePageSize: 0 (V2_35_2__Update_data_sync_job_parameters_with_system_setting_value.java [main])  
+* INFO  2025-09-26T22:07:44,100 No duplicate mappings for categoryoption to usergroups. Skipping duplicate cleanup migration (V2_36_4__Remove_duplicate_mappings_from_categoryoption_to_usergroups.java [main])  
+* INFO  2025-09-26T22:07:44,116 No duplicate mappings for programstage to usergroups. Skipping duplicate cleanup migration (V2_36_6__Remove_duplicate_mappings_from_programstage_to_usergroups.java [main])  
+* INFO  2025-09-26T22:07:45,294 Executing user/usercredentials migration query: [UPDATE userinfo set username = uc.username, password = uc.password, secret = uc.secret, twofa = uc.twofa, externalauth = uc.externalauth, openid = uc.openid, ldapid = uc.ldapid, passwordlastupdated = uc.passwordlastupdated, lastlogin = uc.lastlogin, restoretoken = uc.restoretoken, restoreexpiry = uc.restoreexpiry, selfregistered = uc.selfregistered, invitation = uc.invitation, disabled = uc.disabled, uuid = uc.uuid, idtoken = uc.idtoken, accountexpiry = uc.accountexpiry FROM (SELECT * FROM users) AS uc WHERE userinfo.userinfoid = uc.userid] (V2_38_35__Migrate_user_to_userinfo.java [main])  
+* INFO  2025-09-26T22:07:45,318 Adding entityquerycriteria column to trackedentityinstancefilter with query: alter table trackedentityinstancefilter add column if not exists entityquerycriteria jsonb default '{}'::jsonb (V2_38_37__Add_entityquerycriteria_column_to_trackedentityinstancefilter.java [main])  
+* INFO  2025-09-26T22:07:45,319 Fetching existing  entries for trackedentityinstancefilterid,followup,enrollmentstatus and enrollmentcreatedperiod with query: select trackedentityinstancefilterid,enrollmentstatus,followup,enrollmentcreatedperiod from trackedentityinstancefilter; (V2_38_37__Add_entityquerycriteria_column_to_trackedentityinstancefilter.java [main])  
+* INFO  2025-09-26T22:07:45,320 TrackedEntityInstanceFilters updated entityquerycriteria for 0 rows (V2_38_37__Add_entityquerycriteria_column_to_trackedentityinstancefilter.java [main])  
+* INFO  2025-09-26T22:07:45,320 Removing columns enrollmentstatus,followup and enrollmentcreatedperiod from trackedentityinstancefilter with query: alter table trackedentityinstancefilter drop column if exists followup, drop column if exists enrollmentcreatedperiod, drop column if exists enrollmentstatus (V2_38_37__Add_entityquerycriteria_column_to_trackedentityinstancefilter.java [main])  
+* INFO  2025-09-26T22:07:46,749 Simple Local Cache instance created for region:'periodCache' (SimpleCacheBuilder.java [main])  
+* INFO  2025-09-26T22:07:55,658 DHIS 2 Version: 2.40.2.1, Revision: e76864d, Build date: Fri Jan 12 07:50:36 UTC 2024, Database name: dhis2, Java version: 11.0.24 (DefaultSystemService.java [main])  
+* INFO  2025-09-26T22:07:56,124 Initialized NoOp leader manager with node UUID: '1834a2f7-8b32-46bb-b346-82bdd424805a' and node ID: '' (NoOpLeaderManager.java [main])  
+* INFO  2025-09-26T22:07:57,236 File store configured with provider: 'filesystem', container: 'files' and location: '/opt/dhis2/files'. (JCloudsFileResourceContentStore.java [main])  
+* INFO  2025-09-26T22:07:57,614 File store configured with provider: 'filesystem', container: 'files' and location: '/opt/dhis2/files'. (JCloudsAppStorageService.java [main])  
+* INFO  2025-09-26T22:07:57,627 No apps found during local discovery. (LocalAppStorageService.java [main])  
+* INFO  2025-09-26T22:07:57,628 Starting JClouds discovery (JCloudsAppStorageService.java [main])  
+* INFO  2025-09-26T22:07:57,633 No apps found during JClouds discovery. (JCloudsAppStorageService.java [main])  
+* INFO  2025-09-26T22:07:58,013 Starting embedded Artemis ActiveMQ server. (ArtemisManager.java [main])  
+* INFO  2025-09-26T22:08:06,518 Following listeners are registered: [org.hisp.dhis.sms.listener.TrackerEventSMSListener@59038530, org.hisp.dhis.sms.listener.EnrollmentSMSListener@5d6ea1f6, org.hisp.dhis.sms.listener.ProgramStageDataEntrySMSListener@4e351608, org.hisp.dhis.sms.listener.AggregateDataSetSMSListener@639a9278, org.hisp.dhis.sms.listener.TrackedEntityRegistrationSMSListener@43bc47e5, org.hisp.dhis.sms.listener.DeleteEventSMSListener@8970855, org.hisp.dhis.sms.listener.RelationshipSMSListener@688d7ec1, org.hisp.dhis.sms.listener.DhisMessageAlertListener@95981cb, org.hisp.dhis.sms.listener.SingleEventListener@9ab3085, org.hisp.dhis.sms.listener.DataValueSMSListener@22bd97b6, org.hisp.dhis.sms.listener.UnregisteredSMSListener@36ab8695, org.hisp.dhis.sms.listener.J2MEDataValueSMSListener@4a1be2e8, org.hisp.dhis.sms.listener.SimpleEventSMSListener@b339ef0] (SmsConsumerThread.java [main])  
+* INFO  2025-09-26T22:08:06,548 SMS consumer started (DefaultSmsConsumerService.java [main])  
+* INFO  2025-09-26T22:08:07,001 Scheduled monitoring service (DefaultMonitoringService.java [main])  
+* INFO  2025-09-26T22:08:07,020 Initializing Log4j, max file size: '100MB', max file archives: 1 (Log4JLogConfigInitializer.java [main])  
+* INFO  2025-09-26T22:08:07,038 Added logger: org.hisp.dhis.resourcetable using file: /opt/dhis2/logs/dhis-analytics-table.log (Log4JLogConfigInitializer.java [main])  
+* INFO  2025-09-26T22:08:07,039 Added logger: org.hisp.dhis.analytics.table using file: /opt/dhis2/logs/dhis-analytics-table.log (Log4JLogConfigInitializer.java [main])  
+* INFO  2025-09-26T22:08:07,039 Added logger: org.hisp.dhis.dxf2 using file: /opt/dhis2/logs/dhis-data-exchange.log (Log4JLogConfigInitializer.java [main])  
+* INFO  2025-09-26T22:08:07,040 Added logger: org.hisp.dhis.dxf2.sync using file: /opt/dhis2/logs/dhis-data-sync.log (Log4JLogConfigInitializer.java [main])  
+* INFO  2025-09-26T22:08:07,040 Added logger: org.hisp.dhis.dxf2.metadata using file: /opt/dhis2/logs/dhis-metadata-sync.log (Log4JLogConfigInitializer.java [main])  
+* INFO  2025-09-26T22:08:07,041 Added logger: org.hisp.dhis.pushanalysis using file: /opt/dhis2/logs/dhis-push-analysis.log (Log4JLogConfigInitializer.java [main])  
+* INFO  2025-09-26T22:08:07,046 Added logger: org.hisp.dhis.audit using file: /opt/dhis2/logs/dhis-audit.log (Log4JLogConfigInitializer.java [main])  
+* INFO  2025-09-26T22:08:07,047 Added root logger using file: /opt/dhis2/logs/dhis.log (Log4JLogConfigInitializer.java [main])  
+* WARN  2025-09-26T22:08:07,599 You are asking Spring Security to ignore Ant [pattern='/api/ping']. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead. (WebSecurity.java [main])  
+* INFO  2025-09-26T22:08:09,703 No Gateway configuration found (DefaultGatewayAdministrationService.java [main])  
+* INFO  2025-09-26T22:08:09,716 Executing startup routine [1 of 8, runlevel 2]: defaultAdminUserPopulator (DefaultStartupRoutineExecutor.java [main])  
+* INFO  2025-09-26T22:08:10,322 Executing startup routine [2 of 8, runlevel 3]: PeriodTypePopulator (DefaultStartupRoutineExecutor.java [main])  
+* INFO  2025-09-26T22:08:10,503 Executing startup routine [3 of 8, runlevel 4]: DataElementDefaultDimensionPopulator (DefaultStartupRoutineExecutor.java [main])  
+* INFO  2025-09-26T22:08:10,540 Added default category (DataElementDefaultDimensionPopulator.java [main])  
+* INFO  2025-09-26T22:08:10,799 Executing startup routine [4 of 8, runlevel 7]: ModelUpgrader (DefaultStartupRoutineExecutor.java [main])  
+* INFO  2025-09-26T22:08:10,810 Executing startup routine [5 of 8, runlevel 12]: ConfigurationPopulator (DefaultStartupRoutineExecutor.java [main])  
+* WARN  2025-09-26T22:08:10,811 Encryption not configured: Missing encryption.password in dhis.conf (ConfigurationPopulator.java [main])  
+* INFO  2025-09-26T22:08:10,817 Executing startup routine [6 of 8, runlevel 13]: I18nLocalePopulator (DefaultStartupRoutineExecutor.java [main])  
+* INFO  2025-09-26T22:08:10,843 Populated default locales (I18nLocalePopulator.java [main])  
+* INFO  2025-09-26T22:08:10,852 Executing startup routine [7 of 8, runlevel 14]: SettingUpgrader (DefaultStartupRoutineExecutor.java [main])  
+* INFO  2025-09-26T22:08:10,853 Executing startup routine [8 of 8, runlevel 15]: SchedulerStart (DefaultStartupRoutineExecutor.java [main])  
+* INFO  2025-09-26T22:08:10,897 Setting up default jobs. (SchedulerStart.java [main])  
+* INFO  2025-09-26T22:08:10,919 Scheduling job: JobConfiguration{uid='pd6O228pqr0', name='File resource clean up', jobType=FILE_RESOURCE_CLEANUP, cronExpression='0 0 2 ? * *', delay='null', jobParameters=null, enabled=true, inMemoryJob=false, lastRuntimeExecution='null', userUid='null', leaderOnlyJob=false, jobStatus=SCHEDULED, nextExecutionTime=null, lastExecutedStatus=NOT_STARTED, lastExecuted=null} (DefaultSchedulingManager.java [main])  
+* INFO  2025-09-26T22:08:10,948 Job pd6O228pqr0 of type FILE_RESOURCE_CLEANUP has been added to the schedule (DefaultSchedulingManager.java [main])  
+* INFO  2025-09-26T22:08:10,948 Scheduled job: JobConfiguration{uid='pd6O228pqr0', name='File resource clean up', jobType=FILE_RESOURCE_CLEANUP, cronExpression='0 0 2 ? * *', delay='null', jobParameters=null, enabled=true, inMemoryJob=false, lastRuntimeExecution='null', userUid='null', leaderOnlyJob=false, jobStatus=SCHEDULED, nextExecutionTime=null, lastExecutedStatus=NOT_STARTED, lastExecuted=null} (DefaultSchedulingManager.java [main])  
+* INFO  2025-09-26T22:08:11,004 Scheduling job: JobConfiguration{uid='BFa3jDsbtdO', name='Data statistics', jobType=DATA_STATISTICS, cronExpression='0 0 2 ? * *', delay='null', jobParameters=null, enabled=true, inMemoryJob=false, lastRuntimeExecution='null', userUid='null', leaderOnlyJob=false, jobStatus=SCHEDULED, nextExecutionTime=null, lastExecutedStatus=NOT_STARTED, lastExecuted=null} (DefaultSchedulingManager.java [main])  
+* INFO  2025-09-26T22:08:11,004 Job BFa3jDsbtdO of type DATA_STATISTICS has been added to the schedule (DefaultSchedulingManager.java [main])  
+* INFO  2025-09-26T22:08:11,005 Scheduled job: JobConfiguration{uid='BFa3jDsbtdO', name='Data statistics', jobType=DATA_STATISTICS, cronExpression='0 0 2 ? * *', delay='null', jobParameters=null, enabled=true, inMemoryJob=false, lastRuntimeExecution='null', userUid='null', leaderOnlyJob=false, jobStatus=SCHEDULED, nextExecutionTime=null, lastExecutedStatus=NOT_STARTED, lastExecuted=null} (DefaultSchedulingManager.java [main])  
+* INFO  2025-09-26T22:08:11,014 Scheduling job: JobConfiguration{uid='Js3vHn2AVuG', name='Validation result notification', jobType=VALIDATION_RESULTS_NOTIFICATION, cronExpression='0 0 7 ? * *', delay='null', jobParameters=null, enabled=true, inMemoryJob=false, lastRuntimeExecution='null', userUid='null', leaderOnlyJob=false, jobStatus=SCHEDULED, nextExecutionTime=null, lastExecutedStatus=NOT_STARTED, lastExecuted=null} (DefaultSchedulingManager.java [main])  
+* INFO  2025-09-26T22:08:11,015 Job Js3vHn2AVuG of type VALIDATION_RESULTS_NOTIFICATION has been added to the schedule (DefaultSchedulingManager.java [main])  
+* INFO  2025-09-26T22:08:11,015 Scheduled job: JobConfiguration{uid='Js3vHn2AVuG', name='Validation result notification', jobType=VALIDATION_RESULTS_NOTIFICATION, cronExpression='0 0 7 ? * *', delay='null', jobParameters=null, enabled=true, inMemoryJob=false, lastRuntimeExecution='null', userUid='null', leaderOnlyJob=false, jobStatus=SCHEDULED, nextExecutionTime=null, lastExecutedStatus=NOT_STARTED, lastExecuted=null} (DefaultSchedulingManager.java [main])  
+* INFO  2025-09-26T22:08:11,025 Scheduling job: JobConfiguration{uid='sHMedQF7VYa', name='Credentials expiry alert', jobType=CREDENTIALS_EXPIRY_ALERT, cronExpression='0 0 2 ? * *', delay='null', jobParameters=null, enabled=true, inMemoryJob=false, lastRuntimeExecution='null', userUid='null', leaderOnlyJob=false, jobStatus=SCHEDULED, nextExecutionTime=null, lastExecutedStatus=NOT_STARTED, lastExecuted=null} (DefaultSchedulingManager.java [main])  
+* INFO  2025-09-26T22:08:11,026 Job sHMedQF7VYa of type CREDENTIALS_EXPIRY_ALERT has been added to the schedule (DefaultSchedulingManager.java [main])  
+* INFO  2025-09-26T22:08:11,026 Scheduled job: JobConfiguration{uid='sHMedQF7VYa', name='Credentials expiry alert', jobType=CREDENTIALS_EXPIRY_ALERT, cronExpression='0 0 2 ? * *', delay='null', jobParameters=null, enabled=true, inMemoryJob=false, lastRuntimeExecution='null', userUid='null', leaderOnlyJob=false, jobStatus=SCHEDULED, nextExecutionTime=null, lastExecutedStatus=NOT_STARTED, lastExecuted=null} (DefaultSchedulingManager.java [main])  
+* INFO  2025-09-26T22:08:11,034 Scheduling job: JobConfiguration{uid='fUWM1At1TUx', name='User account expiry alert', jobType=ACCOUNT_EXPIRY_ALERT, cronExpression='0 0 2 ? * *', delay='null', jobParameters=null, enabled=true, inMemoryJob=false, lastRuntimeExecution='null', userUid='null', leaderOnlyJob=false, jobStatus=SCHEDULED, nextExecutionTime=null, lastExecutedStatus=NOT_STARTED, lastExecuted=null} (DefaultSchedulingManager.java [main])  
+* INFO  2025-09-26T22:08:11,035 Job fUWM1At1TUx of type ACCOUNT_EXPIRY_ALERT has been added to the schedule (DefaultSchedulingManager.java [main])  
+* INFO  2025-09-26T22:08:11,036 Scheduled job: JobConfiguration{uid='fUWM1At1TUx', name='User account expiry alert', jobType=ACCOUNT_EXPIRY_ALERT, cronExpression='0 0 2 ? * *', delay='null', jobParameters=null, enabled=true, inMemoryJob=false, lastRuntimeExecution='null', userUid='null', leaderOnlyJob=false, jobStatus=SCHEDULED, nextExecutionTime=null, lastExecutedStatus=NOT_STARTED, lastExecuted=null} (DefaultSchedulingManager.java [main])  
+* INFO  2025-09-26T22:08:11,045 Scheduling job: JobConfiguration{uid='YvAwAmrqAtN', name='Dataset notification', jobType=DATA_SET_NOTIFICATION, cronExpression='0 0 2 ? * *', delay='null', jobParameters=null, enabled=true, inMemoryJob=false, lastRuntimeExecution='null', userUid='null', leaderOnlyJob=false, jobStatus=SCHEDULED, nextExecutionTime=null, lastExecutedStatus=NOT_STARTED, lastExecuted=null} (DefaultSchedulingManager.java [main])  
+* INFO  2025-09-26T22:08:11,045 Job YvAwAmrqAtN of type DATA_SET_NOTIFICATION has been added to the schedule (DefaultSchedulingManager.java [main])  
+* INFO  2025-09-26T22:08:11,046 Scheduled job: JobConfiguration{uid='YvAwAmrqAtN', name='Dataset notification', jobType=DATA_SET_NOTIFICATION, cronExpression='0 0 2 ? * *', delay='null', jobParameters=null, enabled=true, inMemoryJob=false, lastRuntimeExecution='null', userUid='null', leaderOnlyJob=false, jobStatus=SCHEDULED, nextExecutionTime=null, lastExecutedStatus=NOT_STARTED, lastExecuted=null} (DefaultSchedulingManager.java [main])  
+* INFO  2025-09-26T22:08:11,054 Scheduling job: JobConfiguration{uid='uwWCT2BMmlq', name='Remove expired or used reserved values', jobType=REMOVE_USED_OR_EXPIRED_RESERVED_VALUES, cronExpression='0 0 2 ? * *', delay='null', jobParameters=null, enabled=true, inMemoryJob=false, lastRuntimeExecution='null', userUid='null', leaderOnlyJob=false, jobStatus=SCHEDULED, nextExecutionTime=null, lastExecutedStatus=NOT_STARTED, lastExecuted=null} (DefaultSchedulingManager.java [main])  
+* INFO  2025-09-26T22:08:11,055 Job uwWCT2BMmlq of type REMOVE_USED_OR_EXPIRED_RESERVED_VALUES has been added to the schedule (DefaultSchedulingManager.java [main])  
+* INFO  2025-09-26T22:08:11,055 Scheduled job: JobConfiguration{uid='uwWCT2BMmlq', name='Remove expired or used reserved values', jobType=REMOVE_USED_OR_EXPIRED_RESERVED_VALUES, cronExpression='0 0 2 ? * *', delay='null', jobParameters=null, enabled=true, inMemoryJob=false, lastRuntimeExecution='null', userUid='null', leaderOnlyJob=false, jobStatus=SCHEDULED, nextExecutionTime=null, lastExecutedStatus=NOT_STARTED, lastExecuted=null} (DefaultSchedulingManager.java [main])  
+* INFO  2025-09-26T22:08:11,066 Scheduling job: JobConfiguration{uid='vt21671bgno', name='System version update check notification', jobType=SYSTEM_VERSION_UPDATE_CHECK, cronExpression='32 31 5 ? * *', delay='null', jobParameters=null, enabled=true, inMemoryJob=false, lastRuntimeExecution='null', userUid='null', leaderOnlyJob=false, jobStatus=SCHEDULED, nextExecutionTime=null, lastExecutedStatus=NOT_STARTED, lastExecuted=null} (DefaultSchedulingManager.java [main])  
+* INFO  2025-09-26T22:08:11,066 Job vt21671bgno of type SYSTEM_VERSION_UPDATE_CHECK has been added to the schedule (DefaultSchedulingManager.java [main])  
+* INFO  2025-09-26T22:08:11,067 Scheduled job: JobConfiguration{uid='vt21671bgno', name='System version update check notification', jobType=SYSTEM_VERSION_UPDATE_CHECK, cronExpression='32 31 5 ? * *', delay='null', jobParameters=null, enabled=true, inMemoryJob=false, lastRuntimeExecution='null', userUid='null', leaderOnlyJob=false, jobStatus=SCHEDULED, nextExecutionTime=null, lastExecutedStatus=NOT_STARTED, lastExecuted=null} (DefaultSchedulingManager.java [main])  
+* INFO  2025-09-26T22:08:11,068 All startup routines done (DefaultStartupRoutineExecutor.java [main])  
+26-Sep-2025 22:08:12.732 INFO [main] org.apache.catalina.startup.HostConfig.deployDirectory Deployment of web application directory [/usr/local/tomcat/webapps/ROOT] has finished in [65,320] ms
+26-Sep-2025 22:08:12.736 INFO [main] org.apache.coyote.AbstractProtocol.start Starting ProtocolHandler ["http-nio-8080"]
+26-Sep-2025 22:08:12.752 INFO [main] org.apache.catalina.startup.Catalina.start Server startup in [65434] milliseconds
+* INFO  2025-09-26T22:13:36,159 Authentication event: AuthenticationSuccessEvent; username: admin; ip: 10.0.7.4 (AuthenticationLoggerListener.java [http-nio-8080-exec-10]) IDEy1agCtLGrSHn8fnA2dBINvff8J/UeQPbOPvYQonGgA= 
+* INFO  2025-09-26T22:13:36,362 Authentication event: AuthenticationSuccessEvent; username: admin; ip: 10.0.7.4 (AuthenticationLoggerListener.java [http-nio-8080-exec-5]) ID0DFE0WIKhNLXZoF/q/JjpFdxLxAUVzESAAOwcJQjbic= 
+* INFO  2025-09-26T22:13:36,498 (admin) Import:Start (DefaultMetadataImportService.java [http-nio-8080-exec-5]) IDfPUeuY1NFjV+YKQ13K4WsR7+1Yb877E2SDbGP0mRoiQ= 
+* INFO  2025-09-26T22:13:36,584 (admin) Import:Preheat[REFERENCE] took 0.046940 sec. (DefaultPreheatService.java [http-nio-8080-exec-5]) IDfPUeuY1NFjV+YKQ13K4WsR7+1Yb877E2SDbGP0mRoiQ= 
+* INFO  2025-09-26T22:13:36,632 (admin) Import:Validation took 0.006784 sec. (DefaultObjectBundleValidationService.java [http-nio-8080-exec-5]) IDfPUeuY1NFjV+YKQ13K4WsR7+1Yb877E2SDbGP0mRoiQ= 
+* INFO  2025-09-26T22:13:36,635 (admin) Creating 1 object(s) of type DataElement (DefaultObjectBundleService.java [http-nio-8080-exec-5]) IDfPUeuY1NFjV+YKQ13K4WsR7+1Yb877E2SDbGP0mRoiQ= 
+* INFO  2025-09-26T22:13:36,652 Hibernate caches cleared (DefaultHibernateCacheManager.java [http-nio-8080-exec-5]) IDfPUeuY1NFjV+YKQ13K4WsR7+1Yb877E2SDbGP0mRoiQ= 
+* INFO  2025-09-26T22:13:36,653 (admin) Import:Commit took 0.020685 sec. (DefaultMetadataImportService.java [http-nio-8080-exec-5]) IDfPUeuY1NFjV+YKQ13K4WsR7+1Yb877E2SDbGP0mRoiQ= 
+* INFO  2025-09-26T22:13:36,654 (admin) Import:Done took 0.156092 sec. (DefaultMetadataImportService.java [http-nio-8080-exec-5]) IDfPUeuY1NFjV+YKQ13K4WsR7+1Yb877E2SDbGP0mRoiQ= 
+* INFO  2025-09-26T22:13:36,793 Authentication event: AuthenticationSuccessEvent; username: admin; ip: 10.0.7.4 (AuthenticationLoggerListener.java [http-nio-8080-exec-5]) IDfPUeuY1NFjV+YKQ13K4WsR7+1Yb877E2SDbGP0mRoiQ= 
+* INFO  2025-09-26T22:13:36,917 Authentication event: AuthenticationSuccessEvent; username: admin; ip: 10.0.7.4 (AuthenticationLoggerListener.java [http-nio-8080-exec-2]) IDzoWtmygPAC2AwVwyQMSJxzE2SyaVhIywMEsZkLqUZ3k= 
+* INFO  2025-09-26T22:13:37,032 Authentication event: AuthenticationSuccessEvent; username: admin; ip: 10.0.7.4 (AuthenticationLoggerListener.java [http-nio-8080-exec-6]) IDNc7f2PXg3kQjIgo7bJ2T1LX+/n5g3T2WtmCUxhQ/8d8= 
+* INFO  2025-09-26T22:13:37,050 (admin) Import:Start (DefaultMetadataImportService.java [http-nio-8080-exec-6]) IDMfwqsNxstWuTqwK+cA2wp+akhyAPWXZLKmZqZQybWDo= 
+* INFO  2025-09-26T22:13:37,068 (admin) Import:Preheat[REFERENCE] took 0.016678 sec. (DefaultPreheatService.java [http-nio-8080-exec-6]) IDMfwqsNxstWuTqwK+cA2wp+akhyAPWXZLKmZqZQybWDo= 
+* INFO  2025-09-26T22:13:37,087 (admin) Import:Validation took 0.013811 sec. (DefaultObjectBundleValidationService.java [http-nio-8080-exec-6]) IDMfwqsNxstWuTqwK+cA2wp+akhyAPWXZLKmZqZQybWDo= 
+* INFO  2025-09-26T22:13:37,088 (admin) Creating 1 object(s) of type OrganisationUnit (DefaultObjectBundleService.java [http-nio-8080-exec-6]) IDMfwqsNxstWuTqwK+cA2wp+akhyAPWXZLKmZqZQybWDo= 
+* INFO  2025-09-26T22:13:37,108 Hibernate caches cleared (DefaultHibernateCacheManager.java [http-nio-8080-exec-6]) IDMfwqsNxstWuTqwK+cA2wp+akhyAPWXZLKmZqZQybWDo= 
+* INFO  2025-09-26T22:13:37,108 (admin) Import:Commit took 0.020666 sec. (DefaultMetadataImportService.java [http-nio-8080-exec-6]) IDMfwqsNxstWuTqwK+cA2wp+akhyAPWXZLKmZqZQybWDo= 
+* INFO  2025-09-26T22:13:37,109 (admin) Import:Done took 0.058190 sec. (DefaultMetadataImportService.java [http-nio-8080-exec-6]) IDMfwqsNxstWuTqwK+cA2wp+akhyAPWXZLKmZqZQybWDo= 
+* INFO  2025-09-26T22:13:37,217 Authentication event: AuthenticationSuccessEvent; username: admin; ip: 10.0.7.4 (AuthenticationLoggerListener.java [http-nio-8080-exec-7]) IDRLmOlMBtuhXYG2DVVPlTPZ6BuKDkCSh3QCmMl5guHWc= 
+* INFO  2025-09-26T22:13:37,311 Authentication event: AuthenticationSuccessEvent; username: admin; ip: 10.0.7.4 (AuthenticationLoggerListener.java [http-nio-8080-exec-9]) IDiirzv37KVEhBHbnbkhKCxF2DsjYCW8B0OwsODXyJnik= 
+* INFO  2025-09-26T22:13:37,327 (admin) Import:Start (DefaultMetadataImportService.java [http-nio-8080-exec-9]) IDrZq2/uIiBv39NXYBQ1EmZ6rULlaEK+I4t7bN56TGY4Q= 
+* INFO  2025-09-26T22:13:37,352 (admin) Import:Preheat[REFERENCE] took 0.023452 sec. (DefaultPreheatService.java [http-nio-8080-exec-9]) IDrZq2/uIiBv39NXYBQ1EmZ6rULlaEK+I4t7bN56TGY4Q= 
+* INFO  2025-09-26T22:13:37,356 (admin) Import:Validation took 0.000509 sec. (DefaultObjectBundleValidationService.java [http-nio-8080-exec-9]) IDrZq2/uIiBv39NXYBQ1EmZ6rULlaEK+I4t7bN56TGY4Q= 
+* INFO  2025-09-26T22:13:37,357 (admin) Creating 1 object(s) of type OrganisationUnit (DefaultObjectBundleService.java [http-nio-8080-exec-9]) IDrZq2/uIiBv39NXYBQ1EmZ6rULlaEK+I4t7bN56TGY4Q= 
+* INFO  2025-09-26T22:13:37,362 Hibernate caches cleared (DefaultHibernateCacheManager.java [http-nio-8080-exec-9]) IDrZq2/uIiBv39NXYBQ1EmZ6rULlaEK+I4t7bN56TGY4Q= 
+* INFO  2025-09-26T22:13:37,362 (admin) Import:Commit took 0.005744 sec. (DefaultMetadataImportService.java [http-nio-8080-exec-9]) IDrZq2/uIiBv39NXYBQ1EmZ6rULlaEK+I4t7bN56TGY4Q= 
+* INFO  2025-09-26T22:13:37,362 (admin) Import:Done took 0.035116 sec. (DefaultMetadataImportService.java [http-nio-8080-exec-9]) IDrZq2/uIiBv39NXYBQ1EmZ6rULlaEK+I4t7bN56TGY4Q= 
+* INFO  2025-09-26T22:13:37,479 Authentication event: AuthenticationSuccessEvent; username: admin; ip: 10.0.7.4 (AuthenticationLoggerListener.java [http-nio-8080-exec-10]) IDKLrs+wAbcUpOUPSBIp4wBcKtloDSWSWWXLTLcAVpKB4= 
+* INFO  2025-09-26T22:13:37,576 Authentication event: AuthenticationSuccessEvent; username: admin; ip: 10.0.7.4 (AuthenticationLoggerListener.java [http-nio-8080-exec-5]) ID+CLDzV0lGWB3wz/dgz5+mFSrx765XPie2K1aLXBt9xM= 
+* INFO  2025-09-26T22:13:37,591 (admin) Import:Start (DefaultMetadataImportService.java [http-nio-8080-exec-5]) IDZOGQ4jt380sCuMt0J6wzS6mc9i1P36I2QowU0zwZYmA= 
+* INFO  2025-09-26T22:13:37,608 (admin) Import:Preheat[REFERENCE] took 0.015657 sec. (DefaultPreheatService.java [http-nio-8080-exec-5]) IDZOGQ4jt380sCuMt0J6wzS6mc9i1P36I2QowU0zwZYmA= 
+* INFO  2025-09-26T22:13:37,615 (admin) Import:Validation took 0.000653 sec. (DefaultObjectBundleValidationService.java [http-nio-8080-exec-5]) IDZOGQ4jt380sCuMt0J6wzS6mc9i1P36I2QowU0zwZYmA= 
+* INFO  2025-09-26T22:13:37,615 (admin) Creating 1 object(s) of type OrganisationUnit (DefaultObjectBundleService.java [http-nio-8080-exec-5]) IDZOGQ4jt380sCuMt0J6wzS6mc9i1P36I2QowU0zwZYmA= 
+* INFO  2025-09-26T22:13:37,622 Hibernate caches cleared (DefaultHibernateCacheManager.java [http-nio-8080-exec-5]) IDZOGQ4jt380sCuMt0J6wzS6mc9i1P36I2QowU0zwZYmA= 
+* INFO  2025-09-26T22:13:37,622 (admin) Import:Commit took 0.007578 sec. (DefaultMetadataImportService.java [http-nio-8080-exec-5]) IDZOGQ4jt380sCuMt0J6wzS6mc9i1P36I2QowU0zwZYmA= 
+* INFO  2025-09-26T22:13:37,623 (admin) Import:Done took 0.031285 sec. (DefaultMetadataImportService.java [http-nio-8080-exec-5]) IDZOGQ4jt380sCuMt0J6wzS6mc9i1P36I2QowU0zwZYmA= 
+* INFO  2025-09-26T22:13:37,730 Authentication event: AuthenticationSuccessEvent; username: admin; ip: 10.0.7.4 (AuthenticationLoggerListener.java [http-nio-8080-exec-4]) IDjJcQ45ni4TLZJAV2+SvKQYrZwxSz0YzsCX9XNhdNbWM= 
+* INFO  2025-09-26T22:13:37,838 Authentication event: AuthenticationSuccessEvent; username: admin; ip: 10.0.7.4 (AuthenticationLoggerListener.java [http-nio-8080-exec-3]) ID9u3wAweU31aLn3FUK9ZvwyLHWrHm9p3L1PokvKvpzmc= 
+* INFO  2025-09-26T22:13:37,853 (admin) Import:Start (DefaultMetadataImportService.java [http-nio-8080-exec-3]) IDTpIr0Q36QATKhT9HdrkLm8ZWaU6gAX6kMR9xUbEKlYo= 
+* INFO  2025-09-26T22:13:37,868 (admin) Import:Preheat[REFERENCE] took 0.015025 sec. (DefaultPreheatService.java [http-nio-8080-exec-3]) IDTpIr0Q36QATKhT9HdrkLm8ZWaU6gAX6kMR9xUbEKlYo= 
+* INFO  2025-09-26T22:13:37,875 (admin) Import:Validation took 0.000596 sec. (DefaultObjectBundleValidationService.java [http-nio-8080-exec-3]) IDTpIr0Q36QATKhT9HdrkLm8ZWaU6gAX6kMR9xUbEKlYo= 
+* INFO  2025-09-26T22:13:37,875 (admin) Creating 1 object(s) of type OrganisationUnit (DefaultObjectBundleService.java [http-nio-8080-exec-3]) IDTpIr0Q36QATKhT9HdrkLm8ZWaU6gAX6kMR9xUbEKlYo= 
+* INFO  2025-09-26T22:13:37,881 Hibernate caches cleared (DefaultHibernateCacheManager.java [http-nio-8080-exec-3]) IDTpIr0Q36QATKhT9HdrkLm8ZWaU6gAX6kMR9xUbEKlYo= 
+* INFO  2025-09-26T22:13:37,881 (admin) Import:Commit took 0.005893 sec. (DefaultMetadataImportService.java [http-nio-8080-exec-3]) IDTpIr0Q36QATKhT9HdrkLm8ZWaU6gAX6kMR9xUbEKlYo= 
+* INFO  2025-09-26T22:13:37,881 (admin) Import:Done took 0.028681 sec. (DefaultMetadataImportService.java [http-nio-8080-exec-3]) IDTpIr0Q36QATKhT9HdrkLm8ZWaU6gAX6kMR9xUbEKlYo= 
+* INFO  2025-09-26T22:13:37,981 Authentication event: AuthenticationSuccessEvent; username: admin; ip: 10.0.7.4 (AuthenticationLoggerListener.java [http-nio-8080-exec-6]) IDMfwqsNxstWuTqwK+cA2wp+akhyAPWXZLKmZqZQybWDo= 
+* INFO  2025-09-26T22:13:38,082 Authentication event: AuthenticationSuccessEvent; username: admin; ip: 10.0.7.4 (AuthenticationLoggerListener.java [http-nio-8080-exec-8]) IDAlECEtw5w6to71KKaps5qPGhSUl1pWclveGwkp/HSxU= 
+* INFO  2025-09-26T22:13:38,102 (admin) Import:Start (DefaultMetadataImportService.java [http-nio-8080-exec-8]) IDhdbwY4wEw5bDId/1w00mfz4yDg3iGEfB6tmOUaIzOjY= 
+* INFO  2025-09-26T22:13:38,116 (admin) Import:Preheat[REFERENCE] took 0.012892 sec. (DefaultPreheatService.java [http-nio-8080-exec-8]) IDhdbwY4wEw5bDId/1w00mfz4yDg3iGEfB6tmOUaIzOjY= 
+* INFO  2025-09-26T22:13:38,120 (admin) Import:Validation took 0.000692 sec. (DefaultObjectBundleValidationService.java [http-nio-8080-exec-8]) IDhdbwY4wEw5bDId/1w00mfz4yDg3iGEfB6tmOUaIzOjY= 
+* INFO  2025-09-26T22:13:38,121 (admin) Creating 1 object(s) of type OrganisationUnit (DefaultObjectBundleService.java [http-nio-8080-exec-8]) IDhdbwY4wEw5bDId/1w00mfz4yDg3iGEfB6tmOUaIzOjY= 
+* INFO  2025-09-26T22:13:38,126 Hibernate caches cleared (DefaultHibernateCacheManager.java [http-nio-8080-exec-8]) IDhdbwY4wEw5bDId/1w00mfz4yDg3iGEfB6tmOUaIzOjY= 
+* INFO  2025-09-26T22:13:38,126 (admin) Import:Commit took 0.005472 sec. (DefaultMetadataImportService.java [http-nio-8080-exec-8]) IDhdbwY4wEw5bDId/1w00mfz4yDg3iGEfB6tmOUaIzOjY= 
+* INFO  2025-09-26T22:13:38,126 (admin) Import:Done took 0.024952 sec. (DefaultMetadataImportService.java [http-nio-8080-exec-8]) IDhdbwY4wEw5bDId/1w00mfz4yDg3iGEfB6tmOUaIzOjY= 
+* INFO  2025-09-26T22:13:38,220 Authentication event: AuthenticationSuccessEvent; username: admin; ip: 10.0.7.4 (AuthenticationLoggerListener.java [http-nio-8080-exec-9]) IDrZq2/uIiBv39NXYBQ1EmZ6rULlaEK+I4t7bN56TGY4Q= 
+* INFO  2025-09-26T22:13:38,318 Authentication event: AuthenticationSuccessEvent; username: admin; ip: 10.0.7.4 (AuthenticationLoggerListener.java [http-nio-8080-exec-1]) IDUSQ9BGEJwcEyv3MuAsvQuLivvJ4LNgAWpO65KIMykZU= 
+* INFO  2025-09-26T22:13:38,335 (admin) Import:Start (DefaultMetadataImportService.java [http-nio-8080-exec-1]) ID8p0s8Ep7nWiah+AcRb1Bb2vzVX1sLmVbP4FRvLyxMyk= 
+* INFO  2025-09-26T22:13:38,348 (admin) Import:Preheat[REFERENCE] took 0.012444 sec. (DefaultPreheatService.java [http-nio-8080-exec-1]) ID8p0s8Ep7nWiah+AcRb1Bb2vzVX1sLmVbP4FRvLyxMyk= 
+* INFO  2025-09-26T22:13:38,352 (admin) Import:Validation took 0.000461 sec. (DefaultObjectBundleValidationService.java [http-nio-8080-exec-1]) ID8p0s8Ep7nWiah+AcRb1Bb2vzVX1sLmVbP4FRvLyxMyk= 
+* INFO  2025-09-26T22:13:38,353 (admin) Creating 1 object(s) of type OrganisationUnit (DefaultObjectBundleService.java [http-nio-8080-exec-1]) ID8p0s8Ep7nWiah+AcRb1Bb2vzVX1sLmVbP4FRvLyxMyk= 
+* INFO  2025-09-26T22:13:38,357 Hibernate caches cleared (DefaultHibernateCacheManager.java [http-nio-8080-exec-1]) ID8p0s8Ep7nWiah+AcRb1Bb2vzVX1sLmVbP4FRvLyxMyk= 
+* INFO  2025-09-26T22:13:38,357 (admin) Import:Commit took 0.004835 sec. (DefaultMetadataImportService.java [http-nio-8080-exec-1]) ID8p0s8Ep7nWiah+AcRb1Bb2vzVX1sLmVbP4FRvLyxMyk= 
+* INFO  2025-09-26T22:13:38,358 (admin) Import:Done took 0.023044 sec. (DefaultMetadataImportService.java [http-nio-8080-exec-1]) ID8p0s8Ep7nWiah+AcRb1Bb2vzVX1sLmVbP4FRvLyxMyk= 
+* INFO  2025-09-26T22:13:38,452 Authentication event: AuthenticationSuccessEvent; username: admin; ip: 10.0.7.4 (AuthenticationLoggerListener.java [http-nio-8080-exec-5]) IDZOGQ4jt380sCuMt0J6wzS6mc9i1P36I2QowU0zwZYmA= 
+* INFO  2025-09-26T22:13:38,546 Authentication event: AuthenticationSuccessEvent; username: admin; ip: 10.0.7.4 (AuthenticationLoggerListener.java [http-nio-8080-exec-2]) IDluoa30IrM3kW4XJsM/fmm9dUCa0MmLUuJ2v8YqhB8Mc= 
+* INFO  2025-09-26T22:13:38,560 (admin) Import:Start (DefaultMetadataImportService.java [http-nio-8080-exec-2]) IDOie8I4112zSqFB2vKOIkUu+1cKbScCkH8oKRd68+79A= 
+* INFO  2025-09-26T22:13:38,573 (admin) Import:Preheat[REFERENCE] took 0.011843 sec. (DefaultPreheatService.java [http-nio-8080-exec-2]) IDOie8I4112zSqFB2vKOIkUu+1cKbScCkH8oKRd68+79A= 
+* INFO  2025-09-26T22:13:38,577 (admin) Import:Validation took 0.000554 sec. (DefaultObjectBundleValidationService.java [http-nio-8080-exec-2]) IDOie8I4112zSqFB2vKOIkUu+1cKbScCkH8oKRd68+79A= 
+* INFO  2025-09-26T22:13:38,578 (admin) Creating 1 object(s) of type OrganisationUnit (DefaultObjectBundleService.java [http-nio-8080-exec-2]) IDOie8I4112zSqFB2vKOIkUu+1cKbScCkH8oKRd68+79A= 
+* INFO  2025-09-26T22:13:38,582 Hibernate caches cleared (DefaultHibernateCacheManager.java [http-nio-8080-exec-2]) IDOie8I4112zSqFB2vKOIkUu+1cKbScCkH8oKRd68+79A= 
+* INFO  2025-09-26T22:13:38,582 (admin) Import:Commit took 0.004545 sec. (DefaultMetadataImportService.java [http-nio-8080-exec-2]) IDOie8I4112zSqFB2vKOIkUu+1cKbScCkH8oKRd68+79A= 
+* INFO  2025-09-26T22:13:38,582 (admin) Import:Done took 0.022409 sec. (DefaultMetadataImportService.java [http-nio-8080-exec-2]) IDOie8I4112zSqFB2vKOIkUu+1cKbScCkH8oKRd68+79A= 
+* INFO  2025-09-26T22:13:38,673 Authentication event: AuthenticationSuccessEvent; username: admin; ip: 10.0.7.4 (AuthenticationLoggerListener.java [http-nio-8080-exec-3]) IDTpIr0Q36QATKhT9HdrkLm8ZWaU6gAX6kMR9xUbEKlYo= 
+* INFO  2025-09-26T22:13:38,763 Authentication event: AuthenticationSuccessEvent; username: admin; ip: 10.0.7.4 (AuthenticationLoggerListener.java [http-nio-8080-exec-7]) IDRuLohn/SuAhWjhYpZiuSBVMYUUopWzg+11TLOHzOhVM= 
+* INFO  2025-09-26T22:13:38,775 (admin) Import:Start (DefaultMetadataImportService.java [http-nio-8080-exec-7]) ID1Wpu0PyLyHGy5BQXjmFjnwzL31s3jVjb6xD468n5zko= 
+* INFO  2025-09-26T22:13:38,787 (admin) Import:Preheat[REFERENCE] took 0.011721 sec. (DefaultPreheatService.java [http-nio-8080-exec-7]) ID1Wpu0PyLyHGy5BQXjmFjnwzL31s3jVjb6xD468n5zko= 
+* INFO  2025-09-26T22:13:38,792 (admin) Import:Validation took 0.000584 sec. (DefaultObjectBundleValidationService.java [http-nio-8080-exec-7]) ID1Wpu0PyLyHGy5BQXjmFjnwzL31s3jVjb6xD468n5zko= 
+* INFO  2025-09-26T22:13:38,793 (admin) Creating 1 object(s) of type OrganisationUnit (DefaultObjectBundleService.java [http-nio-8080-exec-7]) ID1Wpu0PyLyHGy5BQXjmFjnwzL31s3jVjb6xD468n5zko= 
+* INFO  2025-09-26T22:13:38,797 Hibernate caches cleared (DefaultHibernateCacheManager.java [http-nio-8080-exec-7]) ID1Wpu0PyLyHGy5BQXjmFjnwzL31s3jVjb6xD468n5zko= 
+* INFO  2025-09-26T22:13:38,798 (admin) Import:Commit took 0.004921 sec. (DefaultMetadataImportService.java [http-nio-8080-exec-7]) ID1Wpu0PyLyHGy5BQXjmFjnwzL31s3jVjb6xD468n5zko= 
+* INFO  2025-09-26T22:13:38,798 (admin) Import:Done took 0.022790 sec. (DefaultMetadataImportService.java [http-nio-8080-exec-7]) ID1Wpu0PyLyHGy5BQXjmFjnwzL31s3jVjb6xD468n5zko= 
+* INFO  2025-09-26T22:13:38,886 Authentication event: AuthenticationSuccessEvent; username: admin; ip: 10.0.7.4 (AuthenticationLoggerListener.java [http-nio-8080-exec-8]) IDhdbwY4wEw5bDId/1w00mfz4yDg3iGEfB6tmOUaIzOjY= 
+* INFO  2025-09-26T22:13:38,975 Authentication event: AuthenticationSuccessEvent; username: admin; ip: 10.0.7.4 (AuthenticationLoggerListener.java [http-nio-8080-exec-10]) IDyh/XmAws9lb8zGubx5afAaJhmFlJ5U6ne+JX9rAR3rE= 
+* INFO  2025-09-26T22:13:38,989 (admin) Import:Start (DefaultMetadataImportService.java [http-nio-8080-exec-10]) IDTqbew0AqlMuODLeteCr7a7MI05+VY4Vx1JmxT9o+QK4= 
+* INFO  2025-09-26T22:13:39,000 (admin) Import:Preheat[REFERENCE] took 0.010577 sec. (DefaultPreheatService.java [http-nio-8080-exec-10]) IDTqbew0AqlMuODLeteCr7a7MI05+VY4Vx1JmxT9o+QK4= 
+* INFO  2025-09-26T22:13:39,005 (admin) Import:Validation took 0.000636 sec. (DefaultObjectBundleValidationService.java [http-nio-8080-exec-10]) IDTqbew0AqlMuODLeteCr7a7MI05+VY4Vx1JmxT9o+QK4= 
+* INFO  2025-09-26T22:13:39,005 (admin) Creating 1 object(s) of type OrganisationUnit (DefaultObjectBundleService.java [http-nio-8080-exec-10]) IDTqbew0AqlMuODLeteCr7a7MI05+VY4Vx1JmxT9o+QK4= 
+* INFO  2025-09-26T22:13:39,010 Hibernate caches cleared (DefaultHibernateCacheManager.java [http-nio-8080-exec-10]) IDTqbew0AqlMuODLeteCr7a7MI05+VY4Vx1JmxT9o+QK4= 
+* INFO  2025-09-26T22:13:39,010 (admin) Import:Commit took 0.005131 sec. (DefaultMetadataImportService.java [http-nio-8080-exec-10]) IDTqbew0AqlMuODLeteCr7a7MI05+VY4Vx1JmxT9o+QK4= 
+* INFO  2025-09-26T22:13:39,010 (admin) Import:Done took 0.021705 sec. (DefaultMetadataImportService.java [http-nio-8080-exec-10]) IDTqbew0AqlMuODLeteCr7a7MI05+VY4Vx1JmxT9o+QK4= 
+* INFO  2025-09-26T22:13:39,099 Authentication event: AuthenticationSuccessEvent; username: admin; ip: 10.0.7.4 (AuthenticationLoggerListener.java [http-nio-8080-exec-1]) ID8p0s8Ep7nWiah+AcRb1Bb2vzVX1sLmVbP4FRvLyxMyk= 
+* INFO  2025-09-26T22:13:39,189 Authentication event: AuthenticationSuccessEvent; username: admin; ip: 10.0.7.4 (AuthenticationLoggerListener.java [http-nio-8080-exec-4]) IDal9cH17zi8tw2C8nL/5j+s+2XOET6fx2XWhxsF/4RMU= 
+* INFO  2025-09-26T22:13:39,201 (admin) Import:Start (DefaultMetadataImportService.java [http-nio-8080-exec-4]) ID11Su5arEeuxH+5Dh6s7QM4jJRD6ghmdgMtKdPWlq9a0= 
+* INFO  2025-09-26T22:13:39,214 (admin) Import:Preheat[REFERENCE] took 0.012009 sec. (DefaultPreheatService.java [http-nio-8080-exec-4]) ID11Su5arEeuxH+5Dh6s7QM4jJRD6ghmdgMtKdPWlq9a0= 
+* INFO  2025-09-26T22:13:39,219 (admin) Import:Validation took 0.000498 sec. (DefaultObjectBundleValidationService.java [http-nio-8080-exec-4]) ID11Su5arEeuxH+5Dh6s7QM4jJRD6ghmdgMtKdPWlq9a0= 
+* INFO  2025-09-26T22:13:39,220 (admin) Creating 1 object(s) of type OrganisationUnit (DefaultObjectBundleService.java [http-nio-8080-exec-4]) ID11Su5arEeuxH+5Dh6s7QM4jJRD6ghmdgMtKdPWlq9a0= 
+* INFO  2025-09-26T22:13:39,224 Hibernate caches cleared (DefaultHibernateCacheManager.java [http-nio-8080-exec-4]) ID11Su5arEeuxH+5Dh6s7QM4jJRD6ghmdgMtKdPWlq9a0= 
+* INFO  2025-09-26T22:13:39,225 (admin) Import:Commit took 0.004981 sec. (DefaultMetadataImportService.java [http-nio-8080-exec-4]) ID11Su5arEeuxH+5Dh6s7QM4jJRD6ghmdgMtKdPWlq9a0= 
+* INFO  2025-09-26T22:13:39,225 (admin) Import:Done took 0.023328 sec. (DefaultMetadataImportService.java [http-nio-8080-exec-4]) ID11Su5arEeuxH+5Dh6s7QM4jJRD6ghmdgMtKdPWlq9a0= 
+* INFO  2025-09-26T22:13:39,313 Authentication event: AuthenticationSuccessEvent; username: admin; ip: 10.0.7.4 (AuthenticationLoggerListener.java [http-nio-8080-exec-2]) IDOie8I4112zSqFB2vKOIkUu+1cKbScCkH8oKRd68+79A= 
+* INFO  2025-09-26T22:13:39,402 Authentication event: AuthenticationSuccessEvent; username: admin; ip: 10.0.7.4 (AuthenticationLoggerListener.java [http-nio-8080-exec-6]) IDSlHYYIr8Bd+ZBH5ltDIYU1eM4AcH+Il4H/MU6C9eooc= 
+* INFO  2025-09-26T22:13:39,418 (admin) Import:Start (DefaultMetadataImportService.java [http-nio-8080-exec-6]) IDd7aipDf6inYaFSxJBT9QazIjehLIeDRPqAu5Fkx5TMk= 
+* INFO  2025-09-26T22:13:39,428 (admin) Import:Preheat[REFERENCE] took 0.009219 sec. (DefaultPreheatService.java [http-nio-8080-exec-6]) IDd7aipDf6inYaFSxJBT9QazIjehLIeDRPqAu5Fkx5TMk= 
+* INFO  2025-09-26T22:13:39,431 (admin) Import:Validation took 0.000417 sec. (DefaultObjectBundleValidationService.java [http-nio-8080-exec-6]) IDd7aipDf6inYaFSxJBT9QazIjehLIeDRPqAu5Fkx5TMk= 
+* INFO  2025-09-26T22:13:39,432 (admin) Creating 1 object(s) of type OrganisationUnit (DefaultObjectBundleService.java [http-nio-8080-exec-6]) IDd7aipDf6inYaFSxJBT9QazIjehLIeDRPqAu5Fkx5TMk= 
+* INFO  2025-09-26T22:13:39,435 Hibernate caches cleared (DefaultHibernateCacheManager.java [http-nio-8080-exec-6]) IDd7aipDf6inYaFSxJBT9QazIjehLIeDRPqAu5Fkx5TMk= 
+* INFO  2025-09-26T22:13:39,436 (admin) Import:Commit took 0.003868 sec. (DefaultMetadataImportService.java [http-nio-8080-exec-6]) IDd7aipDf6inYaFSxJBT9QazIjehLIeDRPqAu5Fkx5TMk= 
+* INFO  2025-09-26T22:13:39,436 (admin) Import:Done took 0.017756 sec. (DefaultMetadataImportService.java [http-nio-8080-exec-6]) IDd7aipDf6inYaFSxJBT9QazIjehLIeDRPqAu5Fkx5TMk= 
+* INFO  2025-09-26T22:13:39,524 Authentication event: AuthenticationSuccessEvent; username: admin; ip: 10.0.7.4 (AuthenticationLoggerListener.java [http-nio-8080-exec-7]) ID1Wpu0PyLyHGy5BQXjmFjnwzL31s3jVjb6xD468n5zko= 
+* INFO  2025-09-26T22:13:39,612 Authentication event: AuthenticationSuccessEvent; username: admin; ip: 10.0.7.4 (AuthenticationLoggerListener.java [http-nio-8080-exec-9]) IDa4fIo2zqooBupFmrOOtff4YAgVUNGhzWzlnAf4FitwM= 
+* INFO  2025-09-26T22:13:39,627 (admin) Import:Start (DefaultMetadataImportService.java [http-nio-8080-exec-9]) IDgxOKiJFkJagX1pRN5rkavH2LggiXW2OJ9Kd3FsJ6nGM= 
+* INFO  2025-09-26T22:13:39,638 (admin) Import:Preheat[REFERENCE] took 0.009672 sec. (DefaultPreheatService.java [http-nio-8080-exec-9]) IDgxOKiJFkJagX1pRN5rkavH2LggiXW2OJ9Kd3FsJ6nGM= 
+* INFO  2025-09-26T22:13:39,641 (admin) Import:Validation took 0.000500 sec. (DefaultObjectBundleValidationService.java [http-nio-8080-exec-9]) IDgxOKiJFkJagX1pRN5rkavH2LggiXW2OJ9Kd3FsJ6nGM= 
+* INFO  2025-09-26T22:13:39,642 (admin) Creating 1 object(s) of type OrganisationUnit (DefaultObjectBundleService.java [http-nio-8080-exec-9]) IDgxOKiJFkJagX1pRN5rkavH2LggiXW2OJ9Kd3FsJ6nGM= 
+* INFO  2025-09-26T22:13:39,646 Hibernate caches cleared (DefaultHibernateCacheManager.java [http-nio-8080-exec-9]) IDgxOKiJFkJagX1pRN5rkavH2LggiXW2OJ9Kd3FsJ6nGM= 
+* INFO  2025-09-26T22:13:39,646 (admin) Import:Commit took 0.004525 sec. (DefaultMetadataImportService.java [http-nio-8080-exec-9]) IDgxOKiJFkJagX1pRN5rkavH2LggiXW2OJ9Kd3FsJ6nGM= 
+* INFO  2025-09-26T22:13:39,646 (admin) Import:Done took 0.018869 sec. (DefaultMetadataImportService.java [http-nio-8080-exec-9]) IDgxOKiJFkJagX1pRN5rkavH2LggiXW2OJ9Kd3FsJ6nGM= 
+* INFO  2025-09-26T22:13:39,732 Authentication event: AuthenticationSuccessEvent; username: admin; ip: 10.0.7.4 (AuthenticationLoggerListener.java [http-nio-8080-exec-10]) IDTqbew0AqlMuODLeteCr7a7MI05+VY4Vx1JmxT9o+QK4= 
+* INFO  2025-09-26T22:13:39,818 Authentication event: AuthenticationSuccessEvent; username: admin; ip: 10.0.7.4 (AuthenticationLoggerListener.java [http-nio-8080-exec-5]) IDAwuJ7FjskCOT/bd+FFEX+BnZViaeApQ1cVkWWMBda9A= 
+* INFO  2025-09-26T22:13:39,831 (admin) Import:Start (DefaultMetadataImportService.java [http-nio-8080-exec-5]) ID6LCcwoOOHCvN7LCpJfPYwm/fqhSsPYvEjhZiCzAxFzg= 
+* INFO  2025-09-26T22:13:39,844 (admin) Import:Preheat[REFERENCE] took 0.012735 sec. (DefaultPreheatService.java [http-nio-8080-exec-5]) ID6LCcwoOOHCvN7LCpJfPYwm/fqhSsPYvEjhZiCzAxFzg= 
+* INFO  2025-09-26T22:13:39,848 (admin) Import:Validation took 0.000502 sec. (DefaultObjectBundleValidationService.java [http-nio-8080-exec-5]) ID6LCcwoOOHCvN7LCpJfPYwm/fqhSsPYvEjhZiCzAxFzg= 
+* INFO  2025-09-26T22:13:39,849 (admin) Creating 1 object(s) of type OrganisationUnit (DefaultObjectBundleService.java [http-nio-8080-exec-5]) ID6LCcwoOOHCvN7LCpJfPYwm/fqhSsPYvEjhZiCzAxFzg= 
+* INFO  2025-09-26T22:13:39,854 Hibernate caches cleared (DefaultHibernateCacheManager.java [http-nio-8080-exec-5]) ID6LCcwoOOHCvN7LCpJfPYwm/fqhSsPYvEjhZiCzAxFzg= 
+* INFO  2025-09-26T22:13:39,854 (admin) Import:Commit took 0.005123 sec. (DefaultMetadataImportService.java [http-nio-8080-exec-5]) ID6LCcwoOOHCvN7LCpJfPYwm/fqhSsPYvEjhZiCzAxFzg= 
+* INFO  2025-09-26T22:13:39,854 (admin) Import:Done took 0.023185 sec. (DefaultMetadataImportService.java [http-nio-8080-exec-5]) ID6LCcwoOOHCvN7LCpJfPYwm/fqhSsPYvEjhZiCzAxFzg= 
+* INFO  2025-09-26T22:13:39,939 Authentication event: AuthenticationSuccessEvent; username: admin; ip: 10.0.7.4 (AuthenticationLoggerListener.java [http-nio-8080-exec-4]) ID11Su5arEeuxH+5Dh6s7QM4jJRD6ghmdgMtKdPWlq9a0= 
+* INFO  2025-09-26T22:13:40,026 Authentication event: AuthenticationSuccessEvent; username: admin; ip: 10.0.7.4 (AuthenticationLoggerListener.java [http-nio-8080-exec-3]) ID+1jXqDXyzWNWe9hDZl07mojwvw5XQTEl+VQNnODg5Gc= 
+* INFO  2025-09-26T22:13:40,039 (admin) Import:Start (DefaultMetadataImportService.java [http-nio-8080-exec-3]) IDygbAD7JGucY6wXqmE884qg/jC0OeJ/lq5TAfWV3Rn3U= 
+* INFO  2025-09-26T22:13:40,054 (admin) Import:Preheat[REFERENCE] took 0.014157 sec. (DefaultPreheatService.java [http-nio-8080-exec-3]) IDygbAD7JGucY6wXqmE884qg/jC0OeJ/lq5TAfWV3Rn3U= 
+* INFO  2025-09-26T22:13:40,059 (admin) Import:Validation took 0.000783 sec. (DefaultObjectBundleValidationService.java [http-nio-8080-exec-3]) IDygbAD7JGucY6wXqmE884qg/jC0OeJ/lq5TAfWV3Rn3U= 
+* INFO  2025-09-26T22:13:40,060 (admin) Creating 1 object(s) of type OrganisationUnit (DefaultObjectBundleService.java [http-nio-8080-exec-3]) IDygbAD7JGucY6wXqmE884qg/jC0OeJ/lq5TAfWV3Rn3U= 
+* INFO  2025-09-26T22:13:40,064 Hibernate caches cleared (DefaultHibernateCacheManager.java [http-nio-8080-exec-3]) IDygbAD7JGucY6wXqmE884qg/jC0OeJ/lq5TAfWV3Rn3U= 
+* INFO  2025-09-26T22:13:40,064 (admin) Import:Commit took 0.004657 sec. (DefaultMetadataImportService.java [http-nio-8080-exec-3]) IDygbAD7JGucY6wXqmE884qg/jC0OeJ/lq5TAfWV3Rn3U= 
+* INFO  2025-09-26T22:13:40,064 (admin) Import:Done took 0.025231 sec. (DefaultMetadataImportService.java [http-nio-8080-exec-3]) IDygbAD7JGucY6wXqmE884qg/jC0OeJ/lq5TAfWV3Rn3U= 
+* INFO  2025-09-26T22:13:40,151 Authentication event: AuthenticationSuccessEvent; username: admin; ip: 10.0.7.4 (AuthenticationLoggerListener.java [http-nio-8080-exec-6]) IDd7aipDf6inYaFSxJBT9QazIjehLIeDRPqAu5Fkx5TMk= 
+* INFO  2025-09-26T22:13:40,240 Authentication event: AuthenticationSuccessEvent; username: admin; ip: 10.0.7.4 (AuthenticationLoggerListener.java [http-nio-8080-exec-8]) IDSu3tfPYQoHbPIzBj2l9CNo5M7PO4I1qNWZI/SCqcTmQ= 
+* INFO  2025-09-26T22:13:40,254 (admin) Import:Start (DefaultMetadataImportService.java [http-nio-8080-exec-8]) ID401y+mFD1+wNu9T6Vo6fis5WBr4XDy2rUo0lB0Yfd0Y= 
+* INFO  2025-09-26T22:13:40,265 (admin) Import:Preheat[REFERENCE] took 0.010142 sec. (DefaultPreheatService.java [http-nio-8080-exec-8]) ID401y+mFD1+wNu9T6Vo6fis5WBr4XDy2rUo0lB0Yfd0Y= 
+* INFO  2025-09-26T22:13:40,274 (admin) Import:Validation took 0.000628 sec. (DefaultObjectBundleValidationService.java [http-nio-8080-exec-8]) ID401y+mFD1+wNu9T6Vo6fis5WBr4XDy2rUo0lB0Yfd0Y= 
+* INFO  2025-09-26T22:13:40,275 (admin) Creating 1 object(s) of type OrganisationUnit (DefaultObjectBundleService.java [http-nio-8080-exec-8]) ID401y+mFD1+wNu9T6Vo6fis5WBr4XDy2rUo0lB0Yfd0Y= 
+* INFO  2025-09-26T22:13:40,279 Hibernate caches cleared (DefaultHibernateCacheManager.java [http-nio-8080-exec-8]) ID401y+mFD1+wNu9T6Vo6fis5WBr4XDy2rUo0lB0Yfd0Y= 
+* INFO  2025-09-26T22:13:40,280 (admin) Import:Commit took 0.005022 sec. (DefaultMetadataImportService.java [http-nio-8080-exec-8]) ID401y+mFD1+wNu9T6Vo6fis5WBr4XDy2rUo0lB0Yfd0Y= 
+* INFO  2025-09-26T22:13:40,280 (admin) Import:Done took 0.026000 sec. (DefaultMetadataImportService.java [http-nio-8080-exec-8]) ID401y+mFD1+wNu9T6Vo6fis5WBr4XDy2rUo0lB0Yfd0Y= 
+* INFO  2025-09-26T22:13:40,380 Authentication event: AuthenticationSuccessEvent; username: admin; ip: 10.0.7.4 (AuthenticationLoggerListener.java [http-nio-8080-exec-9]) IDgxOKiJFkJagX1pRN5rkavH2LggiXW2OJ9Kd3FsJ6nGM= 
+* INFO  2025-09-26T22:13:40,474 Authentication event: AuthenticationSuccessEvent; username: admin; ip: 10.0.7.4 (AuthenticationLoggerListener.java [http-nio-8080-exec-1]) IDw7MXt6AwzI9WYGK4l81jmjZSagwy8af7e3Nk5v41aWM= 
+* INFO  2025-09-26T22:13:40,484 (admin) Import:Start (DefaultMetadataImportService.java [http-nio-8080-exec-1]) IDlRw15u5uBQwtZhMavI30jzVc4aePiAL36ZqjfY3Zsc8= 
+* INFO  2025-09-26T22:13:40,502 (admin) Import:Preheat[REFERENCE] took 0.016696 sec. (DefaultPreheatService.java [http-nio-8080-exec-1]) IDlRw15u5uBQwtZhMavI30jzVc4aePiAL36ZqjfY3Zsc8= 
+* INFO  2025-09-26T22:13:40,506 (admin) Import:Validation took 0.000422 sec. (DefaultObjectBundleValidationService.java [http-nio-8080-exec-1]) IDlRw15u5uBQwtZhMavI30jzVc4aePiAL36ZqjfY3Zsc8= 
+* INFO  2025-09-26T22:13:40,506 (admin) Creating 1 object(s) of type OrganisationUnit (DefaultObjectBundleService.java [http-nio-8080-exec-1]) IDlRw15u5uBQwtZhMavI30jzVc4aePiAL36ZqjfY3Zsc8= 
+* INFO  2025-09-26T22:13:40,510 Hibernate caches cleared (DefaultHibernateCacheManager.java [http-nio-8080-exec-1]) IDlRw15u5uBQwtZhMavI30jzVc4aePiAL36ZqjfY3Zsc8= 
+* INFO  2025-09-26T22:13:40,510 (admin) Import:Commit took 0.003889 sec. (DefaultMetadataImportService.java [http-nio-8080-exec-1]) IDlRw15u5uBQwtZhMavI30jzVc4aePiAL36ZqjfY3Zsc8= 
+* INFO  2025-09-26T22:13:40,510 (admin) Import:Done took 0.026041 sec. (DefaultMetadataImportService.java [http-nio-8080-exec-1]) IDlRw15u5uBQwtZhMavI30jzVc4aePiAL36ZqjfY3Zsc8= 
+* INFO  2025-09-26T22:13:40,596 Authentication event: AuthenticationSuccessEvent; username: admin; ip: 10.0.7.4 (AuthenticationLoggerListener.java [http-nio-8080-exec-5]) ID6LCcwoOOHCvN7LCpJfPYwm/fqhSsPYvEjhZiCzAxFzg= 
+* INFO  2025-09-26T22:13:40,682 Authentication event: AuthenticationSuccessEvent; username: admin; ip: 10.0.7.4 (AuthenticationLoggerListener.java [http-nio-8080-exec-2]) IDOi66fzwf19QLD5DQHsXPWA2+Sef6/HpgNw2DNPjMM1w= 
+* INFO  2025-09-26T22:13:40,693 (admin) Import:Start (DefaultMetadataImportService.java [http-nio-8080-exec-2]) IDmtkK6yjGXT5fvW+BZFNnW8N40/rq1DsWj1AOib2YzQs= 
+* INFO  2025-09-26T22:13:40,703 (admin) Import:Preheat[REFERENCE] took 0.009305 sec. (DefaultPreheatService.java [http-nio-8080-exec-2]) IDmtkK6yjGXT5fvW+BZFNnW8N40/rq1DsWj1AOib2YzQs= 
+* INFO  2025-09-26T22:13:40,707 (admin) Import:Validation took 0.000493 sec. (DefaultObjectBundleValidationService.java [http-nio-8080-exec-2]) IDmtkK6yjGXT5fvW+BZFNnW8N40/rq1DsWj1AOib2YzQs= 
+* INFO  2025-09-26T22:13:40,707 (admin) Creating 1 object(s) of type OrganisationUnit (DefaultObjectBundleService.java [http-nio-8080-exec-2]) IDmtkK6yjGXT5fvW+BZFNnW8N40/rq1DsWj1AOib2YzQs= 
+* INFO  2025-09-26T22:13:40,711 Hibernate caches cleared (DefaultHibernateCacheManager.java [http-nio-8080-exec-2]) IDmtkK6yjGXT5fvW+BZFNnW8N40/rq1DsWj1AOib2YzQs= 
+* INFO  2025-09-26T22:13:40,712 (admin) Import:Commit took 0.004463 sec. (DefaultMetadataImportService.java [http-nio-8080-exec-2]) IDmtkK6yjGXT5fvW+BZFNnW8N40/rq1DsWj1AOib2YzQs= 
+* INFO  2025-09-26T22:13:40,712 (admin) Import:Done took 0.018867 sec. (DefaultMetadataImportService.java [http-nio-8080-exec-2]) IDmtkK6yjGXT5fvW+BZFNnW8N40/rq1DsWj1AOib2YzQs= 
+* INFO  2025-09-26T22:13:40,797 Authentication event: AuthenticationSuccessEvent; username: admin; ip: 10.0.7.4 (AuthenticationLoggerListener.java [http-nio-8080-exec-3]) IDygbAD7JGucY6wXqmE884qg/jC0OeJ/lq5TAfWV3Rn3U= 
+* INFO  2025-09-26T22:13:40,884 Authentication event: AuthenticationSuccessEvent; username: admin; ip: 10.0.7.4 (AuthenticationLoggerListener.java [http-nio-8080-exec-7]) IDmB1+ORrnNTBj9nqNGYULg/AvzKfcs5kITRpTX+8/qC4= 
+* INFO  2025-09-26T22:13:40,895 (admin) Import:Start (DefaultMetadataImportService.java [http-nio-8080-exec-7]) IDCYIgfTBc+SFw96X2u0X4NRutbEwOtb1c14qlRZ3gY+Y= 
+* INFO  2025-09-26T22:13:40,907 (admin) Import:Preheat[REFERENCE] took 0.010945 sec. (DefaultPreheatService.java [http-nio-8080-exec-7]) IDCYIgfTBc+SFw96X2u0X4NRutbEwOtb1c14qlRZ3gY+Y= 
+* INFO  2025-09-26T22:13:40,911 (admin) Import:Validation took 0.000412 sec. (DefaultObjectBundleValidationService.java [http-nio-8080-exec-7]) IDCYIgfTBc+SFw96X2u0X4NRutbEwOtb1c14qlRZ3gY+Y= 
+* INFO  2025-09-26T22:13:40,911 (admin) Creating 1 object(s) of type OrganisationUnit (DefaultObjectBundleService.java [http-nio-8080-exec-7]) IDCYIgfTBc+SFw96X2u0X4NRutbEwOtb1c14qlRZ3gY+Y= 
+* INFO  2025-09-26T22:13:40,916 Hibernate caches cleared (DefaultHibernateCacheManager.java [http-nio-8080-exec-7]) IDCYIgfTBc+SFw96X2u0X4NRutbEwOtb1c14qlRZ3gY+Y= 
+* INFO  2025-09-26T22:13:40,916 (admin) Import:Commit took 0.004548 sec. (DefaultMetadataImportService.java [http-nio-8080-exec-7]) IDCYIgfTBc+SFw96X2u0X4NRutbEwOtb1c14qlRZ3gY+Y= 
+* INFO  2025-09-26T22:13:40,916 (admin) Import:Done took 0.020710 sec. (DefaultMetadataImportService.java [http-nio-8080-exec-7]) IDCYIgfTBc+SFw96X2u0X4NRutbEwOtb1c14qlRZ3gY+Y= 
+* INFO  2025-09-26T22:13:41,001 Authentication event: AuthenticationSuccessEvent; username: admin; ip: 10.0.7.4 (AuthenticationLoggerListener.java [http-nio-8080-exec-8]) ID401y+mFD1+wNu9T6Vo6fis5WBr4XDy2rUo0lB0Yfd0Y= 
+* INFO  2025-09-26T22:13:41,088 Authentication event: AuthenticationSuccessEvent; username: admin; ip: 10.0.7.4 (AuthenticationLoggerListener.java [http-nio-8080-exec-10]) IDeuyBOVSdZxqyYRC7OHstsgZa04OP9+0bq9uw6JY3Ij4= 
+* INFO  2025-09-26T22:13:41,099 (admin) Import:Start (DefaultMetadataImportService.java [http-nio-8080-exec-10]) IDApoFqdq3PR3RCK/VVI7PHcWe1FPComEZzWeb5n1aXag= 
+* INFO  2025-09-26T22:13:41,110 (admin) Import:Preheat[REFERENCE] took 0.010284 sec. (DefaultPreheatService.java [http-nio-8080-exec-10]) IDApoFqdq3PR3RCK/VVI7PHcWe1FPComEZzWeb5n1aXag= 
+* INFO  2025-09-26T22:13:41,114 (admin) Import:Validation took 0.000416 sec. (DefaultObjectBundleValidationService.java [http-nio-8080-exec-10]) IDApoFqdq3PR3RCK/VVI7PHcWe1FPComEZzWeb5n1aXag= 
+* INFO  2025-09-26T22:13:41,114 (admin) Creating 1 object(s) of type OrganisationUnit (DefaultObjectBundleService.java [http-nio-8080-exec-10]) IDApoFqdq3PR3RCK/VVI7PHcWe1FPComEZzWeb5n1aXag= 
+* INFO  2025-09-26T22:13:41,118 Hibernate caches cleared (DefaultHibernateCacheManager.java [http-nio-8080-exec-10]) IDApoFqdq3PR3RCK/VVI7PHcWe1FPComEZzWeb5n1aXag= 
+* INFO  2025-09-26T22:13:41,119 (admin) Import:Commit took 0.004181 sec. (DefaultMetadataImportService.java [http-nio-8080-exec-10]) IDApoFqdq3PR3RCK/VVI7PHcWe1FPComEZzWeb5n1aXag= 
+* INFO  2025-09-26T22:13:41,119 (admin) Import:Done took 0.019556 sec. (DefaultMetadataImportService.java [http-nio-8080-exec-10]) IDApoFqdq3PR3RCK/VVI7PHcWe1FPComEZzWeb5n1aXag= 
+* INFO  2025-09-26T22:13:41,202 Authentication event: AuthenticationSuccessEvent; username: admin; ip: 10.0.7.4 (AuthenticationLoggerListener.java [http-nio-8080-exec-1]) IDlRw15u5uBQwtZhMavI30jzVc4aePiAL36ZqjfY3Zsc8= 
+* INFO  2025-09-26T22:13:41,287 Authentication event: AuthenticationSuccessEvent; username: admin; ip: 10.0.7.4 (AuthenticationLoggerListener.java [http-nio-8080-exec-4]) ID7pUKO+m+hHXI622PPnU+OZLxLXxthVg6v0qR0nLvYIA= 
+* INFO  2025-09-26T22:13:41,297 (admin) Import:Start (DefaultMetadataImportService.java [http-nio-8080-exec-4]) IDtkpRM+7p/bP/vG0s39z/Ph8lMFXt4Pc+nPs9vbPky5A= 
+* INFO  2025-09-26T22:13:41,307 (admin) Import:Preheat[REFERENCE] took 0.009281 sec. (DefaultPreheatService.java [http-nio-8080-exec-4]) IDtkpRM+7p/bP/vG0s39z/Ph8lMFXt4Pc+nPs9vbPky5A= 
+* INFO  2025-09-26T22:13:41,311 (admin) Import:Validation took 0.000508 sec. (DefaultObjectBundleValidationService.java [http-nio-8080-exec-4]) IDtkpRM+7p/bP/vG0s39z/Ph8lMFXt4Pc+nPs9vbPky5A= 
+* INFO  2025-09-26T22:13:41,311 (admin) Creating 1 object(s) of type OrganisationUnit (DefaultObjectBundleService.java [http-nio-8080-exec-4]) IDtkpRM+7p/bP/vG0s39z/Ph8lMFXt4Pc+nPs9vbPky5A= 
+* INFO  2025-09-26T22:13:41,315 Hibernate caches cleared (DefaultHibernateCacheManager.java [http-nio-8080-exec-4]) IDtkpRM+7p/bP/vG0s39z/Ph8lMFXt4Pc+nPs9vbPky5A= 
+* INFO  2025-09-26T22:13:41,315 (admin) Import:Commit took 0.004268 sec. (DefaultMetadataImportService.java [http-nio-8080-exec-4]) IDtkpRM+7p/bP/vG0s39z/Ph8lMFXt4Pc+nPs9vbPky5A= 
+* INFO  2025-09-26T22:13:41,315 (admin) Import:Done took 0.018180 sec. (DefaultMetadataImportService.java [http-nio-8080-exec-4]) IDtkpRM+7p/bP/vG0s39z/Ph8lMFXt4Pc+nPs9vbPky5A= 
+* INFO  2025-09-26T22:13:41,399 Authentication event: AuthenticationSuccessEvent; username: admin; ip: 10.0.7.4 (AuthenticationLoggerListener.java [http-nio-8080-exec-2]) IDmtkK6yjGXT5fvW+BZFNnW8N40/rq1DsWj1AOib2YzQs= 
+* INFO  2025-09-26T22:13:41,485 Authentication event: AuthenticationSuccessEvent; username: admin; ip: 10.0.7.4 (AuthenticationLoggerListener.java [http-nio-8080-exec-6]) IDrgEWBUbyDU41g9EnOifsOSF4Te0jemq77eXpy5rTapE= 
+* INFO  2025-09-26T22:13:41,497 (admin) Import:Start (DefaultMetadataImportService.java [http-nio-8080-exec-6]) IDjKkrrHaXW1fVdNexw8qWdmaaroChDVT+PALhoiLWAm8= 
+* INFO  2025-09-26T22:13:41,507 (admin) Import:Preheat[REFERENCE] took 0.009283 sec. (DefaultPreheatService.java [http-nio-8080-exec-6]) IDjKkrrHaXW1fVdNexw8qWdmaaroChDVT+PALhoiLWAm8= 
+* INFO  2025-09-26T22:13:41,511 (admin) Import:Validation took 0.000514 sec. (DefaultObjectBundleValidationService.java [http-nio-8080-exec-6]) IDjKkrrHaXW1fVdNexw8qWdmaaroChDVT+PALhoiLWAm8= 
+* INFO  2025-09-26T22:13:41,511 (admin) Creating 1 object(s) of type OrganisationUnit (DefaultObjectBundleService.java [http-nio-8080-exec-6]) IDjKkrrHaXW1fVdNexw8qWdmaaroChDVT+PALhoiLWAm8= 
+* INFO  2025-09-26T22:13:41,515 Hibernate caches cleared (DefaultHibernateCacheManager.java [http-nio-8080-exec-6]) IDjKkrrHaXW1fVdNexw8qWdmaaroChDVT+PALhoiLWAm8= 
+* INFO  2025-09-26T22:13:41,515 (admin) Import:Commit took 0.004207 sec. (DefaultMetadataImportService.java [http-nio-8080-exec-6]) IDjKkrrHaXW1fVdNexw8qWdmaaroChDVT+PALhoiLWAm8= 
+* INFO  2025-09-26T22:13:41,515 (admin) Import:Done took 0.018687 sec. (DefaultMetadataImportService.java [http-nio-8080-exec-6]) IDjKkrrHaXW1fVdNexw8qWdmaaroChDVT+PALhoiLWAm8= 
+* INFO  2025-09-26T22:13:41,599 Authentication event: AuthenticationSuccessEvent; username: admin; ip: 10.0.7.4 (AuthenticationLoggerListener.java [http-nio-8080-exec-7]) IDCYIgfTBc+SFw96X2u0X4NRutbEwOtb1c14qlRZ3gY+Y= 
+* INFO  2025-09-26T22:13:41,692 Authentication event: AuthenticationSuccessEvent; username: admin; ip: 10.0.7.4 (AuthenticationLoggerListener.java [http-nio-8080-exec-9]) IDZKZ+1DFbmfV6buu0nyf1VriuDkfN9rhET+obY0Dfc0U= 
+* INFO  2025-09-26T22:13:41,704 (admin) Import:Start (DefaultMetadataImportService.java [http-nio-8080-exec-9]) ID+koxpLioxRFDpNmG0vP6LSem7ghQizDWPPQueVFvOEY= 
+* INFO  2025-09-26T22:13:41,712 (admin) Import:Preheat[REFERENCE] took 0.007826 sec. (DefaultPreheatService.java [http-nio-8080-exec-9]) ID+koxpLioxRFDpNmG0vP6LSem7ghQizDWPPQueVFvOEY= 
+* INFO  2025-09-26T22:13:41,715 (admin) Import:Validation took 0.000450 sec. (DefaultObjectBundleValidationService.java [http-nio-8080-exec-9]) ID+koxpLioxRFDpNmG0vP6LSem7ghQizDWPPQueVFvOEY= 
+* INFO  2025-09-26T22:13:41,716 (admin) Creating 1 object(s) of type DataSet (DefaultObjectBundleService.java [http-nio-8080-exec-9]) ID+koxpLioxRFDpNmG0vP6LSem7ghQizDWPPQueVFvOEY= 
+* INFO  2025-09-26T22:13:41,720 Hibernate caches cleared (DefaultHibernateCacheManager.java [http-nio-8080-exec-9]) ID+koxpLioxRFDpNmG0vP6LSem7ghQizDWPPQueVFvOEY= 
+* INFO  2025-09-26T22:13:41,721 (admin) Import:Commit took 0.005027 sec. (DefaultMetadataImportService.java [http-nio-8080-exec-9]) ID+koxpLioxRFDpNmG0vP6LSem7ghQizDWPPQueVFvOEY= 
+* INFO  2025-09-26T22:13:41,721 (admin) Import:Done took 0.016956 sec. (DefaultMetadataImportService.java [http-nio-8080-exec-9]) ID+koxpLioxRFDpNmG0vP6LSem7ghQizDWPPQueVFvOEY= 
+* INFO  2025-09-26T22:13:41,809 Authentication event: AuthenticationSuccessEvent; username: admin; ip: 10.0.7.4 (AuthenticationLoggerListener.java [http-nio-8080-exec-10]) IDApoFqdq3PR3RCK/VVI7PHcWe1FPComEZzWeb5n1aXag= 

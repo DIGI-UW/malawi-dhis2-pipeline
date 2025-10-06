@@ -124,31 +124,6 @@ malawi-dhis2-pipeline/
 # Expected output: instant version 2.x.x
 ```
 
-### Method 2: Manual Download
-
-```bash
-# Download instant CLI v2 for Linux
-curl -L https://github.com/openhie/instant-v2/releases/latest/download/instant-linux -o instant
-chmod +x instant
-
-# Option 1: Use locally
-# ./instant <command>
-
-# Option 2: Install system-wide
-sudo mv instant /usr/local/bin/
-instant --version
-```
-
-### Method 3: Install via npm
-
-```bash
-# Install globally via npm
-npm install -g @openhie/instant-v2-cli
-
-# Verify installation
-instant --version
-```
-
 ## Environment Configuration
 
 ### Create Environment File
@@ -203,7 +178,7 @@ OPENFN_MEMORY_LIMIT=1G
 1. **Never commit `.env` to version control**
 2. **Use strong passwords in production**
 3. **Rotate API keys regularly**
-4. **Use Docker secrets for sensitive data in production**
+4. **Docker secrets are automatically created** - The system automatically creates Docker Swarm secrets from environment variables during deployment, ensuring secure credential management without manual setup
 
 ## Building Custom Images
 
@@ -254,10 +229,12 @@ docker inspect openfn-cli-test:latest
 # 1. Validates environment configuration
 # 2. Builds necessary Docker images
 # 3. Initializes the instant project
-# 4. Deploys all services
+# 4. Deploys all services (automatically creates Docker secrets from env vars)
 # 5. Waits for services to be ready
 # 6. Loads OpenFN workflows
 ```
+
+**Note on Secrets**: The deployment process automatically creates all required Docker Swarm secrets from environment variables defined in `packages/openfn/package-metadata.json`. No manual secret setup is required for development. See [OpenFN Secrets Documentation](./secrets-openfn.md) for details.
 
 ### Method 2: Manual Step-by-Step
 

@@ -273,7 +273,6 @@ For workflow changes without full rebuild:
 
 #### Workflow Components
 - **[SFTP-DHIS2 Workflow](projects/openfn-workflows/workflows/sftp-dhis2/README.md)** - Main data import workflow
-- **[Configuration Loader](projects/openfn-workflows/shared/config-loader.js)** - Dynamic configuration system
 
 #### Other Resources
 - **[Original OpenFN Setup](projects/original-openfn-setup/README.md)** - Legacy setup documentation

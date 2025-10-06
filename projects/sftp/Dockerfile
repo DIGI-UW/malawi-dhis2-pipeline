@@ -1,13 +1,13 @@
 ARG SFTP_BASE_IMAGE=atmoz/sftp:latest
 FROM ${SFTP_BASE_IMAGE}
 
-# Copy Excel files to the SFTP server's data directory
-COPY data/excel-files/*.xlsx /home/openfn/data/excel-files/
+# Copy all files to the SFTP server's data directory
+COPY data/ /home/openfn/data/
 
 # Copy test files for debugging and testing
-COPY data/excel-files/test.json /home/openfn/data/excel-files/test.json 
-COPY data/excel-files/test.csv /home/openfn/data/excel-files/test.csv 
-COPY data/excel-files/test.txt /home/openfn/data/excel-files/test.txt 
+# COPY data/excel-files/test.json /home/openfn/data/excel-files/test.json 
+# COPY data/excel-files/test.csv /home/openfn/data/excel-files/test.csv 
+# COPY data/excel-files/test.txt /home/openfn/data/excel-files/test.txt 
 
 # Copy SSH configuration for OpenFN compatibility
 COPY sshd_config_legacy.conf /tmp/sshd_config_legacy.conf

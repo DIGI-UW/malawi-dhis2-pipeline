@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="DHIS2 Workflow Debug Collection" tests="20" time="0.683">
+  <testsuite name="0. Admin: Who Am I" id="6b5f47c1-7443-40c4-9644-96f7facbac5d" timestamp="2025-09-27T05:44:55.965Z" tests="0" failures="0" errors="0" time="0.104"/>
+  <testsuite name="1. Check Root Country Org Unit (Malawi)" id="54a78554-ddde-4c72-bfef-a6dc984d3784" timestamp="2025-09-27T05:44:55.965Z" tests="0" failures="0" errors="0" time="0.034"/>
+  <testsuite name="2. Create Root Country Org Unit (Malawi)" id="c3bbce7f-98ef-4c74-8097-8edb8546aef5" timestamp="2025-09-27T05:44:55.965Z" tests="0" failures="0" errors="0" time="0.008"/>
+  <testsuite name="2b. Test Upsert Org Unit (Malawi)" id="35b6c3f0-fea8-4c8c-b311-cf894081e73f" timestamp="2025-09-27T05:44:55.965Z" tests="0" failures="0" errors="0" time="0.007"/>
+  <testsuite name="3. Get Superuser Role" id="c1bc684a-123e-4756-aa57-e543d606948a" timestamp="2025-09-27T05:44:55.965Z" tests="0" failures="0" errors="0" time="0.006"/>
+  <testsuite name="3b. Check Integration User (exists?)" id="7ab83e6b-b16f-486d-9e8e-6357cfb31ced" timestamp="2025-09-27T05:44:55.965Z" tests="0" failures="0" errors="0" time="0.011"/>
+  <testsuite name="4. Create Integration User" id="4cb31b9f-3482-491b-bd4c-206aef0deaf2" timestamp="2025-09-27T05:44:55.965Z" tests="0" failures="0" errors="0" time="0.008"/>
+  <testsuite name="4a. Resolve Integration User Id" id="228746f0-1952-47c2-a080-84584a0c557f" timestamp="2025-09-27T05:44:55.965Z" tests="0" failures="0" errors="0" time="0.007"/>
+  <testsuite name="4b. Assign Integration User to Country OU" id="d5130937-1acb-4d2e-9ed7-e9d67c77af91" timestamp="2025-09-27T05:44:55.965Z" tests="0" failures="0" errors="0" time="0.012"/>
+  <testsuite name="5. Create Data Element (TX_CURR)" id="89a4b566-7249-401b-a7b3-2d63c2411cfe" timestamp="2025-09-27T05:44:55.965Z" tests="0" failures="0" errors="0" time="0.010"/>
+  <testsuite name="6. Create Facility Org Unit (Test Facility)" id="68aa6938-0009-4ad2-ae50-f9f6195cbf1e" timestamp="2025-09-27T05:44:55.965Z" tests="0" failures="0" errors="0" time="0.013"/>
+  <testsuite name="5b. Get Data Element (TX_CURR) ID" id="16d0360f-a31c-46d7-ada2-3b6b5b8303eb" timestamp="2025-09-27T05:44:55.965Z" tests="0" failures="0" errors="0" time="0.008"/>
+  <testsuite name="7. Create Dataset" id="de373399-baaa-43f7-b05c-a3303dac6f00" timestamp="2025-09-27T05:44:55.965Z" tests="0" failures="0" errors="0" time="0.012"/>
+  <testsuite name="8. Test Upload with Integration User (UID scheme)" id="184b4f26-7bcf-4023-9a5f-22c6d24d0955" timestamp="2025-09-27T05:44:55.965Z" tests="0" failures="0" errors="0" time="0.093"/>
+  <testsuite name="8b. Test Upload with Admin User (for comparison)" id="fb0ced7d-a812-44d2-82b8-963f75d51eb8" timestamp="2025-09-27T05:44:55.965Z" tests="0" failures="0" errors="0" time="0.090"/>
+  <testsuite name="9. Test Upload with Integration User (CODE/NAME scheme)" id="13703a33-4d4b-4d0b-8515-aff82aadf059" timestamp="2025-09-27T05:44:55.965Z" tests="0" failures="0" errors="0" time="0.099"/>
+  <testsuite name="10. Debug: Get Integration User Org Units" id="a9e781b6-77e5-4c97-ba20-599e6f20aace" timestamp="2025-09-27T05:44:55.965Z" tests="0" failures="0" errors="0" time="0.045"/>
+  <testsuite name="11. Debug: List All Org Units" id="43f4a869-536b-4c14-b7db-7ba6d4252fc4" timestamp="2025-09-27T05:44:55.965Z" tests="0" failures="0" errors="0" time="0.093"/>
+  <testsuite name="12. Debug: Test UID Resolution (simplified approach)" id="4ceca156-2513-4a0e-88a3-04962ce61ffd" timestamp="2025-09-27T05:44:55.965Z" tests="0" failures="0" errors="0" time="0.014"/>
+  <testsuite name="13. Debug: Check Response Structure" id="60656fce-8dd3-471c-9a5f-00e89997ffa8" timestamp="2025-09-27T05:44:55.965Z" tests="0" failures="0" errors="0" time="0.009"/>
+</testsuites>

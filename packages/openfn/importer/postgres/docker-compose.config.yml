@@ -2,7 +2,11 @@
 services:
   openfn_db_config:
     image: node:erbium-alpine
-    command: sh -c "cd /importer && ls && npm i && ls && node create-db.js"
+    command: sh -lc '
+      export_from_secret() { var="$1"; path="$2"; [ -f "$path" ] && export "$var"="$(cat "$path")" || true; };
+      export_from_secret POSTGRES_PASSWORD /run/secrets/postgres_password;
+      export_from_secret NEW_DATABASE_PASSWORD /run/secrets/openfn_db_user_password;
+      cd /importer && ls && npm i && ls && node create-db.js'
     configs:
       - target: /importer/package.json
         source: package.json
@@ -24,6 +28,10 @@ services:
       restart_policy:
         condition: none
 
+    secrets:
+      - postgres_password
+      - openfn_db_user_password
+
 networks:
   postgres:
     name: postgres_public
@@ -37,6 +45,12 @@ configs:
       name: openfn
   create-db.js:
     file: ./create-db.js
-    name: create_db.js-${create_db_js_DIGEST:?err}
+    name: create_db.js
     labels:
       name: openfn
+secrets:
+  postgres_password:
+    external: true
+  openfn_db_user_password:
+    external: true
+

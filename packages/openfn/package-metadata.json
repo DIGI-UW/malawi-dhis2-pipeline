@@ -58,6 +58,10 @@
     "LOCAL_ADAPTORS": "true",
     "OPENFN_ADAPTORS_REPO": "/app/openfn-adaptors",
     "WORKER_MAX_RUN_MEMORY_MB": "2048",
-    "WORKER_MAX_RUN_DURATION_SECONDS": "36000"
+    "WORKER_MAX_RUN_DURATION_SECONDS": "36000",
+    "DHIS2_PASSWORD": "OpenFn@2024!",
+    "DHIS2_USER": "openfn_integration",
+    "DHIS2_ADMIN_PASSWORD": "district",
+    "DHIS2_ADMIN_USER": "admin"
   }
 }
