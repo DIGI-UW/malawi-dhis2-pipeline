@@ -1,0 +1,49 @@
+{
+  "config": {
+    "directory": "/data",
+    "fileTypesEnabled": [
+      "csv"
+    ],
+    "lockTtlSeconds": 600,
+    "pruneProcessedAfterDays": 30,
+    "targetFile": "samples/pepfar/PEPFAR_TxCURR_2025_Q2_Cleaned_v3_20250805160300.csv",
+    "targetFilePattern": null,
+    "targetFilePatterns": [
+      "^PEPFAR_TxCURR_.*\\.(csv)(\\.csv)?$"
+    ]
+  },
+  "fileName": "samples/pepfar/PEPFAR_TxCURR_2025_Q2_Cleaned_v3_20250805160300.csv",
+  "filePath": "/data/samples/pepfar/PEPFAR_TxCURR_2025_Q2_Cleaned_v3_20250805160300.csv",
+  "fileType": "csv",
+  "fileTypeConfigKey": "pepfar_tx_curr_csv",
+  "filesIndex": {
+    "samples/pepfar/PEPFAR_TxCURR_2025_Q2_Cleaned_v3_20250805160300.csv": {
+      "fileType": "csv",
+      "fileTypeConfigKey": "pepfar_tx_curr_csv",
+      "inflight": {
+        "startedAt": "2025-10-07T06:40:41.024Z"
+      },
+      "lastProcessedAt": null,
+      "lastSeenAt": "2025-10-07T06:40:40.030Z",
+      "mtime": 1758758600000,
+      "path": "/data/samples/pepfar/PEPFAR_TxCURR_2025_Q2_Cleaned_v3_20250805160300.csv",
+      "processed": false,
+      "size": 150042,
+      "status": "inflight"
+    }
+  },
+  "hasFileToProcess": true,
+  "lock": {
+    "acquiredAt": "2025-10-07T06:40:39.902Z",
+    "expiresAt": "2025-10-07T06:50:39.902Z",
+    "key": "workflow-lock",
+    "owner": "openfn-95d56bd469fdb"
+  },
+  "workflow-owner": "openfn-95d56bd469fdb",
+  "workflowLock": {
+    "acquiredAt": "2025-10-07T06:40:39.902Z",
+    "expiresAt": "2025-10-07T06:50:39.902Z",
+    "key": "workflow-lock",
+    "owner": "openfn-95d56bd469fdb"
+  }
+}

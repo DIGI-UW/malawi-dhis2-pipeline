@@ -321,9 +321,24 @@ function buildDataValues(records, fileTypeConfig, dhis2Mappings, metadataMapping
     const orgUnitName = mappedRow.orgUnit;
     // Prefer explicit code mapping if present; fallback to generated code from name
     const dataElementCode = mappedRow.dataElementCode || getCodeFromName(mappedRow.dataElement);
-    const categoryKey = [mappedRow.categoryOptions?.hsector, mappedRow.categoryOptions?.reportingPeriodType]
-      .filter(Boolean)
-      .join('+');
+    
+    // Build category option combo key based on available category options
+    // For PEPFAR files: use sex and age group
+    // For other files: use hsector and reportingPeriodType
+    const categoryParts = [];
+    if (mappedRow.categoryOptions?.sex) {
+      categoryParts.push(mappedRow.categoryOptions.sex);
+    }
+    if (mappedRow.categoryOptions?.ageGroup) {
+      categoryParts.push(mappedRow.categoryOptions.ageGroup);
+    }
+    if (mappedRow.categoryOptions?.hsector) {
+      categoryParts.push(mappedRow.categoryOptions.hsector);
+    }
+    if (mappedRow.categoryOptions?.reportingPeriodType) {
+      categoryParts.push(mappedRow.categoryOptions.reportingPeriodType);
+    }
+    const categoryKey = categoryParts.length > 0 ? categoryParts.join('+') : '';
 
     const mappedDataElement = dhis2Mappings.dataElements?.[dataElementCode] || dhis2Mappings.dataElements?.[getCodeFromName(mappedRow.dataElement)];
     const mappedOrgUnit = dhis2Mappings.orgUnits?.[orgUnitName] || dhis2Mappings.orgUnits?.[getCodeFromName(orgUnitName)];
@@ -337,23 +352,11 @@ function buildDataValues(records, fileTypeConfig, dhis2Mappings, metadataMapping
       continue;
     }
 
-    // Handle period transformation - if it's a timestamp, extract YYYYMM
-    let period = mappedRow.period;
-    console.log(`   🔍 Period debug: "${period}" (type: ${typeof period})`);
-    if (period && typeof period === 'string' && (period.includes('T') || period.includes(' '))) {
-      // It's a timestamp, extract YYYYMM
-      const date = new Date(period);
-      if (!isNaN(date.getTime())) {
-        const year = date.getUTCFullYear();
-        const month = String(date.getUTCMonth() + 1).padStart(2, '0');
-        period = `${year}${month}`;
-        console.log(`   🔄 Period transformed: ${mappedRow.period} → ${period}`);
-      } else {
-        console.log(`   ⚠️ Period looks like timestamp but couldn't parse: ${period}`);
-      }
-    } else {
-      console.log(`   ℹ️ Period doesn't look like timestamp: ${period}`);
-    }
+    // Period handling: prioritize overridePeriod from filename, fall back to data period
+    // This ensures period consistency based on file metadata rather than submission timestamps
+    const finalPeriod = overridePeriod 
+      ? normalizePeriodForPeriodType(overridePeriod, periodType)
+      : normalizePeriodForPeriodType(normalizePeriod(mappedRow.period), periodType);
     
     // If this is a PEPFAR MMD file-type, emit up to three rows for durations
     if (String(fileTypeConfig?.fileType || '').startsWith('pepfar_tx_mmd_csv')) {
@@ -365,14 +368,13 @@ function buildDataValues(records, fileTypeConfig, dhis2Mappings, metadataMapping
       for (const d of durations) {
         const val = mappedRow[d.key];
         if (val !== undefined && val !== null && String(val).trim() !== '') {
-          const normalizedForDataset = normalizePeriodForPeriodType(overridePeriod || normalizePeriod(period), periodType);
           const cocKey = `mmdDuration:${d.label}`;
           const coc = dhis2Mappings.categoryOptionCombos?.[cocKey]
             || dhis2Mappings.categoryOptionCombos?.[`mmd:${d.label}`]
             || categoryOptionCombo;
           values.push({
             dataElement,
-            period: normalizedForDataset,
+            period: finalPeriod,
             orgUnit,
             categoryOptionCombo: coc,
             value: String(val)
@@ -382,10 +384,9 @@ function buildDataValues(records, fileTypeConfig, dhis2Mappings, metadataMapping
       continue;
     }
 
-    const normalizedForDataset = normalizePeriodForPeriodType(overridePeriod || normalizePeriod(period), periodType);
     values.push({
       dataElement,
-      period: normalizedForDataset,
+      period: finalPeriod,
       orgUnit,
       categoryOptionCombo,
       value: mappedRow.value !== undefined && mappedRow.value !== null ? String(mappedRow.value) : '0'

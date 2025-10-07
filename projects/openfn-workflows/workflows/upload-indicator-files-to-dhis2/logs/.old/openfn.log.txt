@@ -3,25 +3,22 @@ RTE Timeout: 36000s
 RTE Payload limit: 10mb
 VER Versions:
     ▸ node.js                   22.20.0
-    ▸ worker                    1.15.0
+    ▸ worker                    1.15.4
     ▸ @openfn/language-dhis2    local
     ▸ @openfn/language-sftp     local
-R/T Added import statement for @openfn/language-sftp
-R/T Added export * statement for @openfn/language-sftp
-R/T Finished in 0.094s
-R/T Added import statement for @openfn/language-sftp
-R/T Added export * statement for @openfn/language-sftp
-R/T Finished in 0.007s
-R/T Added import statement for @openfn/language-sftp
-R/T Added export * statement for @openfn/language-sftp
-R/T Finished in 0.018s
-R/T Added import statement for @openfn/language-dhis2
-R/T Added export * statement for @openfn/language-dhis2
-R/T Finished in 0.051s
-R/T Added import statement for @openfn/language-dhis2
-R/T Added export * statement for @openfn/language-dhis2
-R/T Finished in 0.016s
-R/T Executing 3d7b0aa8-38de-472e-ab52-8c9f72c722df
+R/T Compiling all workflow steps...
+R/T Finished in 0.155s
+R/T Compiled Discover indicator files and manage workflow lock in 0.39s
+R/T Finished in 0.003s
+R/T Compiled Select next file and load file-type configuration in 0.030s
+R/T Finished in 0.027s
+R/T Compiled Parse file metadata and build DHIS2 structures in 0.10s
+R/T Finished in 0.05s
+R/T Compiled Ensure DHIS2 metadata exists per file config in 0.21s
+R/T Finished in 0.027s
+R/T Compiled Stream chunks to DHIS2 with resume support in 0.085s
+R/T Workflow compilation complete in 0.96s
+R/T Executing 880cc08a-60b5-40b4-931e-1189d7293332
 R/T Starting step Discover indicator files and manage workflow lock
 R/T [linker] loading module @openfn/language-sftp
 R/T [linker] Loading module @openfn/language-sftp from /app/openfn-adaptors/packages/sftp/dist/index.cjs
@@ -42,27 +39,27 @@ ADA 🔗 SFTP: Connection timeout: 10000ms
 ADA ✅ SFTP: Successfully connected to 172.17.0.1:***
 ADA ✅ SFTP: Connection ready for operations
 JOB 🔎 Job 0: Scanning SFTP directory for new/updated indicator files...
-JOB    • Loaded 3 file-type configs
+JOB    • Loaded 8 file type configurations
 JOB    • Directory: /data
-JOB    • Patterns: ^PEPFAR_TxCURR.*\.(csv)(\.csv)?$
+JOB    • Patterns: ^PEPFAR_TxCURR_.*\.(csv)(\.csv)?$
 JOB    • Enabled types: csv
 ADA 📂 SFTP: Starting directory listing...
 ADA 📂 SFTP: Listing directory: /data
-ADA ✅ SFTP: Directory listing completed in 127ms
+ADA ✅ SFTP: Directory listing completed in 126ms
 ADA 📊 SFTP: Found 2 items
 ADA 📋 SFTP: First few items:
 ADA   1. 📁 excel-files
 ADA   2. 📁 samples
 ADA 📂 SFTP: Starting directory listing...
 ADA 📂 SFTP: Listing directory: /data
-ADA ✅ SFTP: Directory listing completed in 166ms
+ADA ✅ SFTP: Directory listing completed in 165ms
 ADA 📊 SFTP: Found 2 items
 ADA 📋 SFTP: First few items:
 ADA   1. 📁 excel-files
 ADA   2. 📁 samples
 ADA 📂 SFTP: Starting directory listing...
 ADA 📂 SFTP: Listing directory: /data/excel-files
-ADA ✅ SFTP: Directory listing completed in 164ms
+ADA ✅ SFTP: Directory listing completed in 165ms
 ADA 📊 SFTP: Found 8 items
 ADA 📋 SFTP: First few items:
 ADA   1. 📄 Direct Queries - Q1 2025 MoH Reports.xlsx (4222983 bytes)
@@ -71,14 +68,14 @@ ADA   3. 📄 test.xlsx (10519 bytes)
 ADA   ... and 5 more items
 ADA 📂 SFTP: Starting directory listing...
 ADA 📂 SFTP: Listing directory: /data/samples
-ADA ✅ SFTP: Directory listing completed in 165ms
+ADA ✅ SFTP: Directory listing completed in 164ms
 ADA 📊 SFTP: Found 2 items
 ADA 📋 SFTP: First few items:
 ADA   1. 📁 pepfar
 ADA   2. 📁 moh
 ADA 📂 SFTP: Starting directory listing...
 ADA 📂 SFTP: Listing directory: /data/samples/pepfar
-ADA ✅ SFTP: Directory listing completed in 164ms
+ADA ✅ SFTP: Directory listing completed in 167ms
 ADA 📊 SFTP: Found 6 items
 ADA 📋 SFTP: First few items:
 ADA   1. 📄 PEPFAR_TxRTT_2025_Q2_Cleaned_v3_20250805160300.csv (35102 bytes)
@@ -87,30 +84,30 @@ ADA   3. 📄 PEPFAR_TxCURR_2025_Q2_Cleaned_v3_20250805160300.csv (150042 bytes)
 ADA   ... and 3 more items
 ADA 📂 SFTP: Starting directory listing...
 ADA 📂 SFTP: Listing directory: /data/samples/pepfar/Compiled PEPFAR report
-ADA ✅ SFTP: Directory listing completed in 165ms
+ADA ✅ SFTP: Directory listing completed in 167ms
 ADA 📊 SFTP: Found 1 items
 ADA 📋 SFTP: First few items:
 ADA   1. 📄 Q2FY25_DQ_AnalyticalDB_15_Aug.xlsx (119982 bytes)
 ADA 📂 SFTP: Starting directory listing...
 ADA 📂 SFTP: Listing directory: /data/samples/moh
-ADA ✅ SFTP: Directory listing completed in 164ms
+ADA ✅ SFTP: Directory listing completed in 167ms
 ADA 📊 SFTP: Found 6 items
 ADA 📋 SFTP: First few items:
 ADA   1. 📄 MoH_SurvivalAnalysisWomen_2025_Q1_Initial_v1_20250805160300.csv.csv (361749 bytes)
 ADA   2. 📄 MoH_TPTNewInitiations_2025_Q1_Initial_v1_20250805160300.csv.csv (60071 bytes)
 ADA   3. 📄 MoH_SurvivalAnalysisGeneral_2025_Q1_Initial_v1_20250805160300.csv (518400 bytes)
 ADA   ... and 3 more items
-JOB    • Matched files: 2
+JOB    • Matched files: 1
 JOB 📄 Next file selected: samples/pepfar/PEPFAR_TxCURR_2025_Q2_Cleaned_v3_20250805160300.csv
 ADA 🔌 SFTP: Disconnecting...
 ADA ✅ SFTP: Successfully disconnected
-R/T Operation 1 complete in 1.572s
+R/T Operation 1 complete in 1.599s
 ADA 🔌 SFTP: Disconnecting...
 ADA ℹ️  SFTP: No active connection to disconnect
 R/T Expression complete!
-R/T Discover indicator files and manage workflow lock completed in 2.223s
+R/T Discover indicator files and manage workflow lock completed in 2.314s
 R/T Cleaning up state. Removing keys: configuration
-R/T Final memory usage: [step 75mb] [system 173mb]
+R/T Final memory usage: [step 59mb] [system 175mb]
 R/T Edge function (state) {
 return Boolean(!state?.errors?.["7600110c-cf5c-459a-bc8c-5f7a11489f09"] ?? true)
 } returned true; ecaff61f-8dc8-4c60-a8c5-b8daf387ee70 will be executed next
@@ -126,15 +123,20 @@ ADA 🔗 SFTP: Connection timeout: 10000ms
 ADA ✅ SFTP: Successfully connected to 172.17.0.1:***
 ADA ✅ SFTP: Connection ready for operations
 R/T Starting operation 1
-JOB 📁 Job 1: Selecting target indicator file...
-JOB ✅ Selected file: samples/pepfar/PEPFAR_TxCURR_2025_Q2_Cleaned_v3_20250805160300.csv (type=csv)
+JOB 📁 Job 1: Validating file configuration...
+JOB ✅ Using configuration: PEPFAR TxCURR CSV (pepfar_tx_curr_csv)
+JOB    • File: samples/pepfar/PEPFAR_TxCURR_2025_Q2_Cleaned_v3_20250805160300.csv
+JOB    • Type: csv
+JOB    • Has columnMappings: true
+JOB    • Has uniqueValueCollectors: true
+JOB    • Has builders: true
 R/T Operation 1 complete in 0ms
 ADA 🔌 SFTP: Disconnecting...
 ADA ✅ SFTP: Successfully disconnected
 R/T Expression complete!
-R/T Select next file and load file-type configuration completed in 447ms
+R/T Select next file and load file-type configuration completed in 474ms
 R/T Cleaning up state. Removing keys: configuration
-R/T Final memory usage: [step 75mb] [system 173mb]
+R/T Final memory usage: [step 60mb] [system 175mb]
 R/T Edge function (state) {
 return Boolean(!state?.errors?.["ecaff61f-8dc8-4c60-a8c5-b8daf387ee70"] ?? true)
 } returned true; 26316fca-ca6e-49b4-870b-92dd5e93063b will be executed next
@@ -154,15 +156,15 @@ JOB 📊 Job 2: Reading file metadata and generating DHIS2 structures...
 JOB 📄 File: samples/pepfar/PEPFAR_TxCURR_2025_Q2_Cleaned_v3_20250805160300.csv
 JOB 🧩 Type: csv
 JOB 🔧 Chunk size: 5000
-ADA ✅ SFTP: CSV metadata parsed in 197ms rows: 801 chunks: 1
-ADA ✅ SFTP: CSV chunk parsed in 202ms chunk rows: 801
-R/T Operation 1 complete in 417ms
+ADA ✅ SFTP: CSV metadata parsed in 194ms rows: 781 chunks: 1
+ADA ✅ SFTP: CSV chunk parsed in 200ms chunk rows: 781
+R/T Operation 1 complete in 413ms
 ADA 🔌 SFTP: Disconnecting...
 ADA ✅ SFTP: Successfully disconnected
 R/T Expression complete!
-R/T Parse file metadata and build DHIS2 structures completed in 871ms
+R/T Parse file metadata and build DHIS2 structures completed in 884ms
 R/T Cleaning up state. Removing keys: configuration
-R/T Final memory usage: [step 68mb] [system 180mb]
+R/T Final memory usage: [step 73mb] [system 180mb]
 R/T Edge function (state) {
 return Boolean(!state?.errors?.["26316fca-ca6e-49b4-870b-92dd5e93063b"] ?? true)
 } returned true; 0397234c-010e-4b3c-9025-e44380b6e4f2 will be executed next
@@ -173,233 +175,663 @@ R/T Resolved adaptor @openfn/language-dhis2 to version 7.1.3-custom
 R/T Executing expression (1 operations)
 R/T Starting operation 1
 JOB 🏗️ Job 3: Setting up DHIS2 metadata...
-JOB 📊 Creating 2 data elements...
+JOB 🔐 DHIS2 ADMIN DEBUG: {"hostUrl":"http://dhis2:8080","pw_raw":"***","username":"admin"}
 ADA Using latest available version of the DHIS2 api on this server.
-ADA with params:  {"fields":"id","filter":"code:eq:TX_CURR"}
-ADA ADA HTTP Request: GET http://dhis2:8080/api/dataElements?filter=code%3Aeq%3ATX_CURR&fields=id
+ADA with params:  {"fields":"id,categoryOptions[id,code]","filter":"code:eq:SEX","paging":"false"}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: GET http://dhis2:8080/api/categories?filter=code%3Aeq%3ASEX&fields=id%2CcategoryOptions%5Bid%2Ccode%5D&paging=false
+ADA Retrieved categories
+ADA Using latest available version of the DHIS2 api on this server.
+ADA with params:  {"fields":"id","filter":"code:eq:MALE","paging":"false"}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: GET http://dhis2:8080/api/categoryOptions?filter=code%3Aeq%3AMALE&fields=id&paging=false
+ADA Retrieved categoryOptions
+ADA Using latest available version of the DHIS2 api on this server.
+ADA with params:  {}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: POST http://dhis2:8080/api/categoryOptions
+ADA ADA HTTP Payload Preview: {"name":"Male","shortName":"Male","code":"MALE"}
+ADA Created categoryOptions
+ADA Record available @ http://dhis2:8080/api/categoryOptions/w20poOKFuhrhttp://dhis2:8080/api/categoryOptions/w20poOKFuhr
+ADA Using latest available version of the DHIS2 api on this server.
+ADA with params:  {"fields":"id","filter":"code:eq:FNP","paging":"false"}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: GET http://dhis2:8080/api/categoryOptions?filter=code%3Aeq%3AFNP&fields=id&paging=false
+ADA Retrieved categoryOptions
+ADA Using latest available version of the DHIS2 api on this server.
+ADA with params:  {}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: POST http://dhis2:8080/api/categoryOptions
+ADA ADA HTTP Payload Preview: {"name":"FNP","shortName":"FNP","code":"FNP"}
+ADA Created categoryOptions
+ADA Record available @ http://dhis2:8080/api/categoryOptions/JkgSyjiXCkbhttp://dhis2:8080/api/categoryOptions/JkgSyjiXCkb
+ADA Using latest available version of the DHIS2 api on this server.
+ADA with params:  {"fields":"id","filter":"code:eq:FEMALE","paging":"false"}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: GET http://dhis2:8080/api/categoryOptions?filter=code%3Aeq%3AFEMALE&fields=id&paging=false
+ADA Retrieved categoryOptions
+ADA Using latest available version of the DHIS2 api on this server.
+ADA with params:  {}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: POST http://dhis2:8080/api/categoryOptions
+ADA ADA HTTP Payload Preview: {"name":"Female","shortName":"Female","code":"FEMALE"}
+ADA Created categoryOptions
+ADA Record available @ http://dhis2:8080/api/categoryOptions/Aix5SxODmM5http://dhis2:8080/api/categoryOptions/Aix5SxODmM5
+ADA Using latest available version of the DHIS2 api on this server.
+ADA with params:  {"fields":"id","filter":"code:eq:FP","paging":"false"}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: GET http://dhis2:8080/api/categoryOptions?filter=code%3Aeq%3AFP&fields=id&paging=false
+ADA Retrieved categoryOptions
+ADA Using latest available version of the DHIS2 api on this server.
+ADA with params:  {}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: POST http://dhis2:8080/api/categoryOptions
+ADA ADA HTTP Payload Preview: {"name":"FP","shortName":"FP","code":"FP"}
+ADA Created categoryOptions
+ADA Record available @ http://dhis2:8080/api/categoryOptions/l2wcUb6tlcDhttp://dhis2:8080/api/categoryOptions/l2wcUb6tlcD
+ADA Using latest available version of the DHIS2 api on this server.
+ADA with params:  {"fields":"id","filter":"code:eq:UNKNOWN","paging":"false"}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: GET http://dhis2:8080/api/categoryOptions?filter=code%3Aeq%3AUNKNOWN&fields=id&paging=false
+ADA Retrieved categoryOptions
+ADA Using latest available version of the DHIS2 api on this server.
+ADA with params:  {}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: POST http://dhis2:8080/api/categoryOptions
+ADA ADA HTTP Payload Preview: {"name":"Unknown","shortName":"Unknown","code":"UNKNOWN"}
+ADA Created categoryOptions
+ADA Record available @ http://dhis2:8080/api/categoryOptions/lXUF6wN6Kwqhttp://dhis2:8080/api/categoryOptions/lXUF6wN6Kwq
+ADA Using latest available version of the DHIS2 api on this server.
+ADA with params:  {"fields":"id","filter":"code:eq:FBF","paging":"false"}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: GET http://dhis2:8080/api/categoryOptions?filter=code%3Aeq%3AFBF&fields=id&paging=false
+ADA Retrieved categoryOptions
+ADA Using latest available version of the DHIS2 api on this server.
+ADA with params:  {}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: POST http://dhis2:8080/api/categoryOptions
+ADA ADA HTTP Payload Preview: {"name":"FBF","shortName":"FBF","code":"FBF"}
+ADA Created categoryOptions
+ADA Record available @ http://dhis2:8080/api/categoryOptions/CyQt6g32XvXhttp://dhis2:8080/api/categoryOptions/CyQt6g32XvX
+ADA Using latest available version of the DHIS2 api on this server.
+ADA with params:  {}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: POST http://dhis2:8080/api/categories
+ADA ADA HTTP Payload Preview: {"name":"Sex","shortName":"Sex","code":"SEX","dataDimensionType":"ATTRIBUTE","categoryOptions":[{"id":"w20poOKFuhr"},{"id":"JkgSyjiXCkb"},{"id":"Aix5SxODmM5"},{"id":"l2wcUb6tlcD"},{"id":"lXUF6wN6Kwq"},{"id":"CyQt6g32XvX"}]}
+ADA Created categories
+ADA Record available @ http://dhis2:8080/api/categories/jYzHExKZFbGhttp://dhis2:8080/api/categories/jYzHExKZFbG
+ADA Using latest available version of the DHIS2 api on this server.
+ADA with params:  jYzHExKZFbG
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: GET http://dhis2:8080/api/categories?jYzHExKZFbG=
+ADA Retrieved categories
+ADA Using latest available version of the DHIS2 api on this server.
+ADA with params:  {"fields":"id,categoryOptions[id,code]","filter":"code:eq:AGE_GROUP","paging":"false"}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: GET http://dhis2:8080/api/categories?filter=code%3Aeq%3AAGE_GROUP&fields=id%2CcategoryOptions%5Bid%2Ccode%5D&paging=false
+ADA Retrieved categories
+ADA Using latest available version of the DHIS2 api on this server.
+ADA with params:  {"fields":"id","filter":"code:eq:40_44_YEARS","paging":"false"}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: GET http://dhis2:8080/api/categoryOptions?filter=code%3Aeq%3A40_44_YEARS&fields=id&paging=false
+ADA Retrieved categoryOptions
+ADA Using latest available version of the DHIS2 api on this server.
+ADA with params:  {}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: POST http://dhis2:8080/api/categoryOptions
+ADA ADA HTTP Payload Preview: {"name":"40-44 years","shortName":"40-44 years","code":"40_44_YEARS"}
+ADA Created categoryOptions
+ADA Record available @ http://dhis2:8080/api/categoryOptions/wmULp8Fbzejhttp://dhis2:8080/api/categoryOptions/wmULp8Fbzej
+ADA Using latest available version of the DHIS2 api on this server.
+ADA with params:  {"fields":"id","filter":"code:eq:ALL","paging":"false"}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: GET http://dhis2:8080/api/categoryOptions?filter=code%3Aeq%3AALL&fields=id&paging=false
+ADA Retrieved categoryOptions
+ADA Using latest available version of the DHIS2 api on this server.
+ADA with params:  {}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: POST http://dhis2:8080/api/categoryOptions
+ADA ADA HTTP Payload Preview: {"name":"All","shortName":"All","code":"ALL"}
+ADA Created categoryOptions
+ADA Record available @ http://dhis2:8080/api/categoryOptions/eDJEwJQYxRzhttp://dhis2:8080/api/categoryOptions/eDJEwJQYxRz
+ADA Using latest available version of the DHIS2 api on this server.
+ADA with params:  {"fields":"id","filter":"code:eq:15_19_YEARS","paging":"false"}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: GET http://dhis2:8080/api/categoryOptions?filter=code%3Aeq%3A15_19_YEARS&fields=id&paging=false
+ADA Retrieved categoryOptions
+ADA Using latest available version of the DHIS2 api on this server.
+ADA with params:  {}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: POST http://dhis2:8080/api/categoryOptions
+ADA ADA HTTP Payload Preview: {"name":"15-19 years","shortName":"15-19 years","code":"15_19_YEARS"}
+ADA Created categoryOptions
+ADA Record available @ http://dhis2:8080/api/categoryOptions/exM22y0JHH7http://dhis2:8080/api/categoryOptions/exM22y0JHH7
+ADA Using latest available version of the DHIS2 api on this server.
+ADA with params:  {"fields":"id","filter":"code:eq:55_59_YEARS","paging":"false"}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: GET http://dhis2:8080/api/categoryOptions?filter=code%3Aeq%3A55_59_YEARS&fields=id&paging=false
+ADA Retrieved categoryOptions
+ADA Using latest available version of the DHIS2 api on this server.
+ADA with params:  {}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: POST http://dhis2:8080/api/categoryOptions
+ADA ADA HTTP Payload Preview: {"name":"55-59 years","shortName":"55-59 years","code":"55_59_YEARS"}
+ADA Created categoryOptions
+ADA Record available @ http://dhis2:8080/api/categoryOptions/uLkmO2g4GPvhttp://dhis2:8080/api/categoryOptions/uLkmO2g4GPv
+ADA Using latest available version of the DHIS2 api on this server.
+ADA with params:  {"fields":"id","filter":"code:eq:45_49_YEARS","paging":"false"}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: GET http://dhis2:8080/api/categoryOptions?filter=code%3Aeq%3A45_49_YEARS&fields=id&paging=false
+ADA Retrieved categoryOptions
+ADA Using latest available version of the DHIS2 api on this server.
+ADA with params:  {}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: POST http://dhis2:8080/api/categoryOptions
+ADA ADA HTTP Payload Preview: {"name":"45-49 years","shortName":"45-49 years","code":"45_49_YEARS"}
+ADA Created categoryOptions
+ADA Record available @ http://dhis2:8080/api/categoryOptions/lojmtXmAumvhttp://dhis2:8080/api/categoryOptions/lojmtXmAumv
+ADA Using latest available version of the DHIS2 api on this server.
+ADA with params:  {"fields":"id","filter":"code:eq:35_39_YEARS","paging":"false"}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: GET http://dhis2:8080/api/categoryOptions?filter=code%3Aeq%3A35_39_YEARS&fields=id&paging=false
+ADA Retrieved categoryOptions
+ADA Using latest available version of the DHIS2 api on this server.
+ADA with params:  {}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: POST http://dhis2:8080/api/categoryOptions
+ADA ADA HTTP Payload Preview: {"name":"35-39 years","shortName":"35-39 years","code":"35_39_YEARS"}
+ADA Created categoryOptions
+ADA Record available @ http://dhis2:8080/api/categoryOptions/bqQCcMcnUkGhttp://dhis2:8080/api/categoryOptions/bqQCcMcnUkG
+ADA Using latest available version of the DHIS2 api on this server.
+ADA with params:  {"fields":"id","filter":"code:eq:50_54_YEARS","paging":"false"}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: GET http://dhis2:8080/api/categoryOptions?filter=code%3Aeq%3A50_54_YEARS&fields=id&paging=false
+ADA Retrieved categoryOptions
+ADA Using latest available version of the DHIS2 api on this server.
+ADA with params:  {}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: POST http://dhis2:8080/api/categoryOptions
+ADA ADA HTTP Payload Preview: {"name":"50-54 years","shortName":"50-54 years","code":"50_54_YEARS"}
+ADA Created categoryOptions
+ADA Record available @ http://dhis2:8080/api/categoryOptions/neTAB4QbVhthttp://dhis2:8080/api/categoryOptions/neTAB4QbVht
+ADA Using latest available version of the DHIS2 api on this server.
+ADA with params:  {"fields":"id","filter":"code:eq:30_34_YEARS","paging":"false"}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: GET http://dhis2:8080/api/categoryOptions?filter=code%3Aeq%3A30_34_YEARS&fields=id&paging=false
+ADA Retrieved categoryOptions
+ADA Using latest available version of the DHIS2 api on this server.
+ADA with params:  {}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: POST http://dhis2:8080/api/categoryOptions
+ADA ADA HTTP Payload Preview: {"name":"30-34 years","shortName":"30-34 years","code":"30_34_YEARS"}
+ADA Created categoryOptions
+ADA Record available @ http://dhis2:8080/api/categoryOptions/YLKm1giZhTUhttp://dhis2:8080/api/categoryOptions/YLKm1giZhTU
+ADA Using latest available version of the DHIS2 api on this server.
+ADA with params:  {"fields":"id","filter":"code:eq:25_29_YEARS","paging":"false"}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: GET http://dhis2:8080/api/categoryOptions?filter=code%3Aeq%3A25_29_YEARS&fields=id&paging=false
+ADA Retrieved categoryOptions
+ADA Using latest available version of the DHIS2 api on this server.
+ADA with params:  {}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: POST http://dhis2:8080/api/categoryOptions
+ADA ADA HTTP Payload Preview: {"name":"25-29 years","shortName":"25-29 years","code":"25_29_YEARS"}
+ADA Created categoryOptions
+ADA Record available @ http://dhis2:8080/api/categoryOptions/nf40m5RUk0Rhttp://dhis2:8080/api/categoryOptions/nf40m5RUk0R
+ADA Using latest available version of the DHIS2 api on this server.
+ADA with params:  {"fields":"id","filter":"code:eq:5_9_YEARS","paging":"false"}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: GET http://dhis2:8080/api/categoryOptions?filter=code%3Aeq%3A5_9_YEARS&fields=id&paging=false
+ADA Retrieved categoryOptions
+ADA Using latest available version of the DHIS2 api on this server.
+ADA with params:  {}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: POST http://dhis2:8080/api/categoryOptions
+ADA ADA HTTP Payload Preview: {"name":"5-9 years","shortName":"5-9 years","code":"5_9_YEARS"}
+ADA Created categoryOptions
+ADA Record available @ http://dhis2:8080/api/categoryOptions/iP12EO0clGQhttp://dhis2:8080/api/categoryOptions/iP12EO0clGQ
+ADA Using latest available version of the DHIS2 api on this server.
+ADA with params:  {"fields":"id","filter":"code:eq:60_64_YEARS","paging":"false"}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: GET http://dhis2:8080/api/categoryOptions?filter=code%3Aeq%3A60_64_YEARS&fields=id&paging=false
+ADA Retrieved categoryOptions
+ADA Using latest available version of the DHIS2 api on this server.
+ADA with params:  {}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: POST http://dhis2:8080/api/categoryOptions
+ADA ADA HTTP Payload Preview: {"name":"60-64 years","shortName":"60-64 years","code":"60_64_YEARS"}
+ADA Created categoryOptions
+ADA Record available @ http://dhis2:8080/api/categoryOptions/EwYOKzv9PI4http://dhis2:8080/api/categoryOptions/EwYOKzv9PI4
+ADA Using latest available version of the DHIS2 api on this server.
+ADA with params:  {"fields":"id","filter":"code:eq:65_69_YEARS","paging":"false"}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: GET http://dhis2:8080/api/categoryOptions?filter=code%3Aeq%3A65_69_YEARS&fields=id&paging=false
+ADA Retrieved categoryOptions
+ADA Using latest available version of the DHIS2 api on this server.
+ADA with params:  {}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: POST http://dhis2:8080/api/categoryOptions
+ADA ADA HTTP Payload Preview: {"name":"65-69 years","shortName":"65-69 years","code":"65_69_YEARS"}
+ADA Created categoryOptions
+ADA Record available @ http://dhis2:8080/api/categoryOptions/TnqSnpv4Q7bhttp://dhis2:8080/api/categoryOptions/TnqSnpv4Q7b
+ADA Using latest available version of the DHIS2 api on this server.
+ADA with params:  {"fields":"id","filter":"code:eq:70_74_YEARS","paging":"false"}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: GET http://dhis2:8080/api/categoryOptions?filter=code%3Aeq%3A70_74_YEARS&fields=id&paging=false
+ADA Retrieved categoryOptions
+ADA Using latest available version of the DHIS2 api on this server.
+ADA with params:  {}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: POST http://dhis2:8080/api/categoryOptions
+ADA ADA HTTP Payload Preview: {"name":"70-74 years","shortName":"70-74 years","code":"70_74_YEARS"}
+ADA Created categoryOptions
+ADA Record available @ http://dhis2:8080/api/categoryOptions/i0U4KMU7jlYhttp://dhis2:8080/api/categoryOptions/i0U4KMU7jlY
+ADA Using latest available version of the DHIS2 api on this server.
+ADA with params:  {"fields":"id","filter":"code:eq:10_14_YEARS","paging":"false"}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: GET http://dhis2:8080/api/categoryOptions?filter=code%3Aeq%3A10_14_YEARS&fields=id&paging=false
+ADA Retrieved categoryOptions
+ADA Using latest available version of the DHIS2 api on this server.
+ADA with params:  {}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: POST http://dhis2:8080/api/categoryOptions
+ADA ADA HTTP Payload Preview: {"name":"10-14 years","shortName":"10-14 years","code":"10_14_YEARS"}
+ADA Created categoryOptions
+ADA Record available @ http://dhis2:8080/api/categoryOptions/eVBvoAaAudShttp://dhis2:8080/api/categoryOptions/eVBvoAaAudS
+ADA Using latest available version of the DHIS2 api on this server.
+ADA with params:  {"fields":"id","filter":"code:eq:20_24_YEARS","paging":"false"}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: GET http://dhis2:8080/api/categoryOptions?filter=code%3Aeq%3A20_24_YEARS&fields=id&paging=false
+ADA Retrieved categoryOptions
+ADA Using latest available version of the DHIS2 api on this server.
+ADA with params:  {}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: POST http://dhis2:8080/api/categoryOptions
+ADA ADA HTTP Payload Preview: {"name":"20-24 years","shortName":"20-24 years","code":"20_24_YEARS"}
+ADA Created categoryOptions
+ADA Record available @ http://dhis2:8080/api/categoryOptions/cQwvtF6GRdihttp://dhis2:8080/api/categoryOptions/cQwvtF6GRdi
+ADA Using latest available version of the DHIS2 api on this server.
+ADA with params:  {"fields":"id","filter":"code:eq:1_4_YEARS","paging":"false"}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: GET http://dhis2:8080/api/categoryOptions?filter=code%3Aeq%3A1_4_YEARS&fields=id&paging=false
+ADA Retrieved categoryOptions
+ADA Using latest available version of the DHIS2 api on this server.
+ADA with params:  {}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: POST http://dhis2:8080/api/categoryOptions
+ADA ADA HTTP Payload Preview: {"name":"1-4 years","shortName":"1-4 years","code":"1_4_YEARS"}
+ADA Created categoryOptions
+ADA Record available @ http://dhis2:8080/api/categoryOptions/eO9FcKSga7Jhttp://dhis2:8080/api/categoryOptions/eO9FcKSga7J
+ADA Using latest available version of the DHIS2 api on this server.
+ADA with params:  {"fields":"id","filter":"code:eq:85_89_YEARS","paging":"false"}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: GET http://dhis2:8080/api/categoryOptions?filter=code%3Aeq%3A85_89_YEARS&fields=id&paging=false
+ADA Retrieved categoryOptions
+ADA Using latest available version of the DHIS2 api on this server.
+ADA with params:  {}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: POST http://dhis2:8080/api/categoryOptions
+ADA ADA HTTP Payload Preview: {"name":"85-89 years","shortName":"85-89 years","code":"85_89_YEARS"}
+ADA Created categoryOptions
+ADA Record available @ http://dhis2:8080/api/categoryOptions/kCN1hscGba9http://dhis2:8080/api/categoryOptions/kCN1hscGba9
+ADA Using latest available version of the DHIS2 api on this server.
+ADA with params:  {"fields":"id","filter":"code:eq:75_79_YEARS","paging":"false"}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: GET http://dhis2:8080/api/categoryOptions?filter=code%3Aeq%3A75_79_YEARS&fields=id&paging=false
+ADA Retrieved categoryOptions
+ADA Using latest available version of the DHIS2 api on this server.
+ADA with params:  {}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: POST http://dhis2:8080/api/categoryOptions
+ADA ADA HTTP Payload Preview: {"name":"75-79 years","shortName":"75-79 years","code":"75_79_YEARS"}
+ADA Created categoryOptions
+ADA Record available @ http://dhis2:8080/api/categoryOptions/u50yXkUj3PZhttp://dhis2:8080/api/categoryOptions/u50yXkUj3PZ
+ADA Using latest available version of the DHIS2 api on this server.
+ADA with params:  {"fields":"id","filter":"code:eq:80_84_YEARS","paging":"false"}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: GET http://dhis2:8080/api/categoryOptions?filter=code%3Aeq%3A80_84_YEARS&fields=id&paging=false
+ADA Retrieved categoryOptions
+ADA Using latest available version of the DHIS2 api on this server.
+ADA with params:  {}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: POST http://dhis2:8080/api/categoryOptions
+ADA ADA HTTP Payload Preview: {"name":"80-84 years","shortName":"80-84 years","code":"80_84_YEARS"}
+ADA Created categoryOptions
+ADA Record available @ http://dhis2:8080/api/categoryOptions/dXCRTikaivUhttp://dhis2:8080/api/categoryOptions/dXCRTikaivU
+ADA Using latest available version of the DHIS2 api on this server.
+ADA with params:  {"fields":"id","filter":"code:eq:1_YEARS","paging":"false"}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: GET http://dhis2:8080/api/categoryOptions?filter=code%3Aeq%3A1_YEARS&fields=id&paging=false
+ADA Retrieved categoryOptions
+ADA Using latest available version of the DHIS2 api on this server.
+ADA with params:  {}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: POST http://dhis2:8080/api/categoryOptions
+ADA ADA HTTP Payload Preview: {"name":"<1 years","shortName":"<1 years","code":"1_YEARS"}
+ADA Created categoryOptions
+ADA Record available @ http://dhis2:8080/api/categoryOptions/X5nLWkdtWhLhttp://dhis2:8080/api/categoryOptions/X5nLWkdtWhL
+ADA Using latest available version of the DHIS2 api on this server.
+ADA with params:  {"fields":"id","filter":"code:eq:90_PLUS_YEARS","paging":"false"}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: GET http://dhis2:8080/api/categoryOptions?filter=code%3Aeq%3A90_PLUS_YEARS&fields=id&paging=false
+ADA Retrieved categoryOptions
+ADA Using latest available version of the DHIS2 api on this server.
+ADA with params:  {}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: POST http://dhis2:8080/api/categoryOptions
+ADA ADA HTTP Payload Preview: {"name":"90 plus years","shortName":"90 plus years","code":"90_PLUS_YEARS"}
+ADA Created categoryOptions
+ADA Record available @ http://dhis2:8080/api/categoryOptions/WARFqkvIayshttp://dhis2:8080/api/categoryOptions/WARFqkvIays
+ADA Using latest available version of the DHIS2 api on this server.
+ADA with params:  {}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: POST http://dhis2:8080/api/categories
+ADA ADA HTTP Payload Preview: {"name":"Age Group","shortName":"Age Group","code":"AGE_GROUP","dataDimensionType":"ATTRIBUTE","categoryOptions":[{"id":"wmULp8Fbzej"},{"id":"eDJEwJQYxRz"},{"id":"exM22y0JHH7"},{"id":"uLkmO2g4GPv"},{"id":"lojmtXmAumv"},{"id":"bqQCcMcnUkG"},{"id":"neTAB4QbVht"},{"id":"YLKm1giZhTU"},{"id":"nf40m5RUk0R"},{"id":"iP12EO0clGQ"},{"id":"EwYOKzv9PI4"},{"id":"TnqSnpv4Q7b"},{"id":"i0U4KMU7jlY"},{"id":"eVBvoAaAudS"},{"id":"cQwvtF6GRdi"},{"id":"eO9FcKSga7J"},{"id":"kCN1hscGba9"},{"id":"u50yXkUj3PZ"},{"id":"dXCRTikaivU"},{"id":"X5nLWkdtWhL"},{"id":"WARFqkvIays"}]}
+ADA Created categories
+ADA Record available @ http://dhis2:8080/api/categories/xsareYVvNQdhttp://dhis2:8080/api/categories/xsareYVvNQd
+ADA Using latest available version of the DHIS2 api on this server.
+ADA with params:  xsareYVvNQd
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: GET http://dhis2:8080/api/categories?xsareYVvNQd=
+ADA Retrieved categories
+ADA Using latest available version of the DHIS2 api on this server.
+ADA with params:  {"fields":"id","filter":"code:eq:SEX"}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: GET http://dhis2:8080/api/categories?filter=code%3Aeq%3ASEX&fields=id
+ADA Retrieved categories
+ADA Using latest available version of the DHIS2 api on this server.
+ADA with params:  {"fields":"id","filter":"code:eq:AGE_GROUP"}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: GET http://dhis2:8080/api/categories?filter=code%3Aeq%3AAGE_GROUP&fields=id
+ADA Retrieved categories
+JOB ⚠️  No categories found for combination
+JOB 📊 Creating 1 data elements...
+ADA Using latest available version of the DHIS2 api on this server.
+ADA with params:  {"fields":"id","filter":"code:eq:TX_CURR","paging":"false"}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: GET http://dhis2:8080/api/dataElements?filter=code%3Aeq%3ATX_CURR&fields=id&paging=false
 ADA Retrieved dataElements
 ADA Using latest available version of the DHIS2 api on this server.
 ADA with params:  {}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
 ADA ADA HTTP Request: POST http://dhis2:8080/api/dataElements
 ADA ADA HTTP Payload Preview: {"name":"TX_CURR","shortName":"TX_CURR","code":"TX_CURR","valueType":"INTEGER","aggregationType":"SUM","domainType":"AGGREGATE"}
 ADA Created dataElements
-ADA Record available @ http://dhis2:8080/api/dataElements/LhK4UilIS4dhttp://dhis2:8080/api/dataElements/LhK4UilIS4d
+ADA Record available @ http://dhis2:8080/api/dataElements/pjkirwsiFvPhttp://dhis2:8080/api/dataElements/pjkirwsiFvP
+JOB    ✓ Created: TX_CURR (pjkirwsiFvP)
+JOB 🏛️ Creating root country org unit and facilities...
+ADA Upserting organisation unit hierarchy...
+ADA Processing Level 1: 1 units.
 ADA Using latest available version of the DHIS2 api on this server.
-ADA with params:  {"fields":"id","filter":"code:eq:TX_CURR"}
-ADA ADA HTTP Request: GET http://dhis2:8080/api/dataElements?filter=code%3Aeq%3ATX_CURR&fields=id
-ADA Retrieved dataElements
-JOB    ⚠️ Warning: Could not create TX_CURR
-ADA Using latest available version of the DHIS2 api on this server.
-ADA with params:  {"fields":"id","filter":"code:eq:INDICATOR"}
-ADA ADA HTTP Request: GET http://dhis2:8080/api/dataElements?filter=code%3Aeq%3AINDICATOR&fields=id
-ADA Retrieved dataElements
+ADA with params:  {"filter":"code:eq:MW"}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: GET http://dhis2:8080/api/organisationUnits?filter=code%3Aeq%3AMW
 ADA Using latest available version of the DHIS2 api on this server.
 ADA with params:  {}
-ADA ADA HTTP Request: POST http://dhis2:8080/api/dataElements
-ADA ADA HTTP Payload Preview: {"name":"indicator","shortName":"indicator","code":"INDICATOR","valueType":"INTEGER","aggregationType":"SUM","domainType":"AGGREGATE"}
-ADA Created dataElements
-ADA Record available @ http://dhis2:8080/api/dataElements/S4BIdJ1UQnHhttp://dhis2:8080/api/dataElements/S4BIdJ1UQnH
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: POST http://dhis2:8080/api/organisationUnits
+ADA ADA HTTP Payload Preview: {"name":"Malawi","shortName":"Malawi","code":"MW","openingDate":"2020-01-01"}
+ADA    ✅ Mapped: 'Malawi' → VWe9D9YCCSK
+ADA Processing Level 2: 21 units.
 ADA Using latest available version of the DHIS2 api on this server.
-ADA with params:  {"fields":"id","filter":"code:eq:INDICATOR"}
-ADA ADA HTTP Request: GET http://dhis2:8080/api/dataElements?filter=code%3Aeq%3AINDICATOR&fields=id
-ADA Retrieved dataElements
-JOB    ⚠️ Warning: Could not create indicator
+ADA with params:  {"filter":"code:eq:KAMUZU_ACADEMY_CLINIC"}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: GET http://dhis2:8080/api/organisationUnits?filter=code%3Aeq%3AKAMUZU_ACADEMY_CLINIC
 ADA Using latest available version of the DHIS2 api on this server.
-ADA with params:  {"fields":"id,name","filter":"name:eq:Kamuzu Academy Clinic"}
-ADA ADA HTTP Request: GET http://dhis2:8080/api/organisationUnits?filter=name%3Aeq%3AKamuzu+Academy+Clinic&fields=id%2Cname
-ADA Retrieved organisationUnits
+ADA with params:  {}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: POST http://dhis2:8080/api/organisationUnits
+ADA ADA HTTP Payload Preview: {"name":"Kamuzu Academy Clinic","shortName":"Kamuzu Academy Clinic","code":"KAMUZU_ACADEMY_CLINIC","openingDate":"2020-01-01","parent":{"id":"VWe9D9YCCSK"}}
+ADA    ✅ Mapped: 'Kamuzu Academy Clinic' → z8U4pg6EFwD
 ADA Using latest available version of the DHIS2 api on this server.
-ADA with params:  {"fields":"id,name","filter":"name:ilike:Kamuzu Academy Clinic"}
-ADA ADA HTTP Request: GET http://dhis2:8080/api/organisationUnits?filter=name%3Ailike%3AKamuzu+Academy+Clinic&fields=id%2Cname
-ADA Retrieved organisationUnits
+ADA with params:  {"filter":"code:eq:KAVUZI_CUMMOCK_HEALTH_CENTRE"}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: GET http://dhis2:8080/api/organisationUnits?filter=code%3Aeq%3AKAVUZI_CUMMOCK_HEALTH_CENTRE
 ADA Using latest available version of the DHIS2 api on this server.
-ADA with params:  {"fields":"id,name","filter":"name:eq:facility"}
-ADA ADA HTTP Request: GET http://dhis2:8080/api/organisationUnits?filter=name%3Aeq%3Afacility&fields=id%2Cname
-ADA Retrieved organisationUnits
+ADA with params:  {}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: POST http://dhis2:8080/api/organisationUnits
+ADA ADA HTTP Payload Preview: {"name":"Kavuzi Cummock Health Centre","shortName":"Kavuzi Cummock Health Centre","code":"KAVUZI_CUMMOCK_HEALTH_CENTRE","openingDate":"2020-01-01","parent":{"id":"VWe9D9YCCSK"}}
+ADA    ✅ Mapped: 'Kavuzi Cummock Health Centre' → EAtLbaM7WzY
 ADA Using latest available version of the DHIS2 api on this server.
-ADA with params:  {"fields":"id,name","filter":"name:ilike:facility"}
-ADA ADA HTTP Request: GET http://dhis2:8080/api/organisationUnits?filter=name%3Ailike%3Afacility&fields=id%2Cname
-ADA Retrieved organisationUnits
+ADA with params:  {"filter":"code:eq:AREA_25_URBAN_HEALTH_CENTRE"}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: GET http://dhis2:8080/api/organisationUnits?filter=code%3Aeq%3AAREA_25_URBAN_HEALTH_CENTRE
 ADA Using latest available version of the DHIS2 api on this server.
-ADA with params:  {"fields":"id,name","filter":"name:eq:Kavuzi Cummock Health Centre"}
-ADA ADA HTTP Request: GET http://dhis2:8080/api/organisationUnits?filter=name%3Aeq%3AKavuzi+Cummock+Health+Centre&fields=id%2Cname
-ADA Retrieved organisationUnits
+ADA with params:  {}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: POST http://dhis2:8080/api/organisationUnits
+ADA ADA HTTP Payload Preview: {"name":"Area 25 Urban Health Centre","shortName":"Area 25 Urban Health Centre","code":"AREA_25_URBAN_HEALTH_CENTRE","openingDate":"2020-01-01","parent":{"id":"VWe9D9YCCSK"}}
+ADA    ✅ Mapped: 'Area 25 Urban Health Centre' → Poo3Xk1aMVF
 ADA Using latest available version of the DHIS2 api on this server.
-ADA with params:  {"fields":"id,name","filter":"name:ilike:Kavuzi Cummock Health Centre"}
-ADA ADA HTTP Request: GET http://dhis2:8080/api/organisationUnits?filter=name%3Ailike%3AKavuzi+Cummock+Health+Centre&fields=id%2Cname
-ADA Retrieved organisationUnits
+ADA with params:  {"filter":"code:eq:CHITEKESA_HEALTH_CENTRE"}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: GET http://dhis2:8080/api/organisationUnits?filter=code%3Aeq%3ACHITEKESA_HEALTH_CENTRE
 ADA Using latest available version of the DHIS2 api on this server.
-ADA with params:  {"fields":"id,name","filter":"name:eq:Area 25 Urban Health Centre"}
-ADA ADA HTTP Request: GET http://dhis2:8080/api/organisationUnits?filter=name%3Aeq%3AArea+25+Urban+Health+Centre&fields=id%2Cname
-ADA Retrieved organisationUnits
+ADA with params:  {}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: POST http://dhis2:8080/api/organisationUnits
+ADA ADA HTTP Payload Preview: {"name":"Chitekesa Health Centre","shortName":"Chitekesa Health Centre","code":"CHITEKESA_HEALTH_CENTRE","openingDate":"2020-01-01","parent":{"id":"VWe9D9YCCSK"}}
+ADA    ✅ Mapped: 'Chitekesa Health Centre' → UEeczv6K2PG
 ADA Using latest available version of the DHIS2 api on this server.
-ADA with params:  {"fields":"id,name","filter":"name:ilike:Area 25 Urban Health Centre"}
-ADA ADA HTTP Request: GET http://dhis2:8080/api/organisationUnits?filter=name%3Ailike%3AArea+25+Urban+Health+Centre&fields=id%2Cname
-ADA Retrieved organisationUnits
+ADA with params:  {"filter":"code:eq:DEDZA_DISTRICT_HOSPITAL"}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: GET http://dhis2:8080/api/organisationUnits?filter=code%3Aeq%3ADEDZA_DISTRICT_HOSPITAL
 ADA Using latest available version of the DHIS2 api on this server.
-ADA with params:  {"fields":"id,name","filter":"name:eq:Chitekesa Health Centre"}
-ADA ADA HTTP Request: GET http://dhis2:8080/api/organisationUnits?filter=name%3Aeq%3AChitekesa+Health+Centre&fields=id%2Cname
-ADA Retrieved organisationUnits
+ADA with params:  {}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: POST http://dhis2:8080/api/organisationUnits
+ADA ADA HTTP Payload Preview: {"name":"Dedza District Hospital","shortName":"Dedza District Hospital","code":"DEDZA_DISTRICT_HOSPITAL","openingDate":"2020-01-01","parent":{"id":"VWe9D9YCCSK"}}
+ADA    ✅ Mapped: 'Dedza District Hospital' → gkO5hlmSDVc
 ADA Using latest available version of the DHIS2 api on this server.
-ADA with params:  {"fields":"id,name","filter":"name:ilike:Chitekesa Health Centre"}
-ADA ADA HTTP Request: GET http://dhis2:8080/api/organisationUnits?filter=name%3Ailike%3AChitekesa+Health+Centre&fields=id%2Cname
-ADA Retrieved organisationUnits
+ADA with params:  {"filter":"code:eq:BANGWE_HEALTH_CENTRE"}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: GET http://dhis2:8080/api/organisationUnits?filter=code%3Aeq%3ABANGWE_HEALTH_CENTRE
 ADA Using latest available version of the DHIS2 api on this server.
-ADA with params:  {"fields":"id,name","filter":"name:eq:Dedza District Hospital"}
-ADA ADA HTTP Request: GET http://dhis2:8080/api/organisationUnits?filter=name%3Aeq%3ADedza+District+Hospital&fields=id%2Cname
-ADA Retrieved organisationUnits
+ADA with params:  {}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: POST http://dhis2:8080/api/organisationUnits
+ADA ADA HTTP Payload Preview: {"name":"Bangwe Health Centre","shortName":"Bangwe Health Centre","code":"BANGWE_HEALTH_CENTRE","openingDate":"2020-01-01","parent":{"id":"VWe9D9YCCSK"}}
+ADA    ✅ Mapped: 'Bangwe Health Centre' → RqbC8o8Z8Uu
 ADA Using latest available version of the DHIS2 api on this server.
-ADA with params:  {"fields":"id,name","filter":"name:ilike:Dedza District Hospital"}
-ADA ADA HTTP Request: GET http://dhis2:8080/api/organisationUnits?filter=name%3Ailike%3ADedza+District+Hospital&fields=id%2Cname
-ADA Retrieved organisationUnits
+ADA with params:  {"filter":"code:eq:JALASI_HEALTH_CENTRE"}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: GET http://dhis2:8080/api/organisationUnits?filter=code%3Aeq%3AJALASI_HEALTH_CENTRE
 ADA Using latest available version of the DHIS2 api on this server.
-ADA with params:  {"fields":"id,name","filter":"name:eq:Bangwe Health Centre"}
-ADA ADA HTTP Request: GET http://dhis2:8080/api/organisationUnits?filter=name%3Aeq%3ABangwe+Health+Centre&fields=id%2Cname
-ADA Retrieved organisationUnits
+ADA with params:  {}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: POST http://dhis2:8080/api/organisationUnits
+ADA ADA HTTP Payload Preview: {"name":"Jalasi Health Centre","shortName":"Jalasi Health Centre","code":"JALASI_HEALTH_CENTRE","openingDate":"2020-01-01","parent":{"id":"VWe9D9YCCSK"}}
+ADA    ✅ Mapped: 'Jalasi Health Centre' → YAkFJOT6vk3
 ADA Using latest available version of the DHIS2 api on this server.
-ADA with params:  {"fields":"id,name","filter":"name:ilike:Bangwe Health Centre"}
-ADA ADA HTTP Request: GET http://dhis2:8080/api/organisationUnits?filter=name%3Ailike%3ABangwe+Health+Centre&fields=id%2Cname
-ADA Retrieved organisationUnits
+ADA with params:  {"filter":"code:eq:JENDA_HEALTH_CENTRE"}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: GET http://dhis2:8080/api/organisationUnits?filter=code%3Aeq%3AJENDA_HEALTH_CENTRE
 ADA Using latest available version of the DHIS2 api on this server.
-ADA with params:  {"fields":"id,name","filter":"name:eq:Jalasi Health Centre"}
-ADA ADA HTTP Request: GET http://dhis2:8080/api/organisationUnits?filter=name%3Aeq%3AJalasi+Health+Centre&fields=id%2Cname
-ADA Retrieved organisationUnits
+ADA with params:  {}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: POST http://dhis2:8080/api/organisationUnits
+ADA ADA HTTP Payload Preview: {"name":"Jenda Health Centre","shortName":"Jenda Health Centre","code":"JENDA_HEALTH_CENTRE","openingDate":"2020-01-01","parent":{"id":"VWe9D9YCCSK"}}
+ADA    ✅ Mapped: 'Jenda Health Centre' → pWZkgNhFOy3
 ADA Using latest available version of the DHIS2 api on this server.
-ADA with params:  {"fields":"id,name","filter":"name:ilike:Jalasi Health Centre"}
-ADA ADA HTTP Request: GET http://dhis2:8080/api/organisationUnits?filter=name%3Ailike%3AJalasi+Health+Centre&fields=id%2Cname
-ADA Retrieved organisationUnits
+ADA with params:  {"filter":"code:eq:KASINJE_HEALTH_CENTRE"}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: GET http://dhis2:8080/api/organisationUnits?filter=code%3Aeq%3AKASINJE_HEALTH_CENTRE
 ADA Using latest available version of the DHIS2 api on this server.
-ADA with params:  {"fields":"id,name","filter":"name:eq:Jenda Health Centre"}
-ADA ADA HTTP Request: GET http://dhis2:8080/api/organisationUnits?filter=name%3Aeq%3AJenda+Health+Centre&fields=id%2Cname
-ADA Retrieved organisationUnits
+ADA with params:  {}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: POST http://dhis2:8080/api/organisationUnits
+ADA ADA HTTP Payload Preview: {"name":"Kasinje Health Centre","shortName":"Kasinje Health Centre","code":"KASINJE_HEALTH_CENTRE","openingDate":"2020-01-01","parent":{"id":"VWe9D9YCCSK"}}
+ADA    ✅ Mapped: 'Kasinje Health Centre' → bfqHc6nrNLW
 ADA Using latest available version of the DHIS2 api on this server.
-ADA with params:  {"fields":"id,name","filter":"name:ilike:Jenda Health Centre"}
-ADA ADA HTTP Request: GET http://dhis2:8080/api/organisationUnits?filter=name%3Ailike%3AJenda+Health+Centre&fields=id%2Cname
-ADA Retrieved organisationUnits
+ADA with params:  {"filter":"code:eq:LIUZI_HEALTH_CENTRE"}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: GET http://dhis2:8080/api/organisationUnits?filter=code%3Aeq%3ALIUZI_HEALTH_CENTRE
 ADA Using latest available version of the DHIS2 api on this server.
-ADA with params:  {"fields":"id,name","filter":"name:eq:Kasinje Health Centre"}
-ADA ADA HTTP Request: GET http://dhis2:8080/api/organisationUnits?filter=name%3Aeq%3AKasinje+Health+Centre&fields=id%2Cname
-ADA Retrieved organisationUnits
+ADA with params:  {}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: POST http://dhis2:8080/api/organisationUnits
+ADA ADA HTTP Payload Preview: {"name":"Liuzi Health Centre","shortName":"Liuzi Health Centre","code":"LIUZI_HEALTH_CENTRE","openingDate":"2020-01-01","parent":{"id":"VWe9D9YCCSK"}}
+ADA    ✅ Mapped: 'Liuzi Health Centre' → HJY88r7Bq5t
 ADA Using latest available version of the DHIS2 api on this server.
-ADA with params:  {"fields":"id,name","filter":"name:ilike:Kasinje Health Centre"}
-ADA ADA HTTP Request: GET http://dhis2:8080/api/organisationUnits?filter=name%3Ailike%3AKasinje+Health+Centre&fields=id%2Cname
-ADA Retrieved organisationUnits
+ADA with params:  {"filter":"code:eq:MANGOCHI_DISTRICT_HOSPITAL"}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: GET http://dhis2:8080/api/organisationUnits?filter=code%3Aeq%3AMANGOCHI_DISTRICT_HOSPITAL
 ADA Using latest available version of the DHIS2 api on this server.
-ADA with params:  {"fields":"id,name","filter":"name:eq:Liuzi Health Centre"}
-ADA ADA HTTP Request: GET http://dhis2:8080/api/organisationUnits?filter=name%3Aeq%3ALiuzi+Health+Centre&fields=id%2Cname
-ADA Retrieved organisationUnits
+ADA with params:  {}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: POST http://dhis2:8080/api/organisationUnits
+ADA ADA HTTP Payload Preview: {"name":"Mangochi District Hospital","shortName":"Mangochi District Hospital","code":"MANGOCHI_DISTRICT_HOSPITAL","openingDate":"2020-01-01","parent":{"id":"VWe9D9YCCSK"}}
+ADA    ✅ Mapped: 'Mangochi District Hospital' → eANr1yj5M4F
 ADA Using latest available version of the DHIS2 api on this server.
-ADA with params:  {"fields":"id,name","filter":"name:ilike:Liuzi Health Centre"}
-ADA ADA HTTP Request: GET http://dhis2:8080/api/organisationUnits?filter=name%3Ailike%3ALiuzi+Health+Centre&fields=id%2Cname
-ADA Retrieved organisationUnits
+ADA with params:  {"filter":"code:eq:MLANGENI_HEALTH_CENTRE"}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: GET http://dhis2:8080/api/organisationUnits?filter=code%3Aeq%3AMLANGENI_HEALTH_CENTRE
 ADA Using latest available version of the DHIS2 api on this server.
-ADA with params:  {"fields":"id,name","filter":"name:eq:Mangochi District Hospital"}
-ADA ADA HTTP Request: GET http://dhis2:8080/api/organisationUnits?filter=name%3Aeq%3AMangochi+District+Hospital&fields=id%2Cname
-ADA Retrieved organisationUnits
+ADA with params:  {}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: POST http://dhis2:8080/api/organisationUnits
+ADA ADA HTTP Payload Preview: {"name":"Mlangeni Health Centre","shortName":"Mlangeni Health Centre","code":"MLANGENI_HEALTH_CENTRE","openingDate":"2020-01-01","parent":{"id":"VWe9D9YCCSK"}}
+ADA    ✅ Mapped: 'Mlangeni Health Centre' → PDZH9AZrqRJ
 ADA Using latest available version of the DHIS2 api on this server.
-ADA with params:  {"fields":"id,name","filter":"name:ilike:Mangochi District Hospital"}
-ADA ADA HTTP Request: GET http://dhis2:8080/api/organisationUnits?filter=name%3Ailike%3AMangochi+District+Hospital&fields=id%2Cname
-ADA Retrieved organisationUnits
+ADA with params:  {"filter":"code:eq:MTWALO_HEALTH_CENTRE"}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: GET http://dhis2:8080/api/organisationUnits?filter=code%3Aeq%3AMTWALO_HEALTH_CENTRE
 ADA Using latest available version of the DHIS2 api on this server.
-ADA with params:  {"fields":"id,name","filter":"name:eq:Mlangeni Health Centre"}
-ADA ADA HTTP Request: GET http://dhis2:8080/api/organisationUnits?filter=name%3Aeq%3AMlangeni+Health+Centre&fields=id%2Cname
-ADA Retrieved organisationUnits
+ADA with params:  {}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: POST http://dhis2:8080/api/organisationUnits
+ADA ADA HTTP Payload Preview: {"name":"Mtwalo Health Centre","shortName":"Mtwalo Health Centre","code":"MTWALO_HEALTH_CENTRE","openingDate":"2020-01-01","parent":{"id":"VWe9D9YCCSK"}}
+ADA    ✅ Mapped: 'Mtwalo Health Centre' → OgKjssDyQxu
 ADA Using latest available version of the DHIS2 api on this server.
-ADA with params:  {"fields":"id,name","filter":"name:ilike:Mlangeni Health Centre"}
-ADA ADA HTTP Request: GET http://dhis2:8080/api/organisationUnits?filter=name%3Ailike%3AMlangeni+Health+Centre&fields=id%2Cname
-ADA Retrieved organisationUnits
+ADA with params:  {"filter":"code:eq:MZIMBA_DISTRICT_HOSPITAL"}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: GET http://dhis2:8080/api/organisationUnits?filter=code%3Aeq%3AMZIMBA_DISTRICT_HOSPITAL
 ADA Using latest available version of the DHIS2 api on this server.
-ADA with params:  {"fields":"id,name","filter":"name:eq:Mtwalo Health Centre"}
-ADA ADA HTTP Request: GET http://dhis2:8080/api/organisationUnits?filter=name%3Aeq%3AMtwalo+Health+Centre&fields=id%2Cname
-ADA Retrieved organisationUnits
+ADA with params:  {}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: POST http://dhis2:8080/api/organisationUnits
+ADA ADA HTTP Payload Preview: {"name":"Mzimba District Hospital","shortName":"Mzimba District Hospital","code":"MZIMBA_DISTRICT_HOSPITAL","openingDate":"2020-01-01","parent":{"id":"VWe9D9YCCSK"}}
+ADA    ✅ Mapped: 'Mzimba District Hospital' → itm6GCNWOlu
 ADA Using latest available version of the DHIS2 api on this server.
-ADA with params:  {"fields":"id,name","filter":"name:ilike:Mtwalo Health Centre"}
-ADA ADA HTTP Request: GET http://dhis2:8080/api/organisationUnits?filter=name%3Ailike%3AMtwalo+Health+Centre&fields=id%2Cname
-ADA Retrieved organisationUnits
+ADA with params:  {"filter":"code:eq:NDAMERA_HEALTH_CENTRE"}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: GET http://dhis2:8080/api/organisationUnits?filter=code%3Aeq%3ANDAMERA_HEALTH_CENTRE
 ADA Using latest available version of the DHIS2 api on this server.
-ADA with params:  {"fields":"id,name","filter":"name:eq:Mzimba District Hospital"}
-ADA ADA HTTP Request: GET http://dhis2:8080/api/organisationUnits?filter=name%3Aeq%3AMzimba+District+Hospital&fields=id%2Cname
-ADA Retrieved organisationUnits
+ADA with params:  {}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: POST http://dhis2:8080/api/organisationUnits
+ADA ADA HTTP Payload Preview: {"name":"Ndamera Health Centre","shortName":"Ndamera Health Centre","code":"NDAMERA_HEALTH_CENTRE","openingDate":"2020-01-01","parent":{"id":"VWe9D9YCCSK"}}
+ADA    ✅ Mapped: 'Ndamera Health Centre' → Uk98L7xjqVM
 ADA Using latest available version of the DHIS2 api on this server.
-ADA with params:  {"fields":"id,name","filter":"name:ilike:Mzimba District Hospital"}
-ADA ADA HTTP Request: GET http://dhis2:8080/api/organisationUnits?filter=name%3Ailike%3AMzimba+District+Hospital&fields=id%2Cname
-ADA Retrieved organisationUnits
+ADA with params:  {"filter":"code:eq:NDIRANDE_URBAN_HEALTH_CENTRE"}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: GET http://dhis2:8080/api/organisationUnits?filter=code%3Aeq%3ANDIRANDE_URBAN_HEALTH_CENTRE
 ADA Using latest available version of the DHIS2 api on this server.
-ADA with params:  {"fields":"id,name","filter":"name:eq:Ndamera Health Centre"}
-ADA ADA HTTP Request: GET http://dhis2:8080/api/organisationUnits?filter=name%3Aeq%3ANdamera+Health+Centre&fields=id%2Cname
-ADA Retrieved organisationUnits
+ADA with params:  {}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: POST http://dhis2:8080/api/organisationUnits
+ADA ADA HTTP Payload Preview: {"name":"Ndirande Urban Health Centre","shortName":"Ndirande Urban Health Centre","code":"NDIRANDE_URBAN_HEALTH_CENTRE","openingDate":"2020-01-01","parent":{"id":"VWe9D9YCCSK"}}
+ADA    ✅ Mapped: 'Ndirande Urban Health Centre' → Y5AqvNnie64
 ADA Using latest available version of the DHIS2 api on this server.
-ADA with params:  {"fields":"id,name","filter":"name:ilike:Ndamera Health Centre"}
-ADA ADA HTTP Request: GET http://dhis2:8080/api/organisationUnits?filter=name%3Ailike%3ANdamera+Health+Centre&fields=id%2Cname
-ADA Retrieved organisationUnits
+ADA with params:  {"filter":"code:eq:NSANJE_DISTRICT_HOSPITAL"}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: GET http://dhis2:8080/api/organisationUnits?filter=code%3Aeq%3ANSANJE_DISTRICT_HOSPITAL
 ADA Using latest available version of the DHIS2 api on this server.
-ADA with params:  {"fields":"id,name","filter":"name:eq:Ndirande Urban Health Centre"}
-ADA ADA HTTP Request: GET http://dhis2:8080/api/organisationUnits?filter=name%3Aeq%3ANdirande+Urban+Health+Centre&fields=id%2Cname
-ADA Retrieved organisationUnits
+ADA with params:  {}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: POST http://dhis2:8080/api/organisationUnits
+ADA ADA HTTP Payload Preview: {"name":"Nsanje District Hospital","shortName":"Nsanje District Hospital","code":"NSANJE_DISTRICT_HOSPITAL","openingDate":"2020-01-01","parent":{"id":"VWe9D9YCCSK"}}
+ADA    ✅ Mapped: 'Nsanje District Hospital' → D2FcU4bkVSy
 ADA Using latest available version of the DHIS2 api on this server.
-ADA with params:  {"fields":"id,name","filter":"name:ilike:Ndirande Urban Health Centre"}
-ADA ADA HTTP Request: GET http://dhis2:8080/api/organisationUnits?filter=name%3Ailike%3ANdirande+Urban+Health+Centre&fields=id%2Cname
-ADA Retrieved organisationUnits
+ADA with params:  {"filter":"code:eq:ZOMBA_CENTRAL_HOSPITAL"}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: GET http://dhis2:8080/api/organisationUnits?filter=code%3Aeq%3AZOMBA_CENTRAL_HOSPITAL
 ADA Using latest available version of the DHIS2 api on this server.
-ADA with params:  {"fields":"id,name","filter":"name:eq:Nsanje District Hospital"}
-ADA ADA HTTP Request: GET http://dhis2:8080/api/organisationUnits?filter=name%3Aeq%3ANsanje+District+Hospital&fields=id%2Cname
-ADA Retrieved organisationUnits
+ADA with params:  {}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: POST http://dhis2:8080/api/organisationUnits
+ADA ADA HTTP Payload Preview: {"name":"Zomba Central Hospital","shortName":"Zomba Central Hospital","code":"ZOMBA_CENTRAL_HOSPITAL","openingDate":"2020-01-01","parent":{"id":"VWe9D9YCCSK"}}
+ADA    ✅ Mapped: 'Zomba Central Hospital' → xdsjEWoOxXw
 ADA Using latest available version of the DHIS2 api on this server.
-ADA with params:  {"fields":"id,name","filter":"name:ilike:Nsanje District Hospital"}
-ADA ADA HTTP Request: GET http://dhis2:8080/api/organisationUnits?filter=name%3Ailike%3ANsanje+District+Hospital&fields=id%2Cname
-ADA Retrieved organisationUnits
+ADA with params:  {"filter":"code:eq:KACHERE_PRIVATE_CLINIC"}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: GET http://dhis2:8080/api/organisationUnits?filter=code%3Aeq%3AKACHERE_PRIVATE_CLINIC
 ADA Using latest available version of the DHIS2 api on this server.
-ADA with params:  {"fields":"id,name","filter":"name:eq:Zomba Central Hospital"}
-ADA ADA HTTP Request: GET http://dhis2:8080/api/organisationUnits?filter=name%3Aeq%3AZomba+Central+Hospital&fields=id%2Cname
-ADA Retrieved organisationUnits
+ADA with params:  {}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: POST http://dhis2:8080/api/organisationUnits
+ADA ADA HTTP Payload Preview: {"name":"Kachere Private Clinic","shortName":"Kachere Private Clinic","code":"KACHERE_PRIVATE_CLINIC","openingDate":"2020-01-01","parent":{"id":"VWe9D9YCCSK"}}
+ADA    ✅ Mapped: 'Kachere Private Clinic' → WMqSeTl6oYd
 ADA Using latest available version of the DHIS2 api on this server.
-ADA with params:  {"fields":"id,name","filter":"name:ilike:Zomba Central Hospital"}
-ADA ADA HTTP Request: GET http://dhis2:8080/api/organisationUnits?filter=name%3Ailike%3AZomba+Central+Hospital&fields=id%2Cname
-ADA Retrieved organisationUnits
+ADA with params:  {"filter":"code:eq:CENTRAL_HEALTH_CLINIC_AREA_47"}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: GET http://dhis2:8080/api/organisationUnits?filter=code%3Aeq%3ACENTRAL_HEALTH_CLINIC_AREA_47
 ADA Using latest available version of the DHIS2 api on this server.
-ADA with params:  {"fields":"id,name","filter":"name:eq:Kachere Private Clinic"}
-ADA ADA HTTP Request: GET http://dhis2:8080/api/organisationUnits?filter=name%3Aeq%3AKachere+Private+Clinic&fields=id%2Cname
-ADA Retrieved organisationUnits
+ADA with params:  {}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: POST http://dhis2:8080/api/organisationUnits
+ADA ADA HTTP Payload Preview: {"name":"Central Health Clinic Area 47","shortName":"Central Health Clinic Area 47","code":"CENTRAL_HEALTH_CLINIC_AREA_47","openingDate":"2020-01-01","parent":{"id":"VWe9D9YCCSK"}}
+ADA    ✅ Mapped: 'Central Health Clinic Area 47' → hpNM8X0Ivqb
 ADA Using latest available version of the DHIS2 api on this server.
-ADA with params:  {"fields":"id,name","filter":"name:ilike:Kachere Private Clinic"}
-ADA ADA HTTP Request: GET http://dhis2:8080/api/organisationUnits?filter=name%3Ailike%3AKachere+Private+Clinic&fields=id%2Cname
-ADA Retrieved organisationUnits
+ADA with params:  {"filter":"code:eq:AREA_18_URBAN_HEALTH_CENTRE"}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: GET http://dhis2:8080/api/organisationUnits?filter=code%3Aeq%3AAREA_18_URBAN_HEALTH_CENTRE
 ADA Using latest available version of the DHIS2 api on this server.
-ADA with params:  {"fields":"id,name","filter":"name:eq:Central Health Clinic Area 47"}
-ADA ADA HTTP Request: GET http://dhis2:8080/api/organisationUnits?filter=name%3Aeq%3ACentral+Health+Clinic+Area+47&fields=id%2Cname
-ADA Retrieved organisationUnits
+ADA with params:  {}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: POST http://dhis2:8080/api/organisationUnits
+ADA ADA HTTP Payload Preview: {"name":"Area 18 Urban Health Centre","shortName":"Area 18 Urban Health Centre","code":"AREA_18_URBAN_HEALTH_CENTRE","openingDate":"2020-01-01","parent":{"id":"VWe9D9YCCSK"}}
+ADA    ✅ Mapped: 'Area 18 Urban Health Centre' → rc39DZJpewh
+JOB    ✓ Root country org unit: Malawi (VWe9D9YCCSK)
+JOB 👤 Creating integration user...
+JOB 🔐 DHIS2 INTEGRATION USER DEBUG: {"pw_raw":"***","username":"***"}
+JOB    🔍 Checking if integration user '***' exists...
 ADA Using latest available version of the DHIS2 api on this server.
-ADA with params:  {"fields":"id,name","filter":"name:ilike:Central Health Clinic Area 47"}
-ADA ADA HTTP Request: GET http://dhis2:8080/api/organisationUnits?filter=name%3Ailike%3ACentral+Health+Clinic+Area+47&fields=id%2Cname
-ADA Retrieved organisationUnits
+ADA with params:  {"fields":"id,username,userCredentials[username],organisationUnits[id,name]","filter":"username:eq:***","paging":"false"}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: GET http://dhis2:8080/api/users?filter=username%3Aeq%3A***&fields=id%2Cusername%2CuserCredentials%5Busername%5D%2CorganisationUnits%5Bid%2Cname%5D&paging=false
+ADA Retrieved users
+JOB    📝 Integration user not found. Creating new user...
 ADA Using latest available version of the DHIS2 api on this server.
-ADA with params:  {"fields":"id,name","filter":"name:eq:Area 18 Urban Health Centre"}
-ADA ADA HTTP Request: GET http://dhis2:8080/api/organisationUnits?filter=name%3Aeq%3AArea+18+Urban+Health+Centre&fields=id%2Cname
-ADA Retrieved organisationUnits
+ADA with params:  {"fields":"id,name,authorities","filter":"name:eq:Superuser","paging":"false"}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: GET http://dhis2:8080/api/userRoles?filter=name%3Aeq%3ASuperuser&fields=id%2Cname%2Cauthorities&paging=false
+ADA Retrieved userRoles
 ADA Using latest available version of the DHIS2 api on this server.
-ADA with params:  {"fields":"id,name","filter":"name:ilike:Area 18 Urban Health Centre"}
-ADA ADA HTTP Request: GET http://dhis2:8080/api/organisationUnits?filter=name%3Ailike%3AArea+18+Urban+Health+Centre&fields=id%2Cname
-ADA Retrieved organisationUnits
+ADA with params:  {}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: POST http://dhis2:8080/api/users
+ADA ADA HTTP Payload Preview: {"username":"***","firstName":"OpenFn","surname":"Integration","email":"openfn@openfn.org","userCredentials":{"username":"***","password":"***","userRoles":[{"id":"yrB6vc5Ip3r"}]},"organisationUnits":[{"id":"VWe9D9YCCSK"}],"dataViewOrganisationUnits":[{"id":"VWe9D9YCCSK"}],"teiSearchOrganisationUnits":[{"id":"VWe9D9YCCSK"}]}
+ADA Created users
+ADA Record available @ http://dhis2:8080/api/users/K2PteLRXzC1http://dhis2:8080/api/users/K2PteLRXzC1
+JOB    ✅ Integration user created/resolved. ID: K2PteLRXzC1
 ADA Using latest available version of the DHIS2 api on this server.
-ADA with params:  {"fields":"id","filter":"code:eq:MALAWI_ART_DATASET"}
-ADA ADA HTTP Request: GET http://dhis2:8080/api/dataSets?filter=code%3Aeq%3AMALAWI_ART_DATASET&fields=id
+ADA with params:  {"fields":"id,username,organisationUnits[id,name]"}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: GET http://dhis2:8080/api/users/K2PteLRXzC1?fields=id%2Cusername%2CorganisationUnits%5Bid%2Cname%5D
+ADA Retrieved users/K2PteLRXzC1
+JOB    ✅ Integration user has access to 1 org unit(s)
+ADA Using latest available version of the DHIS2 api on this server.
+ADA with params:  {"fields":"id","filter":"code:eq:MALAWI_ART_DATASET","paging":"false"}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: GET http://dhis2:8080/api/dataSets?filter=code%3Aeq%3AMALAWI_ART_DATASET&fields=id&paging=false
 ADA Retrieved dataSets
 ADA Using latest available version of the DHIS2 api on this server.
 ADA with params:  {}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=admin pw_raw=*** auth=Basic *** pat=(none)
 ADA ADA HTTP Request: POST http://dhis2:8080/api/dataSets
-ADA ADA HTTP Payload Preview: {"name":"Malawi ART Data Set","shortName":"ART Data Set","code":"MALAWI_ART_DATASET","periodType":"Quarterly","dataSetElements":[],"organisationUnits":[]}
+ADA ADA HTTP Payload Preview: {"name":"Malawi ART Data Set","shortName":"ART Data Set","code":"MALAWI_ART_DATASET","periodType":"Quarterly","dataSetElements":[{"dataElement":{"id":"pjkirwsiFvP"}}],"organisationUnits":[{"id":"VWe9D9YCCSK"},{"id":"z8U4pg6EFwD"},{"id":"EAtLbaM7WzY"},{"id":"Poo3Xk1aMVF"},{"id":"UEeczv6K2PG"},{"id":"gkO5hlmSDVc"},{"id":"RqbC8o8Z8Uu"},{"id":"YAkFJOT6vk3"},{"id":"pWZkgNhFOy3"},{"id":"bfqHc6nrNLW"},{"id":"HJY88r7Bq5t"},{"id":"eANr1yj5M4F"},{"id":"PDZH9AZrqRJ"},{"id":"OgKjssDyQxu"},{"id":"itm6GCNWOlu"},{"id":"Uk98L7xjqVM"},{"id":"Y5AqvNnie64"},{"id":"D2FcU4bkVSy"},{"id":"xdsjEWoOxXw"},{"id":"WMqSeTl6oYd"},{"id":"hpNM8X0Ivqb"},{"id":"rc39DZJpewh"}]}
 ADA Created dataSets
-ADA Record available @ http://dhis2:8080/api/dataSets/jjYMwvXeHuFhttp://dhis2:8080/api/dataSets/jjYMwvXeHuF
-ADA Using latest available version of the DHIS2 api on this server.
-ADA with params:  {"fields":"id","filter":"code:eq:MALAWI_ART_DATASET"}
-ADA ADA HTTP Request: GET http://dhis2:8080/api/dataSets?filter=code%3Aeq%3AMALAWI_ART_DATASET&fields=id
-ADA Retrieved dataSets
-JOB    ⚠️ Warning: Could not create data set
-R/T Operation 1 complete in 6.188s
+ADA Record available @ http://dhis2:8080/api/dataSets/FLpdqEOs3ekhttp://dhis2:8080/api/dataSets/FLpdqEOs3ek
+JOB    ✓ Created data set: FLpdqEOs3ek
+JOB    ✓ Assigned 1 data elements to data set
+JOB    ✓ Assigned data set to 22 organization units
+R/T Operation 1 complete in 14.165s
 R/T Expression complete!
-R/T Ensure DHIS2 metadata exists per file config completed in 6.349s
+R/T Ensure DHIS2 metadata exists per file config completed in 14.342s
 R/T Cleaning up state. Removing keys: configuration
-R/T Final memory usage: [step 70mb] [system 183mb]
+R/T Final memory usage: [step 67mb] [system 145mb]
 R/T Edge function (state) {
 return Boolean(!state?.errors?.["0397234c-010e-4b3c-9025-e44380b6e4f2"] ?? true)
 } returned true; 4f42c4a8-333c-4265-a490-524e42d9fd3b will be executed next
@@ -416,1938 +848,26 @@ JOB 🚀 Job 4: Starting batch processing (csv)
 JOB 📊 Total chunks: 1, chunk size: 5000
 JOB 📦 Processing chunk 1/1
 ADA Using latest available version of the DHIS2 api on this server.
-ADA with params:  {"dataElementIdScheme":"CODE","importStrategy":"CREATE_AND_UPDATE","orgUnitIdScheme":"NAME","skipExistingCheck":true}
-ADA ADA HTTP Request: POST http://dhis2:8080/api/dataValueSets?importStrategy=CREATE_AND_UPDATE&skipExistingCheck=true&dataElementIdScheme=CODE&orgUnitIdScheme=NAME
-ADA ADA HTTP Payload Preview: {"dataValues":[{"dataElement":"TX_CURR","period":"202508","orgUnit":"Kamuzu Academy Clinic","categoryOptionCombo":"HllvX50cXC0","value":"2"},{"dataElement":"TX_CURR","period":"202508","orgUnit":"Kamuzu Academy Clinic","categoryOptionCombo":"HllvX50cXC0","value":"1"},{"dataElement":"TX_CURR","period":"202508","orgUnit":"Kamuzu Academy Clinic","categoryOptionCombo":"HllvX50cXC0","value":"6"},{"dataElement":"TX_CURR","period":"202508","orgUnit":"Kamuzu Academy Clinic","categoryOptionCombo":"HllvX50cXC0","value":"1"},{"dataElement":"TX_CURR","period":"202508","orgUnit":"Kamuzu Academy Clinic","categoryOptionCombo":"HllvX50cXC0","value":"2"},{"dataElement":"TX_CURR","period":"202508","orgUnit":"Kamuzu Academy Clinic","categoryOptionCombo":"HllvX50cXC0","value":"1"},{"dataElement":"TX_CURR","period":"202508","orgUnit":"Kamuzu Academy Clinic","categoryOptionCombo":"HllvX50cXC0","value":"2"},{"dataElement":"TX_CURR","period":"202508","orgUnit":"Kamuzu Academy Clinic","categoryOptionCombo":"HllvX50cXC0","value":"1"},{"dataElement":"TX_CURR","period":"202508","orgUnit":"Kamuzu Academy Clinic","categoryOptionCombo":"HllvX50cXC0","value":"1"},{"dataElement":"TX_CURR","period":"202508","orgUnit":"Kamuzu Academy Clinic","categoryOptionCombo":"HllvX50cXC0","value":"1"},{"dataElement":"TX_CURR","period":"202508","orgUnit":"Kamuzu Academy Clinic","categoryOptionCombo":"HllvX50cXC0","value":"7"},{"dataElement":"TX_CURR","period":"202508","orgUnit":"Kamuzu Academy Clinic","categoryOptionCombo":"HllvX50cXC0","value":"1"},{"dataElement":"INDICATOR","period":"Date_Submitted","orgUnit":"facility","categoryOptionCombo":"HllvX50cXC0","value":"tx_curr"},{"dataElement":"TX_CURR","period":"202508","orgUnit":"Kavuzi Cummock Health Centre","categoryOptionCombo":"HllvX50cXC0","value":"1"},{"dataElement":"TX_CURR","period":"202508","orgUnit":"Kavuzi Cummock Health Centre","categoryOptionCombo":"HllvX50cXC0","value":"5"},{"dataElement":"TX_CURR","period":"202508","orgUnit":"Kavuzi Cummock Health Ce…
-ADA ADA HTTP Error: POST http://dhis2:8080/api/dataValueSets?importStrategy=CREATE_AND_UPDATE&skipExistingCheck=true&dataElementIdScheme=CODE&orgUnitIdScheme=NAME → POST to http://dhis2:8080/api/dataValueSets returned 409: Conflict
-ADA DHIS2 Request Failed: POST to http://dhis2:8080/api/dataValueSets returned 409: Conflict
-ADA ❌ DHIS2: executeWithSftp encountered error: POST to http://dhis2:8080/api/dataValueSets returned 409: Conflict
+ADA with params:  {"fields":"id,periodType,openFuturePeriods"}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=*** pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: GET http://dhis2:8080/api/dataSets/FLpdqEOs3ek?fields=id%2CperiodType%2CopenFuturePeriods
+ADA Retrieved dataSets/FLpdqEOs3ek
+JOB    ℹ️ Using dataset periodType=Quarterly, openFuturePeriods=0
+JOB    ℹ️ Using override period from filename: 2025Q2 (dataset periodType=Quarterly)
+JOB    ℹ️ Sample mapped periods: 2025Q2
+ADA Using latest available version of the DHIS2 api on this server.
+ADA with params:  {"importStrategy":"CREATE_AND_UPDATE","orgUnitIdScheme":"UID","skipExistingCheck":true}
+ADA ADA AUTH DEBUG: host=http://dhis2:8080 user=*** pw_raw=*** auth=Basic *** pat=(none)
+ADA ADA HTTP Request: POST http://dhis2:8080/api/dataValueSets?importStrategy=CREATE_AND_UPDATE&skipExistingCheck=true&orgUnitIdScheme=UID
+ADA ADA HTTP Payload Preview: {"dataValues":[{"dataElement":"pjkirwsiFvP","period":"2025Q2","orgUnit":"z8U4pg6EFwD","categoryOptionCombo":"HllvX50cXC0","value":"2"},{"dataElement":"pjkirwsiFvP","period":"2025Q2","orgUnit":"z8U4pg6EFwD","categoryOptionCombo":"HllvX50cXC0","value":"1"},{"dataElement":"pjkirwsiFvP","period":"2025Q2","orgUnit":"z8U4pg6EFwD","categoryOptionCombo":"HllvX50cXC0","value":"6"},{"dataElement":"pjkirwsiFvP","period":"2025Q2","orgUnit":"z8U4pg6EFwD","categoryOptionCombo":"HllvX50cXC0","value":"1"},{"dataElement":"pjkirwsiFvP","period":"2025Q2","orgUnit":"z8U4pg6EFwD","categoryOptionCombo":"HllvX50cXC0","value":"2"},{"dataElement":"pjkirwsiFvP","period":"2025Q2","orgUnit":"z8U4pg6EFwD","categoryOptionCombo":"HllvX50cXC0","value":"1"},{"dataElement":"pjkirwsiFvP","period":"2025Q2","orgUnit":"z8U4pg6EFwD","categoryOptionCombo":"HllvX50cXC0","value":"2"},{"dataElement":"pjkirwsiFvP","period":"2025Q2","orgUnit":"z8U4pg6EFwD","categoryOptionCombo":"HllvX50cXC0","value":"1"},{"dataElement":"pjkirwsiFvP","period":"2025Q2","orgUnit":"z8U4pg6EFwD","categoryOptionCombo":"HllvX50cXC0","value":"1"},{"dataElement":"pjkirwsiFvP","period":"2025Q2","orgUnit":"z8U4pg6EFwD","categoryOptionCombo":"HllvX50cXC0","value":"1"},{"dataElement":"pjkirwsiFvP","period":"2025Q2","orgUnit":"z8U4pg6EFwD","categoryOptionCombo":"HllvX50cXC0","value":"7"},{"dataElement":"pjkirwsiFvP","period":"2025Q2","orgUnit":"z8U4pg6EFwD","categoryOptionCombo":"HllvX50cXC0","value":"1"},{"dataElement":"pjkirwsiFvP","period":"2025Q2","orgUnit":"EAtLbaM7WzY","categoryOptionCombo":"HllvX50cXC0","value":"1"},{"dataElement":"pjkirwsiFvP","period":"2025Q2","orgUnit":"EAtLbaM7WzY","categoryOptionCombo":"HllvX50cXC0","value":"5"},{"dataElement":"pjkirwsiFvP","period":"2025Q2","orgUnit":"EAtLbaM7WzY","categoryOptionCombo":"HllvX50cXC0","value":"3"},{"dataElement":"pjkirwsiFvP","period":"2025Q2","orgUnit":"EAtLbaM7WzY","categoryOptionCombo":"HllvX50cXC0","value":"2"},{"dataElement":"pjkirwsiFvP","period":"2025Q2","orgUnit":"EAtLbaM…
+ADA Created dataValueSets
+JOB ✅ Job 4 Complete: 0/0 chunks succeeded
+ADA ❌ DHIS2: executeWithSftp encountered error: No data values uploaded
 ADA 🔌 DHIS2: Disconnecting from SFTP server...
 ADA ✅ DHIS2: SFTP connection closed successfully
-R/T Stream chunks to DHIS2 with resume support aborted with error (1.076s)
+R/T Stream chunks to DHIS2 with resume support aborted with error (1.398s)
 R/T Cleaning up state. Removing keys: configuration
-R/T Error reported by "executeWithSftp()" operation line 8:
-R/T Error: POST to http://dhis2:8080/api/dataValueSets returned 409: Conflict
-    @openfn/language-common/dist/index.cjs:148:19)
-    @openfn/language-common/dist/index.cjs:364:3)
-    at async vm:module(0):132:25
-R/T Additional error details:
-R/T {
-  "body": {
-    "httpStatus": "Conflict",
-    "httpStatusCode": 409,
-    "message": "One more conflicts encountered, please check import summary.",
-    "response": {
-      "conflicts": [
-        {
-          "errorCode": "E7612",
-          "indexes": [
-            0,
-            1,
-            2,
-            3,
-            4,
-            5,
-            6,
-            7,
-            8,
-            9,
-            10,
-            11
-          ],
-          "object": "Kamuzu Academy Clinic",
-          "objects": {
-            "organisationUnit": "Kamuzu Academy Clinic"
-          },
-          "property": "orgUnit",
-          "value": "Organisation unit not found or not accessible: `Kamuzu Academy Clinic`"
-        },
-        {
-          "errorCode": "E7611",
-          "indexes": [
-            12,
-            41,
-            88,
-            128,
-            172,
-            216,
-            257,
-            298,
-            338,
-            376,
-            423,
-            460,
-            499,
-            545,
-            591,
-            637,
-            682,
-            725,
-            755,
-            760
-          ],
-          "object": "Date_Submitted",
-          "objects": {
-            "period": "Date_Submitted"
-          },
-          "property": "period",
-          "value": "Period not valid: `Date_Submitted`"
-        },
-        {
-          "errorCode": "E7612",
-          "indexes": [
-            13,
-            14,
-            15,
-            16,
-            17,
-            18,
-            19,
-            20,
-            21,
-            22,
-            23,
-            24,
-            25,
-            26,
-            27,
-            28,
-            29,
-            30,
-            31,
-            32,
-            33,
-            34,
-            35,
-            36,
-            37,
-            38,
-            39,
-            40
-          ],
-          "object": "Kavuzi Cummock Health Centre",
-          "objects": {
-            "organisationUnit": "Kavuzi Cummock Health Centre"
-          },
-          "property": "orgUnit",
-          "value": "Organisation unit not found or not accessible: `Kavuzi Cummock Health Centre`"
-        },
-        {
-          "errorCode": "E7612",
-          "indexes": [
-            42,
-            43,
-            44,
-            45,
-            46,
-            47,
-            48,
-            49,
-            50,
-            51,
-            52,
-            53,
-            54,
-            55,
-            56,
-            57,
-            58,
-            59,
-            60,
-            61,
-            62,
-            63,
-            64,
-            65,
-            66,
-            67,
-            68,
-            69,
-            70,
-            71,
-            72,
-            73,
-            74,
-            75,
-            76,
-            77,
-            78,
-            79,
-            80,
-            81,
-            82,
-            83,
-            84,
-            85,
-            86,
-            87
-          ],
-          "object": "Area 25 Urban Health Centre",
-          "objects": {
-            "organisationUnit": "Area 25 Urban Health Centre"
-          },
-          "property": "orgUnit",
-          "value": "Organisation unit not found or not accessible: `Area 25 Urban Health Centre`"
-        },
-        {
-          "errorCode": "E7612",
-          "indexes": [
-            89,
-            90,
-            91,
-            92,
-            93,
-            94,
-            95,
-            96,
-            97,
-            98,
-            99,
-            100,
-            101,
-            102,
-            103,
-            104,
-            105,
-            106,
-            107,
-            108,
-            109,
-            110,
-            111,
-            112,
-            113,
-            114,
-            115,
-            116,
-            117,
-            118,
-            119,
-            120,
-            121,
-            122,
-            123,
-            124,
-            125,
-            126,
-            127
-          ],
-          "object": "Chitekesa Health Centre",
-          "objects": {
-            "organisationUnit": "Chitekesa Health Centre"
-          },
-          "property": "orgUnit",
-          "value": "Organisation unit not found or not accessible: `Chitekesa Health Centre`"
-        },
-        {
-          "errorCode": "E7612",
-          "indexes": [
-            129,
-            130,
-            131,
-            132,
-            133,
-            134,
-            135,
-            136,
-            137,
-            138,
-            139,
-            140,
-            141,
-            142,
-            143,
-            144,
-            145,
-            146,
-            147,
-            148,
-            149,
-            150,
-            151,
-            152,
-            153,
-            154,
-            155,
-            156,
-            157,
-            158,
-            159,
-            160,
-            161,
-            162,
-            163,
-            164,
-            165,
-            166,
-            167,
-            168,
-            169,
-            170,
-            171
-          ],
-          "object": "Dedza District Hospital",
-          "objects": {
-            "organisationUnit": "Dedza District Hospital"
-          },
-          "property": "orgUnit",
-          "value": "Organisation unit not found or not accessible: `Dedza District Hospital`"
-        },
-        {
-          "errorCode": "E7612",
-          "indexes": [
-            173,
-            174,
-            175,
-            176,
-            177,
-            178,
-            179,
-            180,
-            181,
-            182,
-            183,
-            184,
-            185,
-            186,
-            187,
-            188,
-            189,
-            190,
-            191,
-            192,
-            193,
-            194,
-            195,
-            196,
-            197,
-            198,
-            199,
-            200,
-            201,
-            202,
-            203,
-            204,
-            205,
-            206,
-            207,
-            208,
-            209,
-            210,
-            211,
-            212,
-            213,
-            214,
-            215
-          ],
-          "object": "Bangwe Health Centre",
-          "objects": {
-            "organisationUnit": "Bangwe Health Centre"
-          },
-          "property": "orgUnit",
-          "value": "Organisation unit not found or not accessible: `Bangwe Health Centre`"
-        },
-        {
-          "errorCode": "E7612",
-          "indexes": [
-            217,
-            218,
-            219,
-            220,
-            221,
-            222,
-            223,
-            224,
-            225,
-            226,
-            227,
-            228,
-            229,
-            230,
-            231,
-            232,
-            233,
-            234,
-            235,
-            236,
-            237,
-            238,
-            239,
-            240,
-            241,
-            242,
-            243,
-            244,
-            245,
-            246,
-            247,
-            248,
-            249,
-            250,
-            251,
-            252,
-            253,
-            254,
-            255,
-            256
-          ],
-          "object": "Jalasi Health Centre",
-          "objects": {
-            "organisationUnit": "Jalasi Health Centre"
-          },
-          "property": "orgUnit",
-          "value": "Organisation unit not found or not accessible: `Jalasi Health Centre`"
-        },
-        {
-          "errorCode": "E7612",
-          "indexes": [
-            258,
-            259,
-            260,
-            261,
-            262,
-            263,
-            264,
-            265,
-            266,
-            267,
-            268,
-            269,
-            270,
-            271,
-            272,
-            273,
-            274,
-            275,
-            276,
-            277,
-            278,
-            279,
-            280,
-            281,
-            282,
-            283,
-            284,
-            285,
-            286,
-            287,
-            288,
-            289,
-            290,
-            291,
-            292,
-            293,
-            294,
-            295,
-            296,
-            297
-          ],
-          "object": "Jenda Health Centre",
-          "objects": {
-            "organisationUnit": "Jenda Health Centre"
-          },
-          "property": "orgUnit",
-          "value": "Organisation unit not found or not accessible: `Jenda Health Centre`"
-        },
-        {
-          "errorCode": "E7612",
-          "indexes": [
-            299,
-            300,
-            301,
-            302,
-            303,
-            304,
-            305,
-            306,
-            307,
-            308,
-            309,
-            310,
-            311,
-            312,
-            313,
-            314,
-            315,
-            316,
-            317,
-            318,
-            319,
-            320,
-            321,
-            322,
-            323,
-            324,
-            325,
-            326,
-            327,
-            328,
-            329,
-            330,
-            331,
-            332,
-            333,
-            334,
-            335,
-            336,
-            337
-          ],
-          "object": "Kasinje Health Centre",
-          "objects": {
-            "organisationUnit": "Kasinje Health Centre"
-          },
-          "property": "orgUnit",
-          "value": "Organisation unit not found or not accessible: `Kasinje Health Centre`"
-        },
-        {
-          "errorCode": "E7612",
-          "indexes": [
-            339,
-            340,
-            341,
-            342,
-            343,
-            344,
-            345,
-            346,
-            347,
-            348,
-            349,
-            350,
-            351,
-            352,
-            353,
-            354,
-            355,
-            356,
-            357,
-            358,
-            359,
-            360,
-            361,
-            362,
-            363,
-            364,
-            365,
-            366,
-            367,
-            368,
-            369,
-            370,
-            371,
-            372,
-            373,
-            374,
-            375
-          ],
-          "object": "Liuzi Health Centre",
-          "objects": {
-            "organisationUnit": "Liuzi Health Centre"
-          },
-          "property": "orgUnit",
-          "value": "Organisation unit not found or not accessible: `Liuzi Health Centre`"
-        },
-        {
-          "errorCode": "E7612",
-          "indexes": [
-            377,
-            378,
-            379,
-            380,
-            381,
-            382,
-            383,
-            384,
-            385,
-            386,
-            387,
-            388,
-            389,
-            390,
-            391,
-            392,
-            393,
-            394,
-            395,
-            396,
-            397,
-            398,
-            399,
-            400,
-            401,
-            402,
-            403,
-            404,
-            405,
-            406,
-            407,
-            408,
-            409,
-            410,
-            411,
-            412,
-            413,
-            414,
-            415,
-            416,
-            417,
-            418,
-            419,
-            420,
-            421,
-            422
-          ],
-          "object": "Mangochi District Hospital",
-          "objects": {
-            "organisationUnit": "Mangochi District Hospital"
-          },
-          "property": "orgUnit",
-          "value": "Organisation unit not found or not accessible: `Mangochi District Hospital`"
-        },
-        {
-          "errorCode": "E7612",
-          "indexes": [
-            424,
-            425,
-            426,
-            427,
-            428,
-            429,
-            430,
-            431,
-            432,
-            433,
-            434,
-            435,
-            436,
-            437,
-            438,
-            439,
-            440,
-            441,
-            442,
-            443,
-            444,
-            445,
-            446,
-            447,
-            448,
-            449,
-            450,
-            451,
-            452,
-            453,
-            454,
-            455,
-            456,
-            457,
-            458,
-            459
-          ],
-          "object": "Mlangeni Health Centre",
-          "objects": {
-            "organisationUnit": "Mlangeni Health Centre"
-          },
-          "property": "orgUnit",
-          "value": "Organisation unit not found or not accessible: `Mlangeni Health Centre`"
-        },
-        {
-          "errorCode": "E7612",
-          "indexes": [
-            461,
-            462,
-            463,
-            464,
-            465,
-            466,
-            467,
-            468,
-            469,
-            470,
-            471,
-            472,
-            473,
-            474,
-            475,
-            476,
-            477,
-            478,
-            479,
-            480,
-            481,
-            482,
-            483,
-            484,
-            485,
-            486,
-            487,
-            488,
-            489,
-            490,
-            491,
-            492,
-            493,
-            494,
-            495,
-            496,
-            497,
-            498
-          ],
-          "object": "Mtwalo Health Centre",
-          "objects": {
-            "organisationUnit": "Mtwalo Health Centre"
-          },
-          "property": "orgUnit",
-          "value": "Organisation unit not found or not accessible: `Mtwalo Health Centre`"
-        },
-        {
-          "errorCode": "E7612",
-          "indexes": [
-            500,
-            501,
-            502,
-            503,
-            504,
-            505,
-            506,
-            507,
-            508,
-            509,
-            510,
-            511,
-            512,
-            513,
-            514,
-            515,
-            516,
-            517,
-            518,
-            519,
-            520,
-            521,
-            522,
-            523,
-            524,
-            525,
-            526,
-            527,
-            528,
-            529,
-            530,
-            531,
-            532,
-            533,
-            534,
-            535,
-            536,
-            537,
-            538,
-            539,
-            540,
-            541,
-            542,
-            543,
-            544
-          ],
-          "object": "Mzimba District Hospital",
-          "objects": {
-            "organisationUnit": "Mzimba District Hospital"
-          },
-          "property": "orgUnit",
-          "value": "Organisation unit not found or not accessible: `Mzimba District Hospital`"
-        },
-        {
-          "errorCode": "E7612",
-          "indexes": [
-            546,
-            547,
-            548,
-            549,
-            550,
-            551,
-            552,
-            553,
-            554,
-            555,
-            556,
-            557,
-            558,
-            559,
-            560,
-            561,
-            562,
-            563,
-            564,
-            565,
-            566,
-            567,
-            568,
-            569,
-            570,
-            571,
-            572,
-            573,
-            574,
-            575,
-            576,
-            577,
-            578,
-            579,
-            580,
-            581,
-            582,
-            583,
-            584,
-            585,
-            586,
-            587,
-            588,
-            589,
-            590
-          ],
-          "object": "Ndamera Health Centre",
-          "objects": {
-            "organisationUnit": "Ndamera Health Centre"
-          },
-          "property": "orgUnit",
-          "value": "Organisation unit not found or not accessible: `Ndamera Health Centre`"
-        },
-        {
-          "errorCode": "E7612",
-          "indexes": [
-            592,
-            593,
-            594,
-            595,
-            596,
-            597,
-            598,
-            599,
-            600,
-            601,
-            602,
-            603,
-            604,
-            605,
-            606,
-            607,
-            608,
-            609,
-            610,
-            611,
-            612,
-            613,
-            614,
-            615,
-            616,
-            617,
-            618,
-            619,
-            620,
-            621,
-            622,
-            623,
-            624,
-            625,
-            626,
-            627,
-            628,
-            629,
-            630,
-            631,
-            632,
-            633,
-            634,
-            635,
-            636
-          ],
-          "object": "Ndirande Urban Health Centre",
-          "objects": {
-            "organisationUnit": "Ndirande Urban Health Centre"
-          },
-          "property": "orgUnit",
-          "value": "Organisation unit not found or not accessible: `Ndirande Urban Health Centre`"
-        },
-        {
-          "errorCode": "E7612",
-          "indexes": [
-            638,
-            639,
-            640,
-            641,
-            642,
-            643,
-            644,
-            645,
-            646,
-            647,
-            648,
-            649,
-            650,
-            651,
-            652,
-            653,
-            654,
-            655,
-            656,
-            657,
-            658,
-            659,
-            660,
-            661,
-            662,
-            663,
-            664,
-            665,
-            666,
-            667,
-            668,
-            669,
-            670,
-            671,
-            672,
-            673,
-            674,
-            675,
-            676,
-            677,
-            678,
-            679,
-            680,
-            681
-          ],
-          "object": "Nsanje District Hospital",
-          "objects": {
-            "organisationUnit": "Nsanje District Hospital"
-          },
-          "property": "orgUnit",
-          "value": "Organisation unit not found or not accessible: `Nsanje District Hospital`"
-        },
-        {
-          "errorCode": "E7612",
-          "indexes": [
-            683,
-            684,
-            685,
-            686,
-            687,
-            688,
-            689,
-            690,
-            691,
-            692,
-            693,
-            694,
-            695,
-            696,
-            697,
-            698,
-            699,
-            700,
-            701,
-            702,
-            703,
-            704,
-            705,
-            706,
-            707,
-            708,
-            709,
-            710,
-            711,
-            712,
-            713,
-            714,
-            715,
-            716,
-            717,
-            718,
-            719,
-            720,
-            721,
-            722,
-            723,
-            724
-          ],
-          "object": "Zomba Central Hospital",
-          "objects": {
-            "organisationUnit": "Zomba Central Hospital"
-          },
-          "property": "orgUnit",
-          "value": "Organisation unit not found or not accessible: `Zomba Central Hospital`"
-        },
-        {
-          "errorCode": "E7612",
-          "indexes": [
-            726,
-            727,
-            728,
-            729,
-            730,
-            731,
-            732,
-            733,
-            734,
-            735,
-            736,
-            737,
-            738,
-            739,
-            740,
-            741,
-            742,
-            743,
-            744,
-            745,
-            746,
-            747,
-            748,
-            749,
-            750,
-            751,
-            752,
-            753,
-            754
-          ],
-          "object": "Kachere Private Clinic",
-          "objects": {
-            "organisationUnit": "Kachere Private Clinic"
-          },
-          "property": "orgUnit",
-          "value": "Organisation unit not found or not accessible: `Kachere Private Clinic`"
-        },
-        {
-          "errorCode": "E7612",
-          "indexes": [
-            756,
-            757,
-            758,
-            759
-          ],
-          "object": "Central Health Clinic Area 47",
-          "objects": {
-            "organisationUnit": "Central Health Clinic Area 47"
-          },
-          "property": "orgUnit",
-          "value": "Organisation unit not found or not accessible: `Central Health Clinic Area 47`"
-        },
-        {
-          "errorCode": "E7612",
-          "indexes": [
-            761,
-            762,
-            763,
-            764,
-            765,
-            766,
-            767,
-            768,
-            769,
-            770,
-            771,
-            772,
-            773,
-            774,
-            775,
-            776,
-            777,
-            778,
-            779,
-            780,
-            781,
-            782,
-            783,
-            784,
-            785,
-            786,
-            787,
-            788,
-            789,
-            790,
-            791,
-            792,
-            793,
-            794,
-            795,
-            796,
-            797,
-            798,
-            799,
-            800
-          ],
-          "object": "Area 18 Urban Health Centre",
-          "objects": {
-            "organisationUnit": "Area 18 Urban Health Centre"
-          },
-          "property": "orgUnit",
-          "value": "Organisation unit not found or not accessible: `Area 18 Urban Health Centre`"
-        }
-      ],
-      "dataSetComplete": "false",
-      "description": "Import process completed successfully",
-      "importCount": {
-        "deleted": 0,
-        "ignored": 801,
-        "imported": 0,
-        "updated": 0
-      },
-      "importOptions": {
-        "async": false,
-        "datasetAllowsPeriods": false,
-        "dryRun": false,
-        "firstRowIsHeader": true,
-        "force": false,
-        "idSchemes": {},
-        "ignoreEmptyCollection": false,
-        "importStrategy": "CREATE_AND_UPDATE",
-        "mergeDataValues": false,
-        "mergeMode": "REPLACE",
-        "reportMode": "FULL",
-        "requireAttributeOptionCombo": false,
-        "requireCategoryOptionCombo": false,
-        "sharing": false,
-        "skipAudit": false,
-        "skipCache": false,
-        "skipExistingCheck": true,
-        "skipLastUpdated": false,
-        "skipNotifications": false,
-        "skipPatternValidation": false,
-        "strictAttributeOptionCombos": false,
-        "strictCategoryOptionCombos": false,
-        "strictDataElements": false,
-        "strictDataSetApproval": false,
-        "strictDataSetInputPeriods": false,
-        "strictDataSetLocking": false,
-        "strictOrganisationUnits": false,
-        "strictPeriods": false
-      },
-      "rejectedIndexes": [
-        0,
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        7,
-        8,
-        9,
-        10,
-        11,
-        12,
-        13,
-        14,
-        15,
-        16,
-        17,
-        18,
-        19,
-        20,
-        21,
-        22,
-        23,
-        24,
-        25,
-        26,
-        27,
-        28,
-        29,
-        30,
-        31,
-        32,
-        33,
-        34,
-        35,
-        36,
-        37,
-        38,
-        39,
-        40,
-        41,
-        42,
-        43,
-        44,
-        45,
-        46,
-        47,
-        48,
-        49,
-        50,
-        51,
-        52,
-        53,
-        54,
-        55,
-        56,
-        57,
-        58,
-        59,
-        60,
-        61,
-        62,
-        63,
-        64,
-        65,
-        66,
-        67,
-        68,
-        69,
-        70,
-        71,
-        72,
-        73,
-        74,
-        75,
-        76,
-        77,
-        78,
-        79,
-        80,
-        81,
-        82,
-        83,
-        84,
-        85,
-        86,
-        87,
-        88,
-        89,
-        90,
-        91,
-        92,
-        93,
-        94,
-        95,
-        96,
-        97,
-        98,
-        99,
-        100,
-        101,
-        102,
-        103,
-        104,
-        105,
-        106,
-        107,
-        108,
-        109,
-        110,
-        111,
-        112,
-        113,
-        114,
-        115,
-        116,
-        117,
-        118,
-        119,
-        120,
-        121,
-        122,
-        123,
-        124,
-        125,
-        126,
-        127,
-        128,
-        129,
-        130,
-        131,
-        132,
-        133,
-        134,
-        135,
-        136,
-        137,
-        138,
-        139,
-        140,
-        141,
-        142,
-        143,
-        144,
-        145,
-        146,
-        147,
-        148,
-        149,
-        150,
-        151,
-        152,
-        153,
-        154,
-        155,
-        156,
-        157,
-        158,
-        159,
-        160,
-        161,
-        162,
-        163,
-        164,
-        165,
-        166,
-        167,
-        168,
-        169,
-        170,
-        171,
-        172,
-        173,
-        174,
-        175,
-        176,
-        177,
-        178,
-        179,
-        180,
-        181,
-        182,
-        183,
-        184,
-        185,
-        186,
-        187,
-        188,
-        189,
-        190,
-        191,
-        192,
-        193,
-        194,
-        195,
-        196,
-        197,
-        198,
-        199,
-        200,
-        201,
-        202,
-        203,
-        204,
-        205,
-        206,
-        207,
-        208,
-        209,
-        210,
-        211,
-        212,
-        213,
-        214,
-        215,
-        216,
-        217,
-        218,
-        219,
-        220,
-        221,
-        222,
-        223,
-        224,
-        225,
-        226,
-        227,
-        228,
-        229,
-        230,
-        231,
-        232,
-        233,
-        234,
-        235,
-        236,
-        237,
-        238,
-        239,
-        240,
-        241,
-        242,
-        243,
-        244,
-        245,
-        246,
-        247,
-        248,
-        249,
-        250,
-        251,
-        252,
-        253,
-        254,
-        255,
-        256,
-        257,
-        258,
-        259,
-        260,
-        261,
-        262,
-        263,
-        264,
-        265,
-        266,
-        267,
-        268,
-        269,
-        270,
-        271,
-        272,
-        273,
-        274,
-        275,
-        276,
-        277,
-        278,
-        279,
-        280,
-        281,
-        282,
-        283,
-        284,
-        285,
-        286,
-        287,
-        288,
-        289,
-        290,
-        291,
-        292,
-        293,
-        294,
-        295,
-        296,
-        297,
-        298,
-        299,
-        300,
-        301,
-        302,
-        303,
-        304,
-        305,
-        306,
-        307,
-        308,
-        309,
-        310,
-        311,
-        312,
-        313,
-        314,
-        315,
-        316,
-        317,
-        318,
-        319,
-        320,
-        321,
-        322,
-        323,
-        324,
-        325,
-        326,
-        327,
-        328,
-        329,
-        330,
-        331,
-        332,
-        333,
-        334,
-        335,
-        336,
-        337,
-        338,
-        339,
-        340,
-        341,
-        342,
-        343,
-        344,
-        345,
-        346,
-        347,
-        348,
-        349,
-        350,
-        351,
-        352,
-        353,
-        354,
-        355,
-        356,
-        357,
-        358,
-        359,
-        360,
-        361,
-        362,
-        363,
-        364,
-        365,
-        366,
-        367,
-        368,
-        369,
-        370,
-        371,
-        372,
-        373,
-        374,
-        375,
-        376,
-        377,
-        378,
-        379,
-        380,
-        381,
-        382,
-        383,
-        384,
-        385,
-        386,
-        387,
-        388,
-        389,
-        390,
-        391,
-        392,
-        393,
-        394,
-        395,
-        396,
-        397,
-        398,
-        399,
-        400,
-        401,
-        402,
-        403,
-        404,
-        405,
-        406,
-        407,
-        408,
-        409,
-        410,
-        411,
-        412,
-        413,
-        414,
-        415,
-        416,
-        417,
-        418,
-        419,
-        420,
-        421,
-        422,
-        423,
-        424,
-        425,
-        426,
-        427,
-        428,
-        429,
-        430,
-        431,
-        432,
-        433,
-        434,
-        435,
-        436,
-        437,
-        438,
-        439,
-        440,
-        441,
-        442,
-        443,
-        444,
-        445,
-        446,
-        447,
-        448,
-        449,
-        450,
-        451,
-        452,
-        453,
-        454,
-        455,
-        456,
-        457,
-        458,
-        459,
-        460,
-        461,
-        462,
-        463,
-        464,
-        465,
-        466,
-        467,
-        468,
-        469,
-        470,
-        471,
-        472,
-        473,
-        474,
-        475,
-        476,
-        477,
-        478,
-        479,
-        480,
-        481,
-        482,
-        483,
-        484,
-        485,
-        486,
-        487,
-        488,
-        489,
-        490,
-        491,
-        492,
-        493,
-        494,
-        495,
-        496,
-        497,
-        498,
-        499,
-        500,
-        501,
-        502,
-        503,
-        504,
-        505,
-        506,
-        507,
-        508,
-        509,
-        510,
-        511,
-        512,
-        513,
-        514,
-        515,
-        516,
-        517,
-        518,
-        519,
-        520,
-        521,
-        522,
-        523,
-        524,
-        525,
-        526,
-        527,
-        528,
-        529,
-        530,
-        531,
-        532,
-        533,
-        534,
-        535,
-        536,
-        537,
-        538,
-        539,
-        540,
-        541,
-        542,
-        543,
-        544,
-        545,
-        546,
-        547,
-        548,
-        549,
-        550,
-        551,
-        552,
-        553,
-        554,
-        555,
-        556,
-        557,
-        558,
-        559,
-        560,
-        561,
-        562,
-        563,
-        564,
-        565,
-        566,
-        567,
-        568,
-        569,
-        570,
-        571,
-        572,
-        573,
-        574,
-        575,
-        576,
-        577,
-        578,
-        579,
-        580,
-        581,
-        582,
-        583,
-        584,
-        585,
-        586,
-        587,
-        588,
-        589,
-        590,
-        591,
-        592,
-        593,
-        594,
-        595,
-        596,
-        597,
-        598,
-        599,
-        600,
-        601,
-        602,
-        603,
-        604,
-        605,
-        606,
-        607,
-        608,
-        609,
-        610,
-        611,
-        612,
-        613,
-        614,
-        615,
-        616,
-        617,
-        618,
-        619,
-        620,
-        621,
-        622,
-        623,
-        624,
-        625,
-        626,
-        627,
-        628,
-        629,
-        630,
-        631,
-        632,
-        633,
-        634,
-        635,
-        636,
-        637,
-        638,
-        639,
-        640,
-        641,
-        642,
-        643,
-        644,
-        645,
-        646,
-        647,
-        648,
-        649,
-        650,
-        651,
-        652,
-        653,
-        654,
-        655,
-        656,
-        657,
-        658,
-        659,
-        660,
-        661,
-        662,
-        663,
-        664,
-        665,
-        666,
-        667,
-        668,
-        669,
-        670,
-        671,
-        672,
-        673,
-        674,
-        675,
-        676,
-        677,
-        678,
-        679,
-        680,
-        681,
-        682,
-        683,
-        684,
-        685,
-        686,
-        687,
-        688,
-        689,
-        690,
-        691,
-        692,
-        693,
-        694,
-        695,
-        696,
-        697,
-        698,
-        699,
-        700,
-        701,
-        702,
-        703,
-        704,
-        705,
-        706,
-        707,
-        708,
-        709,
-        710,
-        711,
-        712,
-        713,
-        714,
-        715,
-        716,
-        717,
-        718,
-        719,
-        720,
-        721,
-        722,
-        723,
-        724,
-        725,
-        726,
-        727,
-        728,
-        729,
-        730,
-        731,
-        732,
-        733,
-        734,
-        735,
-        736,
-        737,
-        738,
-        739,
-        740,
-        741,
-        742,
-        743,
-        744,
-        745,
-        746,
-        747,
-        748,
-        749,
-        750,
-        751,
-        752,
-        753,
-        754,
-        755,
-        756,
-        757,
-        758,
-        759,
-        760,
-        761,
-        762,
-        763,
-        764,
-        765,
-        766,
-        767,
-        768,
-        769,
-        770,
-        771,
-        772,
-        773,
-        774,
-        775,
-        776,
-        777,
-        778,
-        779,
-        780,
-        781,
-        782,
-        783,
-        784,
-        785,
-        786,
-        787,
-        788,
-        789,
-        790,
-        791,
-        792,
-        793,
-        794,
-        795,
-        796,
-        797,
-        798,
-        799,
-        800
-      ],
-      "responseType": "ImportSummary",
-      "status": "WARNING"
-    },
-    "status": "WARNING"
-  },
-  "duration": 336,
-  "headers": {
-    "cache-control": "no-cache, private",
-    "connection": "keep-alive",
-    "content-security-policy": "frame-ancestors 'self';",
-    "content-type": "application/json;charset=UTF-8",
-    "date": "Fri, 26 Sep 2025 20:46:24 GMT",
-    "keep-alive": "timeout=20",
-    "set-cookie": "JSESSIONID=3D436BC3038D874F871F2D41EE3A7474; Path=/; HttpOnly",
-    "transfer-encoding": "chunked",
-    "x-content-type-options": "nosniff",
-    "x-xss-protection": "1; mode=block"
-  },
-  "message": "POST to http://dhis2:8080/api/dataValueSets returned 409: Conflict",
-  "method": "POST",
-  "statusCode": 409,
-  "statusMessage": "Conflict",
-  "url": "http://dhis2:8080/api/dataValueSets"
-}
+R/T No data values uploaded
 R/T Check state.errors.4f42c4a8-333c-4265-a490-524e42d9fd3b for details
 R/T Run complete with status: fail
-AdaptorError: POST to http://dhis2:8080/api/dataValueSets returned 409: Conflict
+R/T JobError: No data values uploaded

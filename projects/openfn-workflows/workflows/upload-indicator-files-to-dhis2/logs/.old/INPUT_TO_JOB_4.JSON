@@ -1,0 +1,394 @@
+{
+  "chunkSize": 5000,
+  "config": {
+    "directory": "/data",
+    "fileTypesEnabled": [
+      "csv"
+    ],
+    "lockTtlSeconds": 600,
+    "pruneProcessedAfterDays": 30,
+    "targetFile": "samples/pepfar/PEPFAR_TxCURR_2025_Q2_Cleaned_v3_20250805160300.csv",
+    "targetFilePattern": null,
+    "targetFilePatterns": [
+      "^PEPFAR_TxCURR_.*\\.(csv)(\\.csv)?$"
+    ]
+  },
+  "data": {
+    "dhis2Mappings": {
+      "categories": {},
+      "dataElements": {
+        "TX_CURR": "vhZ1qGRvNIK"
+      },
+      "dataSetId": "gPUslz5i1YX",
+      "orgUnits": {
+        "Area 18 Urban Health Centre": "OJSmMzXkrX4",
+        "Area 25 Urban Health Centre": "Hxi5ozYluBw",
+        "Bangwe Health Centre": "dQIr5a6AT2C",
+        "Central Health Clinic Area 47": "RLi4meWOszj",
+        "Chitekesa Health Centre": "On1wgmHyTRe",
+        "Dedza District Hospital": "hVXkByh126t",
+        "Jalasi Health Centre": "xSdtpUdfo1K",
+        "Jenda Health Centre": "G4EAfhL9kWk",
+        "Kachere Private Clinic": "kWiCiu6vjxQ",
+        "Kamuzu Academy Clinic": "uR6OoeALWiy",
+        "Kasinje Health Centre": "u6Vb9g2CjNg",
+        "Kavuzi Cummock Health Centre": "KLV0T3yklE9",
+        "Liuzi Health Centre": "xlWMw0ljKRD",
+        "Malawi": "zomjphUCwwl",
+        "Mangochi District Hospital": "frwImOZ0l48",
+        "Mlangeni Health Centre": "pktN366fliR",
+        "Mtwalo Health Centre": "VcClnj0rH2X",
+        "Mzimba District Hospital": "qeM49J98MhG",
+        "Ndamera Health Centre": "vuDImAJldpQ",
+        "Ndirande Urban Health Centre": "QCDXNTrPfdl",
+        "Nsanje District Hospital": "k3SH0aPEbK8",
+        "Zomba Central Hospital": "XtnG4UuBvvd"
+      }
+    },
+    "dhis2Structures": {
+      "categories": [
+        {
+          "categoryOptions": [],
+          "code": "SEX",
+          "name": "Sex",
+          "shortName": "Sex"
+        },
+        {
+          "categoryOptions": [],
+          "code": "AGE_GROUP",
+          "name": "Age Group",
+          "shortName": "Age Group"
+        }
+      ],
+      "dataElements": [
+        {
+          "aggregationType": "SUM",
+          "code": "TX_CURR",
+          "domainType": "AGGREGATE",
+          "name": "TX_CURR",
+          "shortName": "TX_CURR",
+          "valueType": "INTEGER"
+        }
+      ],
+      "orgUnits": []
+    },
+    "mappings": {
+      "Area 18 Urban Health Centre": "OJSmMzXkrX4",
+      "Area 25 Urban Health Centre": "Hxi5ozYluBw",
+      "Bangwe Health Centre": "dQIr5a6AT2C",
+      "Central Health Clinic Area 47": "RLi4meWOszj",
+      "Chitekesa Health Centre": "On1wgmHyTRe",
+      "Dedza District Hospital": "hVXkByh126t",
+      "Jalasi Health Centre": "xSdtpUdfo1K",
+      "Jenda Health Centre": "G4EAfhL9kWk",
+      "Kachere Private Clinic": "kWiCiu6vjxQ",
+      "Kamuzu Academy Clinic": "uR6OoeALWiy",
+      "Kasinje Health Centre": "u6Vb9g2CjNg",
+      "Kavuzi Cummock Health Centre": "KLV0T3yklE9",
+      "Liuzi Health Centre": "xlWMw0ljKRD",
+      "Malawi": "zomjphUCwwl",
+      "Mangochi District Hospital": "frwImOZ0l48",
+      "Mlangeni Health Centre": "pktN366fliR",
+      "Mtwalo Health Centre": "VcClnj0rH2X",
+      "Mzimba District Hospital": "qeM49J98MhG",
+      "Ndamera Health Centre": "vuDImAJldpQ",
+      "Ndirande Urban Health Centre": "QCDXNTrPfdl",
+      "Nsanje District Hospital": "k3SH0aPEbK8",
+      "Zomba Central Hospital": "XtnG4UuBvvd"
+    },
+    "orgUnitParentMap": {},
+    "uniqueValues": {
+      "indicators": [
+        "TX_CURR"
+      ],
+      "sites": [
+        "Kamuzu Academy Clinic",
+        "Kavuzi Cummock Health Centre",
+        "Area 25 Urban Health Centre",
+        "Chitekesa Health Centre",
+        "Dedza District Hospital",
+        "Bangwe Health Centre",
+        "Jalasi Health Centre",
+        "Jenda Health Centre",
+        "Kasinje Health Centre",
+        "Liuzi Health Centre",
+        "Mangochi District Hospital",
+        "Mlangeni Health Centre",
+        "Mtwalo Health Centre",
+        "Mzimba District Hospital",
+        "Ndamera Health Centre",
+        "Ndirande Urban Health Centre",
+        "Nsanje District Hospital",
+        "Zomba Central Hospital",
+        "Kachere Private Clinic",
+        "Central Health Clinic Area 47",
+        "Area 18 Urban Health Centre"
+      ]
+    }
+  },
+  "fileName": "samples/pepfar/PEPFAR_TxCURR_2025_Q2_Cleaned_v3_20250805160300.csv",
+  "filePath": "/data/samples/pepfar/PEPFAR_TxCURR_2025_Q2_Cleaned_v3_20250805160300.csv",
+  "fileType": "csv",
+  "fileTypeConfig": {
+    "builders": {
+      "categories": [
+        {
+          "code": "SEX",
+          "name": "Sex",
+          "shortName": "Sex",
+          "uniqueValueKey": "sexValues"
+        },
+        {
+          "code": "AGE_GROUP",
+          "name": "Age Group",
+          "shortName": "Age Group",
+          "uniqueValueKey": "ageGroups"
+        }
+      ],
+      "dataElements": {
+        "aggregationType": "SUM",
+        "domainType": "AGGREGATE",
+        "uniqueValueKey": "indicators",
+        "valueType": "INTEGER"
+      }
+    },
+    "columnMappings": {
+      "Date_Submitted": {
+        "required": true,
+        "sourceColumns": [
+          "Date_Submitted"
+        ],
+        "targetField": "period"
+      },
+      "age_group": {
+        "required": false,
+        "sourceColumns": [
+          "age_group",
+          "Age Group",
+          "Age"
+        ],
+        "targetField": "categoryOptions.ageGroup"
+      },
+      "facility": {
+        "required": true,
+        "sourceColumns": [
+          "facility",
+          "Facility",
+          "Health Facility",
+          "Site",
+          "site",
+          "Site Name"
+        ],
+        "targetField": "orgUnit"
+      },
+      "indicator": {
+        "required": true,
+        "sourceColumns": [
+          "indicator",
+          "Indicator",
+          "TX_CURR"
+        ],
+        "targetField": "dataElement"
+      },
+      "sex": {
+        "required": false,
+        "sourceColumns": [
+          "sex",
+          "Sex"
+        ],
+        "targetField": "categoryOptions.sex"
+      },
+      "value": {
+        "dataType": "numeric",
+        "required": true,
+        "sourceColumns": [
+          "tx_curr",
+          "Value",
+          "value"
+        ],
+        "targetField": "value"
+      }
+    },
+    "description": "PEPFAR CSV for TX_CURR indicator",
+    "dhis2Builder": "default",
+    "dhis2Config": {
+      "openFuturePeriods": 4,
+      "periodSource": "filename",
+      "periodType": "Quarterly"
+    },
+    "displayName": "PEPFAR TxCURR CSV",
+    "filePrefix": "PEPFAR_TxCURR",
+    "fileType": "csv",
+    "headerMap": {
+      "Date_Submitted": "Date_Submitted",
+      "age_group": "age_group",
+      "facility": "facility",
+      "indicator": "indicator",
+      "sex": "sex",
+      "site_id": "site_id",
+      "tx_curr": "tx_curr"
+    },
+    "uniqueValueCollectors": {
+      "ageGroups": {
+        "targetField": "categoryOptions.ageGroup"
+      },
+      "indicators": {
+        "targetField": "dataElement"
+      },
+      "sexValues": {
+        "targetField": "categoryOptions.sex"
+      },
+      "sites": {
+        "targetField": "orgUnit"
+      }
+    }
+  },
+  "fileTypeConfigKey": "pepfar_tx_curr_csv",
+  "filesIndex": {
+    "samples/pepfar/PEPFAR_TxCURR_2025_Q2_Cleaned_v3_20250805160300.csv": {
+      "chunkSize": 5000,
+      "dhis2Mappings": {
+        "categories": {},
+        "dataElements": {
+          "TX_CURR": "vhZ1qGRvNIK"
+        },
+        "dataSetId": "gPUslz5i1YX",
+        "orgUnits": {
+          "Area 18 Urban Health Centre": "OJSmMzXkrX4",
+          "Area 25 Urban Health Centre": "Hxi5ozYluBw",
+          "Bangwe Health Centre": "dQIr5a6AT2C",
+          "Central Health Clinic Area 47": "RLi4meWOszj",
+          "Chitekesa Health Centre": "On1wgmHyTRe",
+          "Dedza District Hospital": "hVXkByh126t",
+          "Jalasi Health Centre": "xSdtpUdfo1K",
+          "Jenda Health Centre": "G4EAfhL9kWk",
+          "Kachere Private Clinic": "kWiCiu6vjxQ",
+          "Kamuzu Academy Clinic": "uR6OoeALWiy",
+          "Kasinje Health Centre": "u6Vb9g2CjNg",
+          "Kavuzi Cummock Health Centre": "KLV0T3yklE9",
+          "Liuzi Health Centre": "xlWMw0ljKRD",
+          "Malawi": "zomjphUCwwl",
+          "Mangochi District Hospital": "frwImOZ0l48",
+          "Mlangeni Health Centre": "pktN366fliR",
+          "Mtwalo Health Centre": "VcClnj0rH2X",
+          "Mzimba District Hospital": "qeM49J98MhG",
+          "Ndamera Health Centre": "vuDImAJldpQ",
+          "Ndirande Urban Health Centre": "QCDXNTrPfdl",
+          "Nsanje District Hospital": "k3SH0aPEbK8",
+          "Zomba Central Hospital": "XtnG4UuBvvd"
+        }
+      },
+      "dhis2Structures": {
+        "categories": [
+          {
+            "categoryOptions": [],
+            "code": "SEX",
+            "name": "Sex",
+            "shortName": "Sex"
+          },
+          {
+            "categoryOptions": [],
+            "code": "AGE_GROUP",
+            "name": "Age Group",
+            "shortName": "Age Group"
+          }
+        ],
+        "dataElements": [
+          {
+            "aggregationType": "SUM",
+            "code": "TX_CURR",
+            "domainType": "AGGREGATE",
+            "name": "TX_CURR",
+            "shortName": "TX_CURR",
+            "valueType": "INTEGER"
+          }
+        ],
+        "orgUnits": []
+      },
+      "fileType": "csv",
+      "fileTypeConfigKey": "pepfar_tx_curr_csv",
+      "hash": "908d2678",
+      "headerMap": {
+        "Date_Submitted": "Date_Submitted",
+        "age_group": "age_group",
+        "facility": "facility",
+        "indicator": "indicator",
+        "sex": "sex",
+        "site_id": "site_id",
+        "tx_curr": "tx_curr"
+      },
+      "inflight": {
+        "chunkSize": 5000,
+        "dhis2Structures": {
+          "categories": [
+            {
+              "categoryOptions": [],
+              "code": "SEX",
+              "name": "Sex",
+              "shortName": "Sex"
+            },
+            {
+              "categoryOptions": [],
+              "code": "AGE_GROUP",
+              "name": "Age Group",
+              "shortName": "Age Group"
+            }
+          ],
+          "dataElements": [
+            {
+              "aggregationType": "SUM",
+              "code": "TX_CURR",
+              "domainType": "AGGREGATE",
+              "name": "TX_CURR",
+              "shortName": "TX_CURR",
+              "valueType": "INTEGER"
+            }
+          ],
+          "orgUnits": []
+        },
+        "hash": "908d2678",
+        "headerMap": {
+          "Date_Submitted": "Date_Submitted",
+          "age_group": "age_group",
+          "facility": "facility",
+          "indicator": "indicator",
+          "sex": "sex",
+          "site_id": "site_id",
+          "tx_curr": "tx_curr"
+        },
+        "orgUnitParentMap": {},
+        "startedAt": "2025-10-07T06:46:15.171Z",
+        "totalChunks": 1,
+        "updatedAt": "2025-10-07T06:46:16.534Z"
+      },
+      "lastProcessedAt": "2025-10-07T06:46:25.441Z",
+      "lastSeenAt": "2025-10-07T06:46:14.176Z",
+      "mtime": 1758758600000,
+      "orgUnitParentMap": {},
+      "path": "/data/samples/pepfar/PEPFAR_TxCURR_2025_Q2_Cleaned_v3_20250805160300.csv",
+      "processed": false,
+      "size": 150042,
+      "status": "metadata-ready",
+      "totalChunks": 1
+    }
+  },
+  "hasFileToProcess": true,
+  "lock": {
+    "acquiredAt": "2025-10-07T06:46:14.050Z",
+    "expiresAt": "2025-10-07T06:56:14.050Z",
+    "key": "workflow-lock",
+    "owner": "openfn-5d4b9cbffbc6c"
+  },
+  "metadataMappings": {},
+  "metadataParsed": true,
+  "metadataSetupComplete": true,
+  "totalChunks": 1,
+  "totalRows": 780,
+  "workflow-owner": "openfn-5d4b9cbffbc6c",
+  "workflowLock": {
+    "acquiredAt": "2025-10-07T06:46:14.050Z",
+    "expiresAt": "2025-10-07T06:56:14.050Z",
+    "key": "workflow-lock",
+    "owner": "openfn-5d4b9cbffbc6c"
+  }
+}

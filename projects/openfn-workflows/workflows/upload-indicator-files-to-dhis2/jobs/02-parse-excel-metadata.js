@@ -174,7 +174,16 @@ function buildColumnMapping(fileTypeConfig) {
 
 function collectUniqueValues(uniqueValueSets, fileTypeConfig, rowValues) {
   Object.entries(fileTypeConfig.uniqueValueCollectors || {}).forEach(([key, collector]) => {
-    const value = rowValues[collector.targetField];
+    // Handle nested properties like 'categoryOptions.sex'
+    let value;
+    const targetField = collector.targetField;
+    if (targetField.includes('.')) {
+      const parts = targetField.split('.');
+      value = rowValues[parts[0]]?.[parts[1]];
+    } else {
+      value = rowValues[targetField];
+    }
+    
     if (!value && value !== 0) return;
     if (!uniqueValueSets[key]) uniqueValueSets[key] = new Set();
     uniqueValueSets[key].add(String(value).trim());
