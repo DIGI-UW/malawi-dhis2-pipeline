@@ -29,12 +29,242 @@ const WORKFLOW_OWNER_KEY = 'workflow-owner';
  *   // filePatterns: ['*pattern*.xlsx'],
  * }
  */
-const FILE_SELECTION_RULES = {
+const FILE_TYPE_CONFIGS = {
   pepfar_tx_curr_csv: {
     fileType: 'csv',
     displayName: 'PEPFAR TxCURR CSV',
     description: 'PEPFAR CSV for TX_CURR indicator',
-    filePrefix: 'PEPFAR_TxCURR'
+    filePrefix: 'PEPFAR_TxCURR',
+    columnMappings: {
+      facility: { sourceColumns: ['facility','Facility','Health Facility','Site','site','Site Name'], targetField: 'orgUnit', required: true },
+      indicator: { sourceColumns: ['indicator','Indicator','TX_CURR'], targetField: 'dataElement', required: true },
+      sex: { sourceColumns: ['sex','Sex'], targetField: 'categoryOptions.sex', required: false },
+      age_group: { sourceColumns: ['age_group','Age Group','Age'], targetField: 'categoryOptions.ageGroup', required: false },
+      Date_Submitted: { sourceColumns: ['Date_Submitted'], targetField: 'period', required: true },
+      value: { sourceColumns: ['tx_curr','Value','value'], targetField: 'value', required: true, dataType: 'numeric' }
+    },
+    headerMap: {
+      site_id: 'site_id',
+      facility: 'facility',
+      indicator: 'indicator',
+      sex: 'sex',
+      age_group: 'age_group',
+      Date_Submitted: 'Date_Submitted',
+      tx_curr: 'tx_curr'
+    },
+    uniqueValueCollectors: {
+      sites: { targetField: 'orgUnit' },
+      indicators: { targetField: 'dataElement' },
+      sexValues: { targetField: 'categoryOptions.sex' },
+      ageGroups: { targetField: 'categoryOptions.ageGroup' }
+    },
+    builders: {
+      dataElements: {
+        uniqueValueKey: 'indicators',
+        valueType: 'INTEGER',
+        aggregationType: 'SUM',
+        domainType: 'AGGREGATE'
+      },
+      categories: [
+        { name: 'Sex', shortName: 'Sex', code: 'SEX', uniqueValueKey: 'sexValues' },
+        { name: 'Age Group', shortName: 'Age Group', code: 'AGE_GROUP', uniqueValueKey: 'ageGroups' }
+      ]
+    },
+    dhis2Builder: 'default',
+    dhis2Config: {
+      periodType: 'Quarterly',
+      periodSource: 'filename',
+      openFuturePeriods: 4
+    }
+  },
+  pepfar_tx_mmd_csv: {
+    fileType: 'pepfar_tx_mmd_csv',
+    displayName: 'PEPFAR TxCURR MMD CSV',
+    description: 'PEPFAR CSV for TX_CURR_MMD indicator (MMD durations)',
+    filePrefix: 'PEPFAR_TxCURRMMD',
+    columnMappings: {
+      facility: { sourceColumns: ['facility','Facility','Health Facility','Site','site','Site Name'], targetField: 'orgUnit', required: true },
+      indicator: { sourceColumns: ['indicator','Indicator','TX_CURR_MMD'], targetField: 'dataElement', required: true },
+      sex: { sourceColumns: ['sex','Sex'], targetField: 'categoryOptions.sex', required: false },
+      age_group: { sourceColumns: ['age_group','Age Group','Age'], targetField: 'categoryOptions.ageGroup', required: false },
+      Date_Submitted: { sourceColumns: ['Date_Submitted'], targetField: 'period', required: true },
+      mmd_lt3: { sourceColumns: ['# of clients on <3 months of ARVs'], targetField: 'mmd_lt3', required: false, dataType: 'numeric' },
+      mmd_3to5: { sourceColumns: ['# of clients on 3 - 5 months of ARVs'], targetField: 'mmd_3to5', required: false, dataType: 'numeric' },
+      mmd_ge6: { sourceColumns: ['# of clients on >= 6 months of ARVs'], targetField: 'mmd_ge6', required: false, dataType: 'numeric' }
+    },
+    headerMap: {
+      site_id: 'site_id',
+      facility: 'facility',
+      indicator: 'indicator',
+      sex: 'sex',
+      age_group: 'age_group',
+      Date_Submitted: 'Date_Submitted',
+      '# of clients on <3 months of ARVs': '# of clients on <3 months of ARVs',
+      '# of clients on 3 - 5 months of ARVs': '# of clients on 3 - 5 months of ARVs',
+      '# of clients on >= 6 months of ARVs': '# of clients on >= 6 months of ARVs'
+    },
+    uniqueValueCollectors: {
+      sites: { targetField: 'orgUnit' },
+      indicators: { targetField: 'dataElement' },
+      sexValues: { targetField: 'categoryOptions.sex' },
+      ageGroups: { targetField: 'categoryOptions.ageGroup' }
+    },
+    builders: {
+      dataElements: {
+        uniqueValueKey: 'indicators',
+        valueType: 'INTEGER',
+        aggregationType: 'SUM',
+        domainType: 'AGGREGATE'
+      },
+      categories: [
+        { name: 'Sex', shortName: 'Sex', code: 'SEX', uniqueValueKey: 'sexValues' },
+        { name: 'Age Group', shortName: 'Age Group', code: 'AGE_GROUP', uniqueValueKey: 'ageGroups' }
+      ]
+    },
+    dhis2Builder: 'default',
+    dhis2Config: {
+      periodType: 'Quarterly',
+      periodSource: 'filename',
+      openFuturePeriods: 4
+    }
+  },
+  pepfar_tx_ml_csv: {
+    fileType: 'pepfar_tx_ml_csv',
+    displayName: 'PEPFAR TxML CSV',
+    description: 'PEPFAR CSV for TX_ML indicator',
+    filePrefix: 'PEPFAR_TxML',
+    columnMappings: {
+      facility: { sourceColumns: ['facility','Facility','Health Facility','Site','site','Site Name'], targetField: 'orgUnit', required: true },
+      indicator: { sourceColumns: ['indicator','Indicator','TX_ML'], targetField: 'dataElement', required: true },
+      sex: { sourceColumns: ['sex','Sex'], targetField: 'categoryOptions.sex', required: false },
+      age_group: { sourceColumns: ['age_group','Age Group','Age'], targetField: 'categoryOptions.ageGroup', required: false },
+      Date_Submitted: { sourceColumns: ['Date_Submitted'], targetField: 'period', required: true },
+      value: { sourceColumns: ['value','Value'], targetField: 'value', required: true, dataType: 'numeric' }
+    },
+    headerMap: {
+      site_id: 'site_id',
+      facility: 'facility',
+      indicator: 'indicator',
+      sex: 'sex',
+      age_group: 'age_group',
+      Date_Submitted: 'Date_Submitted'
+    },
+    uniqueValueCollectors: {
+      sites: { targetField: 'orgUnit' },
+      indicators: { targetField: 'dataElement' },
+      sexValues: { targetField: 'categoryOptions.sex' },
+      ageGroups: { targetField: 'categoryOptions.ageGroup' }
+    },
+    builders: {
+      dataElements: {
+        uniqueValueKey: 'indicators',
+        valueType: 'INTEGER',
+        aggregationType: 'SUM',
+        domainType: 'AGGREGATE'
+      },
+      categories: [
+        { name: 'Sex', shortName: 'Sex', code: 'SEX', uniqueValueKey: 'sexValues' },
+        { name: 'Age Group', shortName: 'Age Group', code: 'AGE_GROUP', uniqueValueKey: 'ageGroups' }
+      ]
+    },
+    dhis2Builder: 'default',
+    dhis2Config: {
+      periodType: 'Quarterly',
+      periodSource: 'filename',
+      openFuturePeriods: 4
+    }
+  },
+  pepfar_tx_new_csv: {
+    fileType: 'pepfar_tx_new_csv',
+    displayName: 'PEPFAR TxNEW CSV',
+    description: 'PEPFAR CSV for TX_NEW indicator',
+    filePrefix: 'PEPFAR_TxNEW',
+    columnMappings: {
+      facility: { sourceColumns: ['facility','Facility','Health Facility','Site','site','Site Name'], targetField: 'orgUnit', required: true },
+      indicator: { sourceColumns: ['indicator','Indicator','TX_NEW'], targetField: 'dataElement', required: true },
+      sex: { sourceColumns: ['sex','Sex'], targetField: 'categoryOptions.sex', required: false },
+      age_group: { sourceColumns: ['age_group','Age Group','Age'], targetField: 'categoryOptions.ageGroup', required: false },
+      Date_Submitted: { sourceColumns: ['Date_Submitted'], targetField: 'period', required: true },
+      value: { sourceColumns: ['value','Value'], targetField: 'value', required: true, dataType: 'numeric' }
+    },
+    headerMap: {
+      site_id: 'site_id',
+      facility: 'facility',
+      indicator: 'indicator',
+      sex: 'sex',
+      age_group: 'age_group',
+      Date_Submitted: 'Date_Submitted'
+    },
+    uniqueValueCollectors: {
+      sites: { targetField: 'orgUnit' },
+      indicators: { targetField: 'dataElement' },
+      sexValues: { targetField: 'categoryOptions.sex' },
+      ageGroups: { targetField: 'categoryOptions.ageGroup' }
+    },
+    builders: {
+      dataElements: {
+        uniqueValueKey: 'indicators',
+        valueType: 'INTEGER',
+        aggregationType: 'SUM',
+        domainType: 'AGGREGATE'
+      },
+      categories: [
+        { name: 'Sex', shortName: 'Sex', code: 'SEX', uniqueValueKey: 'sexValues' },
+        { name: 'Age Group', shortName: 'Age Group', code: 'AGE_GROUP', uniqueValueKey: 'ageGroups' }
+      ]
+    },
+    dhis2Builder: 'default',
+    dhis2Config: {
+      periodType: 'Quarterly',
+      periodSource: 'filename',
+      openFuturePeriods: 4
+    }
+  },
+  pepfar_tx_rtt_csv: {
+    fileType: 'pepfar_tx_rtt_csv',
+    displayName: 'PEPFAR TxRTT CSV',
+    description: 'PEPFAR CSV for TX_RTT indicator',
+    filePrefix: 'PEPFAR_TxRTT',
+    columnMappings: {
+      facility: { sourceColumns: ['facility','Facility','Health Facility','Site','site','Site Name'], targetField: 'orgUnit', required: true },
+      indicator: { sourceColumns: ['indicator','Indicator','TX_RTT'], targetField: 'dataElement', required: true },
+      sex: { sourceColumns: ['sex','Sex'], targetField: 'categoryOptions.sex', required: false },
+      age_group: { sourceColumns: ['age_group','Age Group','Age'], targetField: 'categoryOptions.ageGroup', required: false },
+      Date_Submitted: { sourceColumns: ['Date_Submitted'], targetField: 'period', required: true },
+      value: { sourceColumns: ['value','Value'], targetField: 'value', required: true, dataType: 'numeric' }
+    },
+    headerMap: {
+      site_id: 'site_id',
+      facility: 'facility',
+      indicator: 'indicator',
+      sex: 'sex',
+      age_group: 'age_group',
+      Date_Submitted: 'Date_Submitted'
+    },
+    uniqueValueCollectors: {
+      sites: { targetField: 'orgUnit' },
+      indicators: { targetField: 'dataElement' },
+      sexValues: { targetField: 'categoryOptions.sex' },
+      ageGroups: { targetField: 'categoryOptions.ageGroup' }
+    },
+    builders: {
+      dataElements: {
+        uniqueValueKey: 'indicators',
+        valueType: 'INTEGER',
+        aggregationType: 'SUM',
+        domainType: 'AGGREGATE'
+      },
+      categories: [
+        { name: 'Sex', shortName: 'Sex', code: 'SEX', uniqueValueKey: 'sexValues' },
+        { name: 'Age Group', shortName: 'Age Group', code: 'AGE_GROUP', uniqueValueKey: 'ageGroups' }
+      ]
+    },
+    dhis2Builder: 'default',
+    dhis2Config: {
+      periodType: 'Quarterly',
+      periodSource: 'filename',
+      openFuturePeriods: 4
+    }
   },
   art_data_long_format: {
     fileType: 'art_data_long_format',
@@ -408,6 +638,19 @@ const FILE_SELECTION_RULES = {
       method: 'sum',
       handleDuplicates: 'warn'
     },
+    uniqueValueCollectors: {
+      sites: { targetField: 'orgUnit' },
+      indicators: { targetField: 'dataElement' }
+    },
+    builders: {
+      dataElements: {
+        uniqueValueKey: 'indicators',
+        valueType: 'INTEGER',
+        aggregationType: 'SUM',
+        domainType: 'AGGREGATE'
+      }
+    },
+    dhis2Builder: 'default',
     dhis2Config: {
       dataSetId: 'MoHQuarterlyReports',
       importStrategy: 'CREATE_AND_UPDATE',
@@ -523,8 +766,8 @@ execute(fn(async state => {
     state.filesIndex = filesIndex;
   }
 
-  const fileTypeConfigs = FILE_SELECTION_RULES; // selection rules only
-  console.log(`   • Loaded ${Object.keys(fileTypeConfigs).length} file selection rules`);
+  const fileTypeConfigs = FILE_TYPE_CONFIGS; // Complete configs with all metadata
+  console.log(`   • Loaded ${Object.keys(fileTypeConfigs).length} file type configurations`);
 
   // Normalize directory to avoid trailing slash
   const directory = String(config.directory || '/data').replace(/\/+$/, '');
@@ -576,11 +819,12 @@ execute(fn(async state => {
       .filter(f => f.name && patterns.some(rx => rx.test(String(f.name).split('/').pop())))
       .map(file => {
         const basename = String(file.name).split('/').pop();
+        const configKey = matchFileTypeKey(basename, fileTypeConfigs);
         return {
           ...file,
           fileType: inferFileType(basename),
-          fileTypeConfig: matchFileToConfig(basename, fileTypeConfigs),
-          fileTypeConfigKey: matchFileTypeKey(basename, fileTypeConfigs)
+          fileTypeConfigKey: configKey,
+          fileTypeConfig: configKey ? fileTypeConfigs[configKey] : null
         };
       })
       .filter(f => config.fileTypesEnabled.includes(f.fileType));
@@ -627,7 +871,8 @@ execute(fn(async state => {
           size: file.size,
           mtime: file.mtime,
           fileType: file.fileType,
-          fileTypeConfigKey: nextFilesIndex[key].fileTypeConfigKey
+          fileTypeConfigKey: nextFilesIndex[key].fileTypeConfigKey,
+          fileTypeConfig: file.fileTypeConfig
         });
       }
     }
@@ -688,6 +933,7 @@ execute(fn(async state => {
       filePath: nextFile.path,
       fileType: nextFile.fileType,
       fileTypeConfigKey: nextFile.fileTypeConfigKey,
+      fileTypeConfig: nextFile.fileTypeConfig,
       config: nextConfig
     };
   })(state);

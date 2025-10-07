@@ -18,6 +18,7 @@ services:
         mode: 0755
     command: >
       bash -c "
+        set -e
         echo 'Starting DHIS2 database initialization...'
         
         # Wait for PostgreSQL to be ready

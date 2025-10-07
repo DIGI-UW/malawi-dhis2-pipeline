@@ -12,15 +12,10 @@
 
 ./instant package destroy -n openfn
 ./instant package destroy -n dhis2-instance
-
 ./instant package destroy -n database-postgres
+
 ./instant package init -n database-postgres -d
-
-
 ./instant package init -n dhis2-instance -d 
-# ./instant package up -n dhis2-instance -d --env-file .env
-# ./instant package down -n dhis2-instance -d --env-file .env
-
 ./instant package init -n openfn -d
 
 # ./instant package down -n openfn

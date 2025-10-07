@@ -41,7 +41,6 @@ RUN mkdir -p /app/workflows /app/shared /app/scripts /app/configs
 # Copy the workflows and related assets into the image
 COPY workflows/. /app/workflows/
 COPY scripts/ /app/scripts/
-COPY configs/ /app/configs/
 COPY docker/entrypoint.sh /app/entrypoint.sh
 
 # Make scripts executable

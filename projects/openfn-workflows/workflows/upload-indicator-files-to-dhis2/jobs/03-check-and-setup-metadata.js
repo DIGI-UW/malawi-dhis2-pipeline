@@ -225,7 +225,7 @@ async function createCategories(categoryStructures, state) {
       state = await get(`categories`, {
         filter: `code:eq:${category.code}`,
         fields: 'id,categoryOptions[id,code]',
-        paging: 'false'
+        paging: false
       })(state);
       
       let categoryData = state.data.categories && state.data.categories[0];
@@ -236,7 +236,7 @@ async function createCategories(categoryStructures, state) {
         
         for (const option of category.categoryOptions) {
           try {
-            state = await get(`categoryOptions`, { filter: `code:eq:${option.code}`, fields: 'id', paging: 'false' })(state);
+            state = await get(`categoryOptions`, { filter: `code:eq:${option.code}`, fields: 'id', paging: false })(state);
             let catOption = state.data.categoryOptions && state.data.categoryOptions[0];
 
             if (catOption) {
@@ -271,7 +271,7 @@ async function createCategories(categoryStructures, state) {
         
         if (state.data?.response?.uid) {
           const categoryId = state.data.response.uid;
-          state = await get('categories', categoryId, { fields: 'id,categoryOptions[id,code]'})(state);
+          state = await get(`categories/${categoryId}`, { fields: 'id,categoryOptions[id,code]', paging: false })(state);
           categoryData = state.data;
         }
       }
@@ -481,9 +481,10 @@ async function createCategoryCombination(categoryStructures, state) {
   // Get category IDs for the combination
   const categoryIds = [];
   for (const category of categoryStructures) {
-    await get(`categories`, {
+    state = await get(`categories`, {
       filter: `code:eq:${category.code}`,
-      fields: 'id'
+      fields: 'id',
+      paging: false
     })(state);
     
     if (state.data.categories && state.data.categories[0]) {
@@ -493,14 +494,18 @@ async function createCategoryCombination(categoryStructures, state) {
   
   if (categoryIds.length === 0) {
     console.log('⚠️  No categories found for combination');
-    return mappings;
+    return {
+      categoryOptionCombos: mappings,
+      categoryCombinationId: null
+    };
   }
   
   // Create category combination
   const combCode = 'HEALTH_REPORTING_COMBO';
-  await get(`categoryCombos`, {
+  state = await get(`categoryCombos`, {
     filter: `code:eq:${combCode}`,
-    fields: 'id,categoryOptionCombos[id,name,categoryOptions[id,name]]'
+    fields: 'id,categoryOptionCombos[id,name,categoryOptions[id,name]]',
+    paging: false
   })(state);
   
   let categoryCombo = state.data.categoryCombos && state.data.categoryCombos[0];
@@ -509,21 +514,22 @@ async function createCategoryCombination(categoryStructures, state) {
     console.log(`   ✓ Found existing category combination: ${categoryCombo.id}`);
   } else {
     const comboPayload = {
-      name: 'Health Sector and Reporting Period',
+      name: 'Data Disaggregation',
       code: combCode,
       dataDimensionType: 'ATTRIBUTE',
       categories: categoryIds
     };
     
-    await create('categoryCombos', comboPayload)(state);
+    state = await create('categoryCombos', comboPayload)(state);
     
     if (state.data?.response?.uid) {
       const comboId = state.data.response.uid;
       console.log(`   ✓ Created category combination: ${comboId}`);
       
       // Get the combination with its option combos
-      await get(`categoryCombos/${comboId}`, { 
-        fields: 'id,categoryOptionCombos[id,name,categoryOptions[id,name]]'
+      state = await get(`categoryCombos/${comboId}`, { 
+        fields: 'id,categoryOptionCombos[id,name,categoryOptions[id,name]]',
+        paging: false
       })(state);
       categoryCombo = state.data;
     }
