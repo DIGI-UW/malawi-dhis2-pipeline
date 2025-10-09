@@ -1,0 +1,562 @@
+{
+  "info": {
+    "name": "DHIS2 Data Verification Collection",
+    "description": "Verifies that the OpenFN workflow correctly uploaded 781 disaggregated data values to DHIS2",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "dhis2_base_url",
+      "value": "http://127.0.0.1:8080",
+      "description": "DHIS2 base URL"
+    },
+    {
+      "key": "dhis2_username",
+      "value": "admin",
+      "description": "DHIS2 admin username"
+    },
+    {
+      "key": "dhis2_password",
+      "value": "district",
+      "description": "DHIS2 admin password"
+    },
+    {
+      "key": "data_set_id",
+      "value": "B3WmE0SBHpV",
+      "description": "Malawi ART Data Set ID"
+    },
+    {
+      "key": "data_element_id",
+      "value": "uHTdYgsEqaf",
+      "description": "TX_CURR data element ID"
+    },
+    {
+      "key": "period",
+      "value": "2025Q2",
+      "description": "Reporting period"
+    },
+    {
+      "key": "expected_total",
+      "value": "781",
+      "description": "Expected number of data values"
+    },
+    {
+      "key": "expected_combos",
+      "value": "55",
+      "description": "Expected unique category combos"
+    },
+    {
+      "key": "sample_org_unit",
+      "value": "Ih1TCbpltCJ",
+      "description": "Kamuzu Academy Clinic (sample facility)"
+    }
+  ],
+  "auth": {
+    "type": "basic",
+    "basic": [
+      {
+        "key": "username",
+        "value": "{{dhis2_username}}",
+        "type": "string"
+      },
+      {
+        "key": "password",
+        "value": "{{dhis2_password}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "0. Basic Connectivity",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{dhis2_base_url}}/api/me?fields=id,username",
+          "host": ["{{dhis2_base_url}}"],
+          "path": ["api", "me"],
+          "query": [
+            { "key": "fields", "value": "id,username" }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('DHIS2 is accessible', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('User is authenticated', function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property('username');",
+              "    console.log('✓ Connected as:', jsonData.username);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "1. Get All Data Values",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{dhis2_base_url}}/api/dataValues?dataElement={{data_element_id}}&period={{period}}&paging=false",
+          "host": ["{{dhis2_base_url}}"],
+          "path": ["api", "dataValues"],
+          "query": [
+            { "key": "dataElement", "value": "{{data_element_id}}" },
+            { "key": "period", "value": "{{period}}" },
+            { "key": "paging", "value": "false" }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Query successful', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('Data values found', function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property('dataValues');",
+              "    pm.expect(jsonData.dataValues).to.be.an('array');",
+              "});",
+              "",
+              "var jsonData = pm.response.json();",
+              "var totalCount = jsonData.dataValues ? jsonData.dataValues.length : 0;",
+              "var expectedTotal = parseInt(pm.collectionVariables.get('expected_total'));",
+              "",
+              "pm.test('Total data values: ' + totalCount + ' (expected: ' + expectedTotal + ')', function () {",
+              "    pm.expect(totalCount).to.equal(expectedTotal);",
+              "});",
+              "",
+              "if (totalCount > 0) {",
+              "    console.log('✓ Found', totalCount, 'data values');",
+              "    ",
+              "    // Count unique org units",
+              "    var orgUnits = new Set(jsonData.dataValues.map(v => v.orgUnit));",
+              "    console.log('✓ Unique org units:', orgUnits.size);",
+              "    ",
+              "    // Count unique category combos",
+              "    var combos = new Set(jsonData.dataValues.map(v => v.categoryOptionCombo));",
+              "    console.log('✓ Unique category combos:', combos.size);",
+              "    pm.collectionVariables.set('actual_combos', combos.size);",
+              "    ",
+              "    // Show sample values",
+              "    console.log('✓ Sample values:', JSON.stringify(jsonData.dataValues.slice(0, 3), null, 2));",
+              "} else {",
+              "    console.log('✗ No data values found!');",
+              "}"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Count Unique Category Combos",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{dhis2_base_url}}/api/dataValues?dataElement={{data_element_id}}&period={{period}}&paging=false&fields=categoryOptionCombo",
+          "host": ["{{dhis2_base_url}}"],
+          "path": ["api", "dataValues"],
+          "query": [
+            { "key": "dataElement", "value": "{{data_element_id}}" },
+            { "key": "period", "value": "{{period}}" },
+            { "key": "paging", "value": "false" },
+            { "key": "fields", "value": "categoryOptionCombo" }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "var jsonData = pm.response.json();",
+              "var dataValues = jsonData.dataValues || [];",
+              "",
+              "// Count unique combos",
+              "var uniqueCombos = new Set(dataValues.map(v => v.categoryOptionCombo));",
+              "var actualCount = uniqueCombos.size;",
+              "var expectedCount = parseInt(pm.collectionVariables.get('expected_combos'));",
+              "",
+              "pm.test('Unique category combos: ' + actualCount + ' (expected: ' + expectedCount + ')', function () {",
+              "    pm.expect(actualCount).to.equal(expectedCount);",
+              "});",
+              "",
+              "if (actualCount > 0) {",
+              "    // Count frequency of each combo",
+              "    var comboCount = {};",
+              "    dataValues.forEach(v => {",
+              "        var combo = v.categoryOptionCombo;",
+              "        comboCount[combo] = (comboCount[combo] || 0) + 1;",
+              "    });",
+              "    ",
+              "    // Show top 5 most used combos",
+              "    var sorted = Object.entries(comboCount).sort((a, b) => b[1] - a[1]).slice(0, 5);",
+              "    console.log('✓ Top 5 category combos:');",
+              "    sorted.forEach(([combo, count]) => {",
+              "        console.log('  -', combo + ':', count, 'values');",
+              "    });",
+              "}"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "3a. Sample Combo: 50-54 years+Male",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{dhis2_base_url}}/api/dataValues?dataElement={{data_element_id}}&period={{period}}&categoryOptionCombo=yIQ4kpNaYYw&paging=false",
+          "host": ["{{dhis2_base_url}}"],
+          "path": ["api", "dataValues"],
+          "query": [
+            { "key": "dataElement", "value": "{{data_element_id}}" },
+            { "key": "period", "value": "{{period}}" },
+            { "key": "categoryOptionCombo", "value": "yIQ4kpNaYYw" },
+            { "key": "paging", "value": "false" }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "var jsonData = pm.response.json();",
+              "var count = jsonData.dataValues ? jsonData.dataValues.length : 0;",
+              "",
+              "pm.test('50-54 years+Male (yIQ4kpNaYYw): ' + count + ' values', function () {",
+              "    pm.expect(count).to.be.above(0);",
+              "});",
+              "",
+              "if (count > 0) {",
+              "    console.log('✓ Found', count, 'values for 50-54 years+Male');",
+              "}"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "3b. Sample Combo: 40-44 years+Male",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{dhis2_base_url}}/api/dataValues?dataElement={{data_element_id}}&period={{period}}&categoryOptionCombo=lxNxZu87SgP&paging=false",
+          "host": ["{{dhis2_base_url}}"],
+          "path": ["api", "dataValues"],
+          "query": [
+            { "key": "dataElement", "value": "{{data_element_id}}" },
+            { "key": "period", "value": "{{period}}" },
+            { "key": "categoryOptionCombo", "value": "lxNxZu87SgP" },
+            { "key": "paging", "value": "false" }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "var jsonData = pm.response.json();",
+              "var count = jsonData.dataValues ? jsonData.dataValues.length : 0;",
+              "",
+              "pm.test('40-44 years+Male (lxNxZu87SgP): ' + count + ' values', function () {",
+              "    pm.expect(count).to.be.above(0);",
+              "});",
+              "",
+              "if (count > 0) {",
+              "    console.log('✓ Found', count, 'values for 40-44 years+Male');",
+              "}"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "3c. Sample Combo: All+FNP",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{dhis2_base_url}}/api/dataValues?dataElement={{data_element_id}}&period={{period}}&categoryOptionCombo=D2UhDW2YmrY&paging=false",
+          "host": ["{{dhis2_base_url}}"],
+          "path": ["api", "dataValues"],
+          "query": [
+            { "key": "dataElement", "value": "{{data_element_id}}" },
+            { "key": "period", "value": "{{period}}" },
+            { "key": "categoryOptionCombo", "value": "D2UhDW2YmrY" },
+            { "key": "paging", "value": "false" }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "var jsonData = pm.response.json();",
+              "var count = jsonData.dataValues ? jsonData.dataValues.length : 0;",
+              "",
+              "pm.test('All+FNP (D2UhDW2YmrY): ' + count + ' values', function () {",
+              "    pm.expect(count).to.be.above(0);",
+              "});",
+              "",
+              "if (count > 0) {",
+              "    console.log('✓ Found', count, 'values for All+FNP');",
+              "}"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Validate Category Combo Structure",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{dhis2_base_url}}/api/categoryOptionCombos/yIQ4kpNaYYw?fields=id,name,categoryOptions[id,name,code]",
+          "host": ["{{dhis2_base_url}}"],
+          "path": ["api", "categoryOptionCombos", "yIQ4kpNaYYw"],
+          "query": [
+            { "key": "fields", "value": "id,name,categoryOptions[id,name,code]" }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Category combo exists', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "var jsonData = pm.response.json();",
+              "var options = jsonData.categoryOptions || [];",
+              "",
+              "pm.test('Category combo has 2 options (sex + age)', function () {",
+              "    pm.expect(options.length).to.equal(2);",
+              "});",
+              "",
+              "if (options.length > 0) {",
+              "    console.log('✓ Category combo:', jsonData.name);",
+              "    console.log('✓ Category options:');",
+              "    options.forEach(opt => {",
+              "        console.log('  -', opt.name, '(' + opt.code + ')');",
+              "    });",
+              "}"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Check for Default Combo Usage",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{dhis2_base_url}}/api/dataValues?dataElement={{data_element_id}}&period={{period}}&categoryOptionCombo=HllvX50cXC0&paging=false",
+          "host": ["{{dhis2_base_url}}"],
+          "path": ["api", "dataValues"],
+          "query": [
+            { "key": "dataElement", "value": "{{data_element_id}}" },
+            { "key": "period", "value": "{{period}}" },
+            { "key": "categoryOptionCombo", "value": "HllvX50cXC0" },
+            { "key": "paging", "value": "false" }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "var jsonData = pm.response.json();",
+              "var count = jsonData.dataValues ? jsonData.dataValues.length : 0;",
+              "",
+              "pm.test('No default combo usage (proper disaggregation)', function () {",
+              "    pm.expect(count).to.equal(0);",
+              "});",
+              "",
+              "if (count === 0) {",
+              "    console.log('✓ No default combo usage - all data is properly disaggregated');",
+              "} else {",
+              "    console.log('✗ Found', count, 'values using default combo (missing disaggregation)');",
+              "}"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. Check Sample Facility",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{dhis2_base_url}}/api/dataValues?dataElement={{data_element_id}}&period={{period}}&orgUnit={{sample_org_unit}}&paging=false",
+          "host": ["{{dhis2_base_url}}"],
+          "path": ["api", "dataValues"],
+          "query": [
+            { "key": "dataElement", "value": "{{data_element_id}}" },
+            { "key": "period", "value": "{{period}}" },
+            { "key": "orgUnit", "value": "{{sample_org_unit}}" },
+            { "key": "paging", "value": "false" }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "var jsonData = pm.response.json();",
+              "var count = jsonData.dataValues ? jsonData.dataValues.length : 0;",
+              "",
+              "pm.test('Kamuzu Academy Clinic has data', function () {",
+              "    pm.expect(count).to.be.above(0);",
+              "});",
+              "",
+              "if (count > 0) {",
+              "    console.log('✓ Kamuzu Academy Clinic:', count, 'values');",
+              "    ",
+              "    // Show disaggregation for this facility",
+              "    var combos = new Set(jsonData.dataValues.map(v => v.categoryOptionCombo));",
+              "    console.log('✓ Disaggregated across', combos.size, 'category combos');",
+              "}"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "7. Check for Duplicates",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{dhis2_base_url}}/api/dataValues?dataElement={{data_element_id}}&period={{period}}&paging=false",
+          "host": ["{{dhis2_base_url}}"],
+          "path": ["api", "dataValues"],
+          "query": [
+            { "key": "dataElement", "value": "{{data_element_id}}" },
+            { "key": "period", "value": "{{period}}" },
+            { "key": "paging", "value": "false" }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "var jsonData = pm.response.json();",
+              "var dataValues = jsonData.dataValues || [];",
+              "",
+              "// Check for duplicates by creating unique keys",
+              "var seen = {};",
+              "var duplicates = [];",
+              "",
+              "dataValues.forEach(v => {",
+              "    var key = v.orgUnit + '+' + v.categoryOptionCombo + '+' + v.period;",
+              "    if (seen[key]) {",
+              "        duplicates.push(key);",
+              "    }",
+              "    seen[key] = true;",
+              "});",
+              "",
+              "pm.test('No duplicate data values', function () {",
+              "    pm.expect(duplicates.length).to.equal(0);",
+              "});",
+              "",
+              "if (duplicates.length === 0) {",
+              "    console.log('✓ No duplicate data values found');",
+              "} else {",
+              "    console.log('✗ Found', duplicates.length, 'duplicate combinations');",
+              "    console.log('Sample duplicates:', duplicates.slice(0, 3));",
+              "}"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "8. Value Distribution Statistics",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{dhis2_base_url}}/api/dataValues?dataElement={{data_element_id}}&period={{period}}&paging=false",
+          "host": ["{{dhis2_base_url}}"],
+          "path": ["api", "dataValues"],
+          "query": [
+            { "key": "dataElement", "value": "{{data_element_id}}" },
+            { "key": "period", "value": "{{period}}" },
+            { "key": "paging", "value": "false" }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "var jsonData = pm.response.json();",
+              "var dataValues = jsonData.dataValues || [];",
+              "",
+              "if (dataValues.length > 0) {",
+              "    var values = dataValues.map(v => parseFloat(v.value));",
+              "    var sum = values.reduce((a, b) => a + b, 0);",
+              "    var min = Math.min(...values);",
+              "    var max = Math.max(...values);",
+              "    var avg = sum / values.length;",
+              "    ",
+              "    console.log('✓ Value Statistics:');",
+              "    console.log('  - Count:', values.length);",
+              "    console.log('  - Sum:', sum);",
+              "    console.log('  - Min:', min);",
+              "    console.log('  - Max:', max);",
+              "    console.log('  - Avg:', avg.toFixed(2));",
+              "    ",
+              "    pm.test('All values are numeric and positive', function () {",
+              "        pm.expect(min).to.be.at.least(0);",
+              "    });",
+              "}"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
+

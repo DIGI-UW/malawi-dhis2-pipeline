@@ -1,0 +1,11 @@
+{
+  "httpStatus": "Created",
+  "httpStatusCode": 201,
+  "status": "OK",
+  "response": {
+    "responseType": "ObjectReport",
+    "uid": "lKD0ITiaO7p",
+    "klass": "org.hisp.dhis.category.CategoryOption",
+    "errorReports": []
+  }
+}

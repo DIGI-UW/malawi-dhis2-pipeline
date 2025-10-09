@@ -1,0 +1,37 @@
+{
+  "dataElements": [
+    {
+      "code": "TX_CURR_TEST_WITH_COMBO",
+      "name": "TX_CURR Test (With Combo)",
+      "id": "rqBX77Lm37O",
+      "categoryCombo": {
+        "name": "Health Reporting Combo",
+        "id": "AKPwmyoKkWy",
+        "categoryOptionCombos": [
+          {
+            "name": "Male",
+            "categoryOptions": [
+              {
+                "code": "MALE",
+                "name": "Male",
+                "id": "lKD0ITiaO7p"
+              }
+            ],
+            "id": "svYAzdCLqJT"
+          },
+          {
+            "name": "Female",
+            "categoryOptions": [
+              {
+                "code": "FEMALE",
+                "name": "Female",
+                "id": "JV0cH2NY970"
+              }
+            ],
+            "id": "VqFgn8A2T9N"
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "categoryCombos": [
+    {
+      "code": "HEALTH_REPORTING_COMBO",
+      "name": "Health Reporting Combo",
+      "categories": [
+        {
+          "name": "Sex",
+          "id": "mR1qhaObPyR"
+        }
+      ],
+      "id": "AKPwmyoKkWy",
+      "categoryOptionCombos": [
+        {
+          "name": "Male",
+          "categoryOptions": [
+            {
+              "code": "MALE",
+              "name": "Male",
+              "id": "lKD0ITiaO7p"
+            }
+          ],
+          "id": "svYAzdCLqJT"
+        },
+        {
+          "name": "Female",
+          "categoryOptions": [
+            {
+              "code": "FEMALE",
+              "name": "Female",
+              "id": "JV0cH2NY970"
+            }
+          ],
+          "id": "VqFgn8A2T9N"
+        }
+      ]
+    }
+  ]
+}

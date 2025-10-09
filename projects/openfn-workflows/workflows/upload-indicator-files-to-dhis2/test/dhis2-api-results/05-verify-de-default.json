@@ -1,0 +1,19 @@
+{
+  "dataElements": [
+    {
+      "code": "TX_CURR_TEST_DEFAULT",
+      "name": "TX_CURR Test (Default)",
+      "id": "pBesExVvOxf",
+      "categoryCombo": {
+        "name": "default",
+        "id": "bjDvmb4bfuf",
+        "categoryOptionCombos": [
+          {
+            "name": "default",
+            "id": "HllvX50cXC0"
+          }
+        ]
+      }
+    }
+  ]
+}

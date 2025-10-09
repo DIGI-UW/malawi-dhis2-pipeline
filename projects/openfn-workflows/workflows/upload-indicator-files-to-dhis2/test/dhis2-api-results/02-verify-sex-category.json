@@ -1,0 +1,21 @@
+{
+  "categories": [
+    {
+      "code": "SEX",
+      "name": "Sex",
+      "categoryOptions": [
+        {
+          "code": "MALE",
+          "name": "Male",
+          "id": "lKD0ITiaO7p"
+        },
+        {
+          "code": "FEMALE",
+          "name": "Female",
+          "id": "JV0cH2NY970"
+        }
+      ],
+      "id": "mR1qhaObPyR"
+    }
+  ]
+}

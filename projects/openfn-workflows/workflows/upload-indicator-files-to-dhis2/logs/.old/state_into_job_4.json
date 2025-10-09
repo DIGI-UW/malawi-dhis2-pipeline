@@ -1,0 +1,1152 @@
+{
+    "chunkSize": 5000,
+    "config": {
+      "directory": "/data",
+      "fileTypesEnabled": [
+        "csv"
+      ],
+      "lockTtlSeconds": 600,
+      "pruneProcessedAfterDays": 30,
+      "targetFile": "samples/pepfar/PEPFAR_TxCURR_2025_Q2_Cleaned_v3_20250805160300.csv",
+      "targetFilePattern": null,
+      "targetFilePatterns": [
+        "^PEPFAR_TxCURR_.*\\.(csv)(\\.csv)?$"
+      ]
+    },
+    "data": {
+      "dhis2Mappings": {
+        "categories": {
+          "1-4 years": "bqVVKyl5YCy",
+          "10-14 years": "vFcCUECKosR",
+          "15-19 years": "MG2JMKoHeiY",
+          "20-24 years": "NjVePYqR03V",
+          "25-29 years": "qJft700quLs",
+          "30-34 years": "a3uBWw8rPgL",
+          "35-39 years": "w1QQUDOt6Yi",
+          "40-44 years": "lu0DqcUjbt5",
+          "45-49 years": "Bmh5ihIoIvV",
+          "5-9 years": "CiaHl5X6vdy",
+          "50-54 years": "p9aa8UKZTvm",
+          "55-59 years": "fitH10Cvs0H",
+          "60-64 years": "fkRk07QDdvp",
+          "65-69 years": "nFOlE2XPxaf",
+          "70-74 years": "cPWEsONwrvx",
+          "75-79 years": "J51jFDAhKp3",
+          "80-84 years": "oGEDufDW0AO",
+          "85-89 years": "IOL6EDGnV5z",
+          "90 plus years": "aPtJe9C46x7",
+          "<1 years": "Yzer9uwF0Ul",
+          "Age Group": "pFTc1BFFOtr",
+          "All": "MUAmE9l7qPS",
+          "FBF": "Mp23mZ4TWXb",
+          "FNP": "pqtGQ4Xp64Q",
+          "FP": "Gp2TSXAlibb",
+          "Female": "SHzJmxdaZUJ",
+          "Male": "ftFmaAY8N1Q",
+          "Sex": "pAsZNvaRFwS",
+          "Unknown": "nacagjJB9HO"
+        },
+        "categoryOptionCombos": {
+          "All+FBF": "qPmuueHPEzm",
+          "45-49 years+Male": "acNvsij66MX",
+          "90 plus years+Male": "nKy9bF2mUWE",
+          "5-9 years+FNP": "AnKgPlaFWuj",
+          "10-14 years+FP": "aNzp1VEe0HI",
+          "50-54 years+FNP": "qVN1UZh1bur",
+          "15-19 years+Female": "ew5ySL5udGg",
+          "40-44 years+FP": "Wogzb9VaWgg",
+          "20-24 years+FBF": "gHgSkxsbahV",
+          "70-74 years+Male": "LjF7hrWXzTr",
+          "75-79 years+FBF": "IBXxbfMVYDM",
+          "5-9 years+FP": "AFlr1I6Z4JM",
+          "75-79 years+Male": "aWfr62HO2QH",
+          "55-59 years+FP": "dY7FHmLs3Ey",
+          "75-79 years+Unknown": "W0RpkfA7679",
+          "65-69 years+FP": "qQHD1PbS5Lq",
+          "10-14 years+FBF": "wO8oAJPEjPN",
+          "30-34 years+Male": "i5Zq29GPOrf",
+          "All+Unknown": "jnlOppS46bu",
+          "80-84 years+Male": "SPaGmtuRyFK",
+          "1-4 years+FBF": "LBU6pRuihOt",
+          "5-9 years+Unknown": "K05uhcbzNvp",
+          "20-24 years+Unknown": "eniTYYJBjDn",
+          "35-39 years+Unknown": "dLw5E6Wg4fX",
+          "35-39 years+FNP": "kBuZtNjsZgc",
+          "50-54 years+FP": "d2buozDjwCa",
+          "80-84 years+FP": "GqaeSkH4xz9",
+          "30-34 years+FNP": "n6R8VsFi00q",
+          "40-44 years+Unknown": "tg1O5jxIsuT",
+          "90 plus years+FP": "HESwAqgrRnD",
+          "20-24 years+Female": "NhtdYMfF88k",
+          "70-74 years+FP": "YZOdk2E5V0z",
+          "80-84 years+FNP": "LNuBwUpOHiD",
+          "35-39 years+FP": "xNxNjKyUOmK",
+          "20-24 years+FNP": "yO5WeqgC6kS",
+          "60-64 years+FNP": "Z209Wv4um4g",
+          "40-44 years+FBF": "QqAGbGbBU7r",
+          "85-89 years+Female": "UXQuQX09APo",
+          "35-39 years+Female": "CqQSWoiOVst",
+          "25-29 years+FBF": "OAnv7PoFevf",
+          "25-29 years+FP": "khzBmRE9Ts4",
+          "All+Female": "U7hIoEeZM02",
+          "<1 years+Male": "q1QF5p5mEh4",
+          "65-69 years+Unknown": "ierxxhmtT3n",
+          "80-84 years+Female": "EV8y7Vt8AsQ",
+          "45-49 years+FP": "QrAO8mbfvIs",
+          "30-34 years+Female": "W3CqHOWWvE5",
+          "5-9 years+Male": "ePBAdPNHWb1",
+          "40-44 years+Female": "KSmr2kRmnfL",
+          "All+FNP": "ZU4Sw0h7n3y",
+          "15-19 years+FNP": "ZjgQx642PYp",
+          "40-44 years+Male": "AXlDofv9isa",
+          "40-44 years+FNP": "DK4fXu2PV1h",
+          "65-69 years+Female": "eqKrgG1y64i",
+          "15-19 years+Unknown": "R4mry21m4er",
+          "70-74 years+FNP": "tlBztfjcCDC",
+          "10-14 years+Unknown": "i5Cc6h2tJyz",
+          "50-54 years+FBF": "Gi9uCqRzZ3E",
+          "5-9 years+FBF": "xTLFKt3k7ls",
+          "25-29 years+FNP": "kBCWEhRG71g",
+          "1-4 years+FP": "yRLrEtNgX2t",
+          "35-39 years+Male": "ekZbQkB2mle",
+          "<1 years+FBF": "dVfWdqJXTZJ",
+          "45-49 years+FBF": "P8juy1QIKKT",
+          "15-19 years+FP": "CLC7kEkPEb3",
+          "5-9 years+Female": "XCxaW7Rsncj",
+          "45-49 years+Unknown": "AFmIEW55oVD",
+          "<1 years+FP": "C2zUakCXN6O",
+          "70-74 years+FBF": "uCTOQMEGf4i",
+          "55-59 years+FNP": "TZVL9xmCi25",
+          "25-29 years+Male": "O7jvM7uHmnV",
+          "65-69 years+FBF": "ZiHuiSuiLis",
+          "70-74 years+Unknown": "PsaJtybKzcH",
+          "55-59 years+FBF": "eTPa4b6oXqq",
+          "55-59 years+Unknown": "GY3gmVeSfsK",
+          "65-69 years+Male": "LxpKy4pqI6k",
+          "10-14 years+Female": "Q03QCFifLkD",
+          "15-19 years+Male": "VJE8BDhfreX",
+          "75-79 years+FP": "PWze2qjNJWj",
+          "85-89 years+FNP": "OLBKBrWdpGe",
+          "20-24 years+Male": "sMEcc4TF9hU",
+          "90 plus years+FNP": "fc6Orlwjqih",
+          "80-84 years+FBF": "zSVbmwjY22S",
+          "60-64 years+FP": "kdebzTxXdtG",
+          "1-4 years+Unknown": "IOwMHjET6f2",
+          "<1 years+Female": "vHyWuptnA2I",
+          "90 plus years+Unknown": "iF3octNXtYo",
+          "20-24 years+FP": "LfQfQs3oe6z",
+          "<1 years+FNP": "Id9U5Zalsqu",
+          "50-54 years+Female": "CSzTw4Dr8EP",
+          "45-49 years+FNP": "MBhbdpq00Y5",
+          "90 plus years+FBF": "yBu7tTbPeN9",
+          "85-89 years+Male": "g1IGbZgup15",
+          "75-79 years+FNP": "zao4W4kkzK9",
+          "30-34 years+Unknown": "UmGWTjLRG8s",
+          "30-34 years+FBF": "RrYN49c8RzT",
+          "85-89 years+Unknown": "CW6EY1yJqIL",
+          "35-39 years+FBF": "ivhNryIeUF2",
+          "85-89 years+FP": "eRKdyUrLWDa",
+          "25-29 years+Female": "yUWDE2ow00C",
+          "55-59 years+Female": "qCaJhqpLYFA",
+          "50-54 years+Unknown": "YARaAYm7Qgc",
+          "<1 years+Unknown": "c2aTeiVy8Vm",
+          "50-54 years+Male": "Hq8CoK8l5ix",
+          "45-49 years+Female": "OHK95C83vba",
+          "1-4 years+Female": "ZsdYGrMTglz",
+          "55-59 years+Male": "YXyAKb2QdS4",
+          "10-14 years+FNP": "WnsZ3WOUInN",
+          "25-29 years+Unknown": "nvYEjugrrH2",
+          "65-69 years+FNP": "FYfrJjLQuPx",
+          "30-34 years+FP": "qc9VUau6qrY",
+          "1-4 years+FNP": "Y8QlwETuifK",
+          "60-64 years+Unknown": "eKSFO2qhgKA",
+          "85-89 years+FBF": "JzkvhNuIOJh",
+          "60-64 years+Female": "yTxqKszuSFQ",
+          "80-84 years+Unknown": "KHZ7nh9wXAi",
+          "1-4 years+Male": "apprhQ7I9re",
+          "70-74 years+Female": "KySVv5wgatO",
+          "All+Male": "TwhlgeWK6gb",
+          "15-19 years+FBF": "bQwgIchsVL1",
+          "90 plus years+Female": "Vnw0lLV9DBI",
+          "60-64 years+Male": "vGH1F8ekexC",
+          "All+FP": "xNWllk2sRiT",
+          "60-64 years+FBF": "dRFSYPcTg0r",
+          "10-14 years+Male": "EzEdH63n5D3",
+          "75-79 years+Female": "ooDNCUsbGAH"
+        },
+        "dataElements": {
+          "TX_CURR": "qGKa4asLplN"
+        },
+        "dataSetId": "IvnQNOyL50L",
+        "orgUnits": {
+          "Area 18 Urban Health Centre": "J3iWX2qwsZC",
+          "Area 25 Urban Health Centre": "DHLIhAqjErN",
+          "Bangwe Health Centre": "J3cejAFBjqW",
+          "Central Health Clinic Area 47": "QaIrAgNxcqb",
+          "Chitekesa Health Centre": "pvuBFblJs0j",
+          "Dedza District Hospital": "vLfRGFfyUDS",
+          "Jalasi Health Centre": "hqyjo4Bu3mz",
+          "Jenda Health Centre": "mt0MR5Z0sxQ",
+          "Kachere Private Clinic": "aHGVbxgnnYS",
+          "Kamuzu Academy Clinic": "AzkP0nqoJxd",
+          "Kasinje Health Centre": "CDIyYolmbr5",
+          "Kavuzi Cummock Health Centre": "OVYNMUbGrep",
+          "Liuzi Health Centre": "k7xsHfePXlv",
+          "Malawi": "AfYdIjIufex",
+          "Mangochi District Hospital": "UEnLVspJPJb",
+          "Mlangeni Health Centre": "jNzXUTrdpH9",
+          "Mtwalo Health Centre": "c64Fp275WmH",
+          "Mzimba District Hospital": "kcbNkTB9x77",
+          "Ndamera Health Centre": "C4SMtwDJwLh",
+          "Ndirande Urban Health Centre": "wlTTXFwQVvM",
+          "Nsanje District Hospital": "LxHsXlYyKVH",
+          "Zomba Central Hospital": "lTlOuU2sTsx"
+        }
+      },
+      "dhis2Structures": {
+        "categories": [
+          {
+            "categoryOptions": [
+              {
+                "code": "MALE",
+                "name": "Male",
+                "shortName": "Male"
+              },
+              {
+                "code": "FNP",
+                "name": "FNP",
+                "shortName": "FNP"
+              },
+              {
+                "code": "FEMALE",
+                "name": "Female",
+                "shortName": "Female"
+              },
+              {
+                "code": "FP",
+                "name": "FP",
+                "shortName": "FP"
+              },
+              {
+                "code": "UNKNOWN",
+                "name": "Unknown",
+                "shortName": "Unknown"
+              },
+              {
+                "code": "FBF",
+                "name": "FBF",
+                "shortName": "FBF"
+              }
+            ],
+            "code": "SEX",
+            "name": "Sex",
+            "shortName": "Sex"
+          },
+          {
+            "categoryOptions": [
+              {
+                "code": "40_44_YEARS",
+                "name": "40-44 years",
+                "shortName": "40-44 years"
+              },
+              {
+                "code": "ALL",
+                "name": "All",
+                "shortName": "All"
+              },
+              {
+                "code": "15_19_YEARS",
+                "name": "15-19 years",
+                "shortName": "15-19 years"
+              },
+              {
+                "code": "55_59_YEARS",
+                "name": "55-59 years",
+                "shortName": "55-59 years"
+              },
+              {
+                "code": "45_49_YEARS",
+                "name": "45-49 years",
+                "shortName": "45-49 years"
+              },
+              {
+                "code": "35_39_YEARS",
+                "name": "35-39 years",
+                "shortName": "35-39 years"
+              },
+              {
+                "code": "50_54_YEARS",
+                "name": "50-54 years",
+                "shortName": "50-54 years"
+              },
+              {
+                "code": "30_34_YEARS",
+                "name": "30-34 years",
+                "shortName": "30-34 years"
+              },
+              {
+                "code": "25_29_YEARS",
+                "name": "25-29 years",
+                "shortName": "25-29 years"
+              },
+              {
+                "code": "5_9_YEARS",
+                "name": "5-9 years",
+                "shortName": "5-9 years"
+              },
+              {
+                "code": "60_64_YEARS",
+                "name": "60-64 years",
+                "shortName": "60-64 years"
+              },
+              {
+                "code": "65_69_YEARS",
+                "name": "65-69 years",
+                "shortName": "65-69 years"
+              },
+              {
+                "code": "70_74_YEARS",
+                "name": "70-74 years",
+                "shortName": "70-74 years"
+              },
+              {
+                "code": "10_14_YEARS",
+                "name": "10-14 years",
+                "shortName": "10-14 years"
+              },
+              {
+                "code": "20_24_YEARS",
+                "name": "20-24 years",
+                "shortName": "20-24 years"
+              },
+              {
+                "code": "1_4_YEARS",
+                "name": "1-4 years",
+                "shortName": "1-4 years"
+              },
+              {
+                "code": "85_89_YEARS",
+                "name": "85-89 years",
+                "shortName": "85-89 years"
+              },
+              {
+                "code": "75_79_YEARS",
+                "name": "75-79 years",
+                "shortName": "75-79 years"
+              },
+              {
+                "code": "80_84_YEARS",
+                "name": "80-84 years",
+                "shortName": "80-84 years"
+              },
+              {
+                "code": "1_YEARS",
+                "name": "<1 years",
+                "shortName": "<1 years"
+              },
+              {
+                "code": "90_PLUS_YEARS",
+                "name": "90 plus years",
+                "shortName": "90 plus years"
+              }
+            ],
+            "code": "AGE_GROUP",
+            "name": "Age Group",
+            "shortName": "Age Group"
+          }
+        ],
+        "dataElements": [
+          {
+            "aggregationType": "SUM",
+            "code": "TX_CURR",
+            "domainType": "AGGREGATE",
+            "name": "TX_CURR",
+            "shortName": "TX_CURR",
+            "valueType": "INTEGER"
+          }
+        ],
+        "orgUnits": []
+      },
+      "mappings": {
+        "Area 18 Urban Health Centre": "J3iWX2qwsZC",
+        "Area 25 Urban Health Centre": "DHLIhAqjErN",
+        "Bangwe Health Centre": "J3cejAFBjqW",
+        "Central Health Clinic Area 47": "QaIrAgNxcqb",
+        "Chitekesa Health Centre": "pvuBFblJs0j",
+        "Dedza District Hospital": "vLfRGFfyUDS",
+        "Jalasi Health Centre": "hqyjo4Bu3mz",
+        "Jenda Health Centre": "mt0MR5Z0sxQ",
+        "Kachere Private Clinic": "aHGVbxgnnYS",
+        "Kamuzu Academy Clinic": "AzkP0nqoJxd",
+        "Kasinje Health Centre": "CDIyYolmbr5",
+        "Kavuzi Cummock Health Centre": "OVYNMUbGrep",
+        "Liuzi Health Centre": "k7xsHfePXlv",
+        "Malawi": "AfYdIjIufex",
+        "Mangochi District Hospital": "UEnLVspJPJb",
+        "Mlangeni Health Centre": "jNzXUTrdpH9",
+        "Mtwalo Health Centre": "c64Fp275WmH",
+        "Mzimba District Hospital": "kcbNkTB9x77",
+        "Ndamera Health Centre": "C4SMtwDJwLh",
+        "Ndirande Urban Health Centre": "wlTTXFwQVvM",
+        "Nsanje District Hospital": "LxHsXlYyKVH",
+        "Zomba Central Hospital": "lTlOuU2sTsx"
+      },
+      "orgUnitParentMap": {},
+      "uniqueValues": {
+        "ageGroups": [
+          "40-44 years",
+          "All",
+          "15-19 years",
+          "55-59 years",
+          "45-49 years",
+          "35-39 years",
+          "50-54 years",
+          "30-34 years",
+          "25-29 years",
+          "5-9 years",
+          "60-64 years",
+          "65-69 years",
+          "70-74 years",
+          "10-14 years",
+          "20-24 years",
+          "1-4 years",
+          "85-89 years",
+          "75-79 years",
+          "80-84 years",
+          "<1 years",
+          "90 plus years"
+        ],
+        "indicators": [
+          "TX_CURR"
+        ],
+        "sexValues": [
+          "Male",
+          "FNP",
+          "Female",
+          "FP",
+          "Unknown",
+          "FBF"
+        ],
+        "sites": [
+          "Kamuzu Academy Clinic",
+          "Kavuzi Cummock Health Centre",
+          "Area 25 Urban Health Centre",
+          "Chitekesa Health Centre",
+          "Dedza District Hospital",
+          "Bangwe Health Centre",
+          "Jalasi Health Centre",
+          "Jenda Health Centre",
+          "Kasinje Health Centre",
+          "Liuzi Health Centre",
+          "Mangochi District Hospital",
+          "Mlangeni Health Centre",
+          "Mtwalo Health Centre",
+          "Mzimba District Hospital",
+          "Ndamera Health Centre",
+          "Ndirande Urban Health Centre",
+          "Nsanje District Hospital",
+          "Zomba Central Hospital",
+          "Kachere Private Clinic",
+          "Central Health Clinic Area 47",
+          "Area 18 Urban Health Centre"
+        ]
+      }
+    },
+    "fileName": "samples/pepfar/PEPFAR_TxCURR_2025_Q2_Cleaned_v3_20250805160300.csv",
+    "filePath": "/data/samples/pepfar/PEPFAR_TxCURR_2025_Q2_Cleaned_v3_20250805160300.csv",
+    "fileType": "csv",
+    "fileTypeConfig": {
+      "builders": {
+        "categories": [
+          {
+            "code": "SEX",
+            "name": "Sex",
+            "shortName": "Sex",
+            "uniqueValueKey": "sexValues"
+          },
+          {
+            "code": "AGE_GROUP",
+            "name": "Age Group",
+            "shortName": "Age Group",
+            "uniqueValueKey": "ageGroups"
+          }
+        ],
+        "dataElements": {
+          "aggregationType": "SUM",
+          "domainType": "AGGREGATE",
+          "uniqueValueKey": "indicators",
+          "valueType": "INTEGER"
+        }
+      },
+      "columnMappings": {
+        "Date_Submitted": {
+          "required": true,
+          "sourceColumns": [
+            "Date_Submitted"
+          ],
+          "targetField": "period"
+        },
+        "age_group": {
+          "required": false,
+          "sourceColumns": [
+            "age_group",
+            "Age Group",
+            "Age"
+          ],
+          "targetField": "categoryOptions.ageGroup"
+        },
+        "facility": {
+          "required": true,
+          "sourceColumns": [
+            "facility",
+            "Facility",
+            "Health Facility",
+            "Site",
+            "site",
+            "Site Name"
+          ],
+          "targetField": "orgUnit"
+        },
+        "indicator": {
+          "required": true,
+          "sourceColumns": [
+            "indicator",
+            "Indicator",
+            "TX_CURR"
+          ],
+          "targetField": "dataElement"
+        },
+        "sex": {
+          "required": false,
+          "sourceColumns": [
+            "sex",
+            "Sex"
+          ],
+          "targetField": "categoryOptions.sex"
+        },
+        "value": {
+          "dataType": "numeric",
+          "required": true,
+          "sourceColumns": [
+            "tx_curr",
+            "Value",
+            "value"
+          ],
+          "targetField": "value"
+        }
+      },
+      "description": "PEPFAR CSV for TX_CURR indicator",
+      "dhis2Builder": "default",
+      "dhis2Config": {
+        "openFuturePeriods": 4,
+        "periodSource": "filename",
+        "periodType": "Quarterly"
+      },
+      "displayName": "PEPFAR TxCURR CSV",
+      "filePrefix": "PEPFAR_TxCURR",
+      "fileType": "csv",
+      "headerMap": {
+        "Date_Submitted": "Date_Submitted",
+        "age_group": "age_group",
+        "facility": "facility",
+        "indicator": "indicator",
+        "sex": "sex",
+        "site_id": "site_id",
+        "tx_curr": "tx_curr"
+      },
+      "uniqueValueCollectors": {
+        "ageGroups": {
+          "targetField": "categoryOptions.ageGroup"
+        },
+        "indicators": {
+          "targetField": "dataElement"
+        },
+        "sexValues": {
+          "targetField": "categoryOptions.sex"
+        },
+        "sites": {
+          "targetField": "orgUnit"
+        }
+      }
+    },
+    "fileTypeConfigKey": "pepfar_tx_curr_csv",
+    "filesIndex": {
+      "samples/pepfar/PEPFAR_TxCURR_2025_Q2_Cleaned_v3_20250805160300.csv": {
+        "chunkSize": 5000,
+        "dhis2Mappings": {
+          "categories": {
+            "1-4 years": "bqVVKyl5YCy",
+            "10-14 years": "vFcCUECKosR",
+            "15-19 years": "MG2JMKoHeiY",
+            "20-24 years": "NjVePYqR03V",
+            "25-29 years": "qJft700quLs",
+            "30-34 years": "a3uBWw8rPgL",
+            "35-39 years": "w1QQUDOt6Yi",
+            "40-44 years": "lu0DqcUjbt5",
+            "45-49 years": "Bmh5ihIoIvV",
+            "5-9 years": "CiaHl5X6vdy",
+            "50-54 years": "p9aa8UKZTvm",
+            "55-59 years": "fitH10Cvs0H",
+            "60-64 years": "fkRk07QDdvp",
+            "65-69 years": "nFOlE2XPxaf",
+            "70-74 years": "cPWEsONwrvx",
+            "75-79 years": "J51jFDAhKp3",
+            "80-84 years": "oGEDufDW0AO",
+            "85-89 years": "IOL6EDGnV5z",
+            "90 plus years": "aPtJe9C46x7",
+            "<1 years": "Yzer9uwF0Ul",
+            "Age Group": "pFTc1BFFOtr",
+            "All": "MUAmE9l7qPS",
+            "FBF": "Mp23mZ4TWXb",
+            "FNP": "pqtGQ4Xp64Q",
+            "FP": "Gp2TSXAlibb",
+            "Female": "SHzJmxdaZUJ",
+            "Male": "ftFmaAY8N1Q",
+            "Sex": "pAsZNvaRFwS",
+            "Unknown": "nacagjJB9HO"
+          },
+          "categoryOptionCombos": {
+            "All+FBF": "qPmuueHPEzm",
+            "45-49 years+Male": "acNvsij66MX",
+            "90 plus years+Male": "nKy9bF2mUWE",
+            "5-9 years+FNP": "AnKgPlaFWuj",
+            "10-14 years+FP": "aNzp1VEe0HI",
+            "50-54 years+FNP": "qVN1UZh1bur",
+            "15-19 years+Female": "ew5ySL5udGg",
+            "40-44 years+FP": "Wogzb9VaWgg",
+            "20-24 years+FBF": "gHgSkxsbahV",
+            "70-74 years+Male": "LjF7hrWXzTr",
+            "75-79 years+FBF": "IBXxbfMVYDM",
+            "5-9 years+FP": "AFlr1I6Z4JM",
+            "75-79 years+Male": "aWfr62HO2QH",
+            "55-59 years+FP": "dY7FHmLs3Ey",
+            "75-79 years+Unknown": "W0RpkfA7679",
+            "65-69 years+FP": "qQHD1PbS5Lq",
+            "10-14 years+FBF": "wO8oAJPEjPN",
+            "30-34 years+Male": "i5Zq29GPOrf",
+            "All+Unknown": "jnlOppS46bu",
+            "80-84 years+Male": "SPaGmtuRyFK",
+            "1-4 years+FBF": "LBU6pRuihOt",
+            "5-9 years+Unknown": "K05uhcbzNvp",
+            "20-24 years+Unknown": "eniTYYJBjDn",
+            "35-39 years+Unknown": "dLw5E6Wg4fX",
+            "35-39 years+FNP": "kBuZtNjsZgc",
+            "50-54 years+FP": "d2buozDjwCa",
+            "80-84 years+FP": "GqaeSkH4xz9",
+            "30-34 years+FNP": "n6R8VsFi00q",
+            "40-44 years+Unknown": "tg1O5jxIsuT",
+            "90 plus years+FP": "HESwAqgrRnD",
+            "20-24 years+Female": "NhtdYMfF88k",
+            "70-74 years+FP": "YZOdk2E5V0z",
+            "80-84 years+FNP": "LNuBwUpOHiD",
+            "35-39 years+FP": "xNxNjKyUOmK",
+            "20-24 years+FNP": "yO5WeqgC6kS",
+            "60-64 years+FNP": "Z209Wv4um4g",
+            "40-44 years+FBF": "QqAGbGbBU7r",
+            "85-89 years+Female": "UXQuQX09APo",
+            "35-39 years+Female": "CqQSWoiOVst",
+            "25-29 years+FBF": "OAnv7PoFevf",
+            "25-29 years+FP": "khzBmRE9Ts4",
+            "All+Female": "U7hIoEeZM02",
+            "<1 years+Male": "q1QF5p5mEh4",
+            "65-69 years+Unknown": "ierxxhmtT3n",
+            "80-84 years+Female": "EV8y7Vt8AsQ",
+            "45-49 years+FP": "QrAO8mbfvIs",
+            "30-34 years+Female": "W3CqHOWWvE5",
+            "5-9 years+Male": "ePBAdPNHWb1",
+            "40-44 years+Female": "KSmr2kRmnfL",
+            "All+FNP": "ZU4Sw0h7n3y",
+            "15-19 years+FNP": "ZjgQx642PYp",
+            "40-44 years+Male": "AXlDofv9isa",
+            "40-44 years+FNP": "DK4fXu2PV1h",
+            "65-69 years+Female": "eqKrgG1y64i",
+            "15-19 years+Unknown": "R4mry21m4er",
+            "70-74 years+FNP": "tlBztfjcCDC",
+            "10-14 years+Unknown": "i5Cc6h2tJyz",
+            "50-54 years+FBF": "Gi9uCqRzZ3E",
+            "5-9 years+FBF": "xTLFKt3k7ls",
+            "25-29 years+FNP": "kBCWEhRG71g",
+            "1-4 years+FP": "yRLrEtNgX2t",
+            "35-39 years+Male": "ekZbQkB2mle",
+            "<1 years+FBF": "dVfWdqJXTZJ",
+            "45-49 years+FBF": "P8juy1QIKKT",
+            "15-19 years+FP": "CLC7kEkPEb3",
+            "5-9 years+Female": "XCxaW7Rsncj",
+            "45-49 years+Unknown": "AFmIEW55oVD",
+            "<1 years+FP": "C2zUakCXN6O",
+            "70-74 years+FBF": "uCTOQMEGf4i",
+            "55-59 years+FNP": "TZVL9xmCi25",
+            "25-29 years+Male": "O7jvM7uHmnV",
+            "65-69 years+FBF": "ZiHuiSuiLis",
+            "70-74 years+Unknown": "PsaJtybKzcH",
+            "55-59 years+FBF": "eTPa4b6oXqq",
+            "55-59 years+Unknown": "GY3gmVeSfsK",
+            "65-69 years+Male": "LxpKy4pqI6k",
+            "10-14 years+Female": "Q03QCFifLkD",
+            "15-19 years+Male": "VJE8BDhfreX",
+            "75-79 years+FP": "PWze2qjNJWj",
+            "85-89 years+FNP": "OLBKBrWdpGe",
+            "20-24 years+Male": "sMEcc4TF9hU",
+            "90 plus years+FNP": "fc6Orlwjqih",
+            "80-84 years+FBF": "zSVbmwjY22S",
+            "60-64 years+FP": "kdebzTxXdtG",
+            "1-4 years+Unknown": "IOwMHjET6f2",
+            "<1 years+Female": "vHyWuptnA2I",
+            "90 plus years+Unknown": "iF3octNXtYo",
+            "20-24 years+FP": "LfQfQs3oe6z",
+            "<1 years+FNP": "Id9U5Zalsqu",
+            "50-54 years+Female": "CSzTw4Dr8EP",
+            "45-49 years+FNP": "MBhbdpq00Y5",
+            "90 plus years+FBF": "yBu7tTbPeN9",
+            "85-89 years+Male": "g1IGbZgup15",
+            "75-79 years+FNP": "zao4W4kkzK9",
+            "30-34 years+Unknown": "UmGWTjLRG8s",
+            "30-34 years+FBF": "RrYN49c8RzT",
+            "85-89 years+Unknown": "CW6EY1yJqIL",
+            "35-39 years+FBF": "ivhNryIeUF2",
+            "85-89 years+FP": "eRKdyUrLWDa",
+            "25-29 years+Female": "yUWDE2ow00C",
+            "55-59 years+Female": "qCaJhqpLYFA",
+            "50-54 years+Unknown": "YARaAYm7Qgc",
+            "<1 years+Unknown": "c2aTeiVy8Vm",
+            "50-54 years+Male": "Hq8CoK8l5ix",
+            "45-49 years+Female": "OHK95C83vba",
+            "1-4 years+Female": "ZsdYGrMTglz",
+            "55-59 years+Male": "YXyAKb2QdS4",
+            "10-14 years+FNP": "WnsZ3WOUInN",
+            "25-29 years+Unknown": "nvYEjugrrH2",
+            "65-69 years+FNP": "FYfrJjLQuPx",
+            "30-34 years+FP": "qc9VUau6qrY",
+            "1-4 years+FNP": "Y8QlwETuifK",
+            "60-64 years+Unknown": "eKSFO2qhgKA",
+            "85-89 years+FBF": "JzkvhNuIOJh",
+            "60-64 years+Female": "yTxqKszuSFQ",
+            "80-84 years+Unknown": "KHZ7nh9wXAi",
+            "1-4 years+Male": "apprhQ7I9re",
+            "70-74 years+Female": "KySVv5wgatO",
+            "All+Male": "TwhlgeWK6gb",
+            "15-19 years+FBF": "bQwgIchsVL1",
+            "90 plus years+Female": "Vnw0lLV9DBI",
+            "60-64 years+Male": "vGH1F8ekexC",
+            "All+FP": "xNWllk2sRiT",
+            "60-64 years+FBF": "dRFSYPcTg0r",
+            "10-14 years+Male": "EzEdH63n5D3",
+            "75-79 years+Female": "ooDNCUsbGAH"
+          },
+          "dataElements": {
+            "TX_CURR": "qGKa4asLplN"
+          },
+          "dataSetId": "IvnQNOyL50L",
+          "orgUnits": {
+            "Area 18 Urban Health Centre": "J3iWX2qwsZC",
+            "Area 25 Urban Health Centre": "DHLIhAqjErN",
+            "Bangwe Health Centre": "J3cejAFBjqW",
+            "Central Health Clinic Area 47": "QaIrAgNxcqb",
+            "Chitekesa Health Centre": "pvuBFblJs0j",
+            "Dedza District Hospital": "vLfRGFfyUDS",
+            "Jalasi Health Centre": "hqyjo4Bu3mz",
+            "Jenda Health Centre": "mt0MR5Z0sxQ",
+            "Kachere Private Clinic": "aHGVbxgnnYS",
+            "Kamuzu Academy Clinic": "AzkP0nqoJxd",
+            "Kasinje Health Centre": "CDIyYolmbr5",
+            "Kavuzi Cummock Health Centre": "OVYNMUbGrep",
+            "Liuzi Health Centre": "k7xsHfePXlv",
+            "Malawi": "AfYdIjIufex",
+            "Mangochi District Hospital": "UEnLVspJPJb",
+            "Mlangeni Health Centre": "jNzXUTrdpH9",
+            "Mtwalo Health Centre": "c64Fp275WmH",
+            "Mzimba District Hospital": "kcbNkTB9x77",
+            "Ndamera Health Centre": "C4SMtwDJwLh",
+            "Ndirande Urban Health Centre": "wlTTXFwQVvM",
+            "Nsanje District Hospital": "LxHsXlYyKVH",
+            "Zomba Central Hospital": "lTlOuU2sTsx"
+          }
+        },
+        "dhis2Structures": {
+          "categories": [
+            {
+              "categoryOptions": [
+                {
+                  "code": "MALE",
+                  "name": "Male",
+                  "shortName": "Male"
+                },
+                {
+                  "code": "FNP",
+                  "name": "FNP",
+                  "shortName": "FNP"
+                },
+                {
+                  "code": "FEMALE",
+                  "name": "Female",
+                  "shortName": "Female"
+                },
+                {
+                  "code": "FP",
+                  "name": "FP",
+                  "shortName": "FP"
+                },
+                {
+                  "code": "UNKNOWN",
+                  "name": "Unknown",
+                  "shortName": "Unknown"
+                },
+                {
+                  "code": "FBF",
+                  "name": "FBF",
+                  "shortName": "FBF"
+                }
+              ],
+              "code": "SEX",
+              "name": "Sex",
+              "shortName": "Sex"
+            },
+            {
+              "categoryOptions": [
+                {
+                  "code": "40_44_YEARS",
+                  "name": "40-44 years",
+                  "shortName": "40-44 years"
+                },
+                {
+                  "code": "ALL",
+                  "name": "All",
+                  "shortName": "All"
+                },
+                {
+                  "code": "15_19_YEARS",
+                  "name": "15-19 years",
+                  "shortName": "15-19 years"
+                },
+                {
+                  "code": "55_59_YEARS",
+                  "name": "55-59 years",
+                  "shortName": "55-59 years"
+                },
+                {
+                  "code": "45_49_YEARS",
+                  "name": "45-49 years",
+                  "shortName": "45-49 years"
+                },
+                {
+                  "code": "35_39_YEARS",
+                  "name": "35-39 years",
+                  "shortName": "35-39 years"
+                },
+                {
+                  "code": "50_54_YEARS",
+                  "name": "50-54 years",
+                  "shortName": "50-54 years"
+                },
+                {
+                  "code": "30_34_YEARS",
+                  "name": "30-34 years",
+                  "shortName": "30-34 years"
+                },
+                {
+                  "code": "25_29_YEARS",
+                  "name": "25-29 years",
+                  "shortName": "25-29 years"
+                },
+                {
+                  "code": "5_9_YEARS",
+                  "name": "5-9 years",
+                  "shortName": "5-9 years"
+                },
+                {
+                  "code": "60_64_YEARS",
+                  "name": "60-64 years",
+                  "shortName": "60-64 years"
+                },
+                {
+                  "code": "65_69_YEARS",
+                  "name": "65-69 years",
+                  "shortName": "65-69 years"
+                },
+                {
+                  "code": "70_74_YEARS",
+                  "name": "70-74 years",
+                  "shortName": "70-74 years"
+                },
+                {
+                  "code": "10_14_YEARS",
+                  "name": "10-14 years",
+                  "shortName": "10-14 years"
+                },
+                {
+                  "code": "20_24_YEARS",
+                  "name": "20-24 years",
+                  "shortName": "20-24 years"
+                },
+                {
+                  "code": "1_4_YEARS",
+                  "name": "1-4 years",
+                  "shortName": "1-4 years"
+                },
+                {
+                  "code": "85_89_YEARS",
+                  "name": "85-89 years",
+                  "shortName": "85-89 years"
+                },
+                {
+                  "code": "75_79_YEARS",
+                  "name": "75-79 years",
+                  "shortName": "75-79 years"
+                },
+                {
+                  "code": "80_84_YEARS",
+                  "name": "80-84 years",
+                  "shortName": "80-84 years"
+                },
+                {
+                  "code": "1_YEARS",
+                  "name": "<1 years",
+                  "shortName": "<1 years"
+                },
+                {
+                  "code": "90_PLUS_YEARS",
+                  "name": "90 plus years",
+                  "shortName": "90 plus years"
+                }
+              ],
+              "code": "AGE_GROUP",
+              "name": "Age Group",
+              "shortName": "Age Group"
+            }
+          ],
+          "dataElements": [
+            {
+              "aggregationType": "SUM",
+              "code": "TX_CURR",
+              "domainType": "AGGREGATE",
+              "name": "TX_CURR",
+              "shortName": "TX_CURR",
+              "valueType": "INTEGER"
+            }
+          ],
+          "orgUnits": []
+        },
+        "fileType": "csv",
+        "fileTypeConfigKey": "pepfar_tx_curr_csv",
+        "hash": "908d2678",
+        "headerMap": {
+          "Date_Submitted": "Date_Submitted",
+          "age_group": "age_group",
+          "facility": "facility",
+          "indicator": "indicator",
+          "sex": "sex",
+          "site_id": "site_id",
+          "tx_curr": "tx_curr"
+        },
+        "inflight": {
+          "chunkSize": 5000,
+          "dhis2Structures": {
+            "categories": [
+              {
+                "categoryOptions": [
+                  {
+                    "code": "MALE",
+                    "name": "Male",
+                    "shortName": "Male"
+                  },
+                  {
+                    "code": "FNP",
+                    "name": "FNP",
+                    "shortName": "FNP"
+                  },
+                  {
+                    "code": "FEMALE",
+                    "name": "Female",
+                    "shortName": "Female"
+                  },
+                  {
+                    "code": "FP",
+                    "name": "FP",
+                    "shortName": "FP"
+                  },
+                  {
+                    "code": "UNKNOWN",
+                    "name": "Unknown",
+                    "shortName": "Unknown"
+                  },
+                  {
+                    "code": "FBF",
+                    "name": "FBF",
+                    "shortName": "FBF"
+                  }
+                ],
+                "code": "SEX",
+                "name": "Sex",
+                "shortName": "Sex"
+              },
+              {
+                "categoryOptions": [
+                  {
+                    "code": "40_44_YEARS",
+                    "name": "40-44 years",
+                    "shortName": "40-44 years"
+                  },
+                  {
+                    "code": "ALL",
+                    "name": "All",
+                    "shortName": "All"
+                  },
+                  {
+                    "code": "15_19_YEARS",
+                    "name": "15-19 years",
+                    "shortName": "15-19 years"
+                  },
+                  {
+                    "code": "55_59_YEARS",
+                    "name": "55-59 years",
+                    "shortName": "55-59 years"
+                  },
+                  {
+                    "code": "45_49_YEARS",
+                    "name": "45-49 years",
+                    "shortName": "45-49 years"
+                  },
+                  {
+                    "code": "35_39_YEARS",
+                    "name": "35-39 years",
+                    "shortName": "35-39 years"
+                  },
+                  {
+                    "code": "50_54_YEARS",
+                    "name": "50-54 years",
+                    "shortName": "50-54 years"
+                  },
+                  {
+                    "code": "30_34_YEARS",
+                    "name": "30-34 years",
+                    "shortName": "30-34 years"
+                  },
+                  {
+                    "code": "25_29_YEARS",
+                    "name": "25-29 years",
+                    "shortName": "25-29 years"
+                  },
+                  {
+                    "code": "5_9_YEARS",
+                    "name": "5-9 years",
+                    "shortName": "5-9 years"
+                  },
+                  {
+                    "code": "60_64_YEARS",
+                    "name": "60-64 years",
+                    "shortName": "60-64 years"
+                  },
+                  {
+                    "code": "65_69_YEARS",
+                    "name": "65-69 years",
+                    "shortName": "65-69 years"
+                  },
+                  {
+                    "code": "70_74_YEARS",
+                    "name": "70-74 years",
+                    "shortName": "70-74 years"
+                  },
+                  {
+                    "code": "10_14_YEARS",
+                    "name": "10-14 years",
+                    "shortName": "10-14 years"
+                  },
+                  {
+                    "code": "20_24_YEARS",
+                    "name": "20-24 years",
+                    "shortName": "20-24 years"
+                  },
+                  {
+                    "code": "1_4_YEARS",
+                    "name": "1-4 years",
+                    "shortName": "1-4 years"
+                  },
+                  {
+                    "code": "85_89_YEARS",
+                    "name": "85-89 years",
+                    "shortName": "85-89 years"
+                  },
+                  {
+                    "code": "75_79_YEARS",
+                    "name": "75-79 years",
+                    "shortName": "75-79 years"
+                  },
+                  {
+                    "code": "80_84_YEARS",
+                    "name": "80-84 years",
+                    "shortName": "80-84 years"
+                  },
+                  {
+                    "code": "1_YEARS",
+                    "name": "<1 years",
+                    "shortName": "<1 years"
+                  },
+                  {
+                    "code": "90_PLUS_YEARS",
+                    "name": "90 plus years",
+                    "shortName": "90 plus years"
+                  }
+                ],
+                "code": "AGE_GROUP",
+                "name": "Age Group",
+                "shortName": "Age Group"
+              }
+            ],
+            "dataElements": [
+              {
+                "aggregationType": "SUM",
+                "code": "TX_CURR",
+                "domainType": "AGGREGATE",
+                "name": "TX_CURR",
+                "shortName": "TX_CURR",
+                "valueType": "INTEGER"
+              }
+            ],
+            "orgUnits": []
+          },
+          "hash": "908d2678",
+          "headerMap": {
+            "Date_Submitted": "Date_Submitted",
+            "age_group": "age_group",
+            "facility": "facility",
+            "indicator": "indicator",
+            "sex": "sex",
+            "site_id": "site_id",
+            "tx_curr": "tx_curr"
+          },
+          "orgUnitParentMap": {},
+          "startedAt": "2025-10-09T07:56:53.929Z",
+          "totalChunks": 1,
+          "updatedAt": "2025-10-09T07:56:55.277Z"
+        },
+        "lastProcessedAt": "2025-10-09T07:57:10.184Z",
+        "lastSeenAt": "2025-10-09T07:56:52.934Z",
+        "mtime": 1758758600000,
+        "orgUnitParentMap": {},
+        "path": "/data/samples/pepfar/PEPFAR_TxCURR_2025_Q2_Cleaned_v3_20250805160300.csv",
+        "processed": false,
+        "size": 150042,
+        "status": "metadata-ready",
+        "totalChunks": 1
+      }
+    },
+    "hasFileToProcess": true,
+    "lock": {
+      "acquiredAt": "2025-10-09T07:56:52.809Z",
+      "expiresAt": "2025-10-09T08:06:52.809Z",
+      "key": "workflow-lock",
+      "owner": "openfn-9fd12ebc37aa3"
+    },
+    "metadataMappings": {},
+    "metadataParsed": true,
+    "metadataSetupComplete": true,
+    "totalChunks": 1,
+    "totalRows": 780,
+    "workflow-owner": "openfn-9fd12ebc37aa3",
+    "workflowLock": {
+      "acquiredAt": "2025-10-09T07:56:52.809Z",
+      "expiresAt": "2025-10-09T08:06:52.809Z",
+      "key": "workflow-lock",
+      "owner": "openfn-9fd12ebc37aa3"
+    }
+  }
