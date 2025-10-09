@@ -49,6 +49,7 @@ executeWithSftp(
 
     state.chunks = chunks;
     state.chunkResults = [];
+    state.processedChunks = [];
     state.batchProcessingStartTime = new Date().toISOString();
     state.data = {
       ...state.data,
@@ -128,13 +129,19 @@ executeWithSftp(
 
     if (!records || records.length === 0) {
       console.log('   ⚠️ Chunk empty; skipping upload');
-          return {
-            chunkIndex: index,
-            uploadSuccess: true,
-            rowsProcessed: 0,
-            dataValuesUploaded: 0,
+      const result = {
+        chunkIndex: index,
+        uploadSuccess: true,
+        rowsProcessed: 0,
+        dataValuesUploaded: 0,
         message: 'Empty chunk'
       };
+      
+      // Store result in parent state for final aggregation
+      if (!state.processedChunks) state.processedChunks = [];
+      state.processedChunks.push(result);
+      
+      return result;
     }
 
     const useCodeSchemeForValues = !dhis2Mappings.dataElements || Object.keys(dhis2Mappings.dataElements).length === 0;
@@ -165,13 +172,19 @@ executeWithSftp(
         });
       } catch (e) {}
       console.log('   ⚠️ No valid data values built');
-          return {
-            chunkIndex: index,
-            uploadSuccess: true,
+      const result = {
+        chunkIndex: index,
+        uploadSuccess: true,
         rowsProcessed: records.length,
-            dataValuesUploaded: 0,
+        dataValuesUploaded: 0,
         message: 'No valid data values'
       };
+      
+      // Store result in parent state for final aggregation
+      if (!state.processedChunks) state.processedChunks = [];
+      state.processedChunks.push(result);
+      
+      return result;
     }
 
     // If data elements are unmapped, attempt a code-based upload path
@@ -199,15 +212,21 @@ executeWithSftp(
         lastSuccessfulChunk: index,
         lastChunkUploadedAt: new Date().toISOString()
       });
-          
-          return {
-            chunkIndex: index,
-            uploadSuccess: true,
+      
+      const result = {
+        chunkIndex: index,
+        uploadSuccess: true,
         rowsProcessed: records.length,
         dataValuesUploaded: dataValues.length,
         dhis2Response: uploadState?.data || uploadState?.response || uploadState,
         message: `Uploaded ${dataValues.length} data values`
       };
+      
+      // Store result in parent state for final aggregation
+      if (!state.processedChunks) state.processedChunks = [];
+      state.processedChunks.push(result);
+      
+      return result;
     } catch (error) {
       // Condense DHIS2 conflicts for readability
       let condensed = {};
@@ -223,19 +242,26 @@ executeWithSftp(
         condensed = { error: error?.message, codes: byCode, sample: conflicts[0] ? { errorCode: conflicts[0].errorCode, object: conflicts[0].object, property: conflicts[0].property, value: conflicts[0].value } : undefined };
       } catch (_) {}
       console.log(`   ⚠️ Upload failed (condensed): ${JSON.stringify(condensed)}`);
-          return {
-            chunkIndex: index,
-            uploadSuccess: false,
+      const result = {
+        chunkIndex: index,
+        uploadSuccess: false,
         rowsProcessed: records.length,
-            dataValuesUploaded: 0,
+        dataValuesUploaded: 0,
         dhis2Error: condensed,
         message: 'Upload failed with conflicts'
       };
+      
+      // Store result in parent state for final aggregation
+      if (!state.processedChunks) state.processedChunks = [];
+      state.processedChunks.push(result);
+      
+      return result;
     }
   })),
 
   fn(async state => {
-    const results = state.references || [];
+    // Try state.processedChunks first, fall back to references
+    const results = state.processedChunks || state.references || [];
     const successfulChunks = results.filter(r => r.uploadSuccess);
     const failedChunks = results.filter(r => !r.uploadSuccess);
     
@@ -243,6 +269,9 @@ executeWithSftp(
     const totalDataValuesUploaded = results.reduce((sum, r) => sum + (r.dataValuesUploaded || 0), 0);
     
     console.log(`✅ Job 4 Complete: ${successfulChunks.length}/${results.length} chunks succeeded`);
+    if (results.length === 0) {
+      console.log(`⚠️  Warning: No results collected. state.references=${(state.references || []).length}, state.processedChunks=${(state.processedChunks || []).length}`);
+    }
     if (failedChunks.length > 0) {
       console.log(`⚠️  Failed chunks: ${failedChunks.map(c => c.chunkIndex + 1).join(', ')}`);
     }
@@ -312,8 +341,13 @@ function buildDataValues(records, fileTypeConfig, dhis2Mappings, metadataMapping
   const headerMap = options.headerMap || {};
   const periodType = (fileTypeConfig && fileTypeConfig.dhis2Config && fileTypeConfig.dhis2Config.periodType) || 'Monthly';
   const overridePeriod = options.overridePeriod || null;
+  
+  // Track category option combo usage for debugging
+  const cocUsage = {};
+  let rowsProcessed = 0;
 
   for (const record of records) {
+    rowsProcessed++;
     const mappedRow = mapColumns(record, mappings, metadataMappings, { headerMap });
 
     // Skip rows that look like headers or lack required fields
@@ -338,15 +372,32 @@ function buildDataValues(records, fileTypeConfig, dhis2Mappings, metadataMapping
     if (mappedRow.categoryOptions?.reportingPeriodType) {
       categoryParts.push(mappedRow.categoryOptions.reportingPeriodType);
     }
-    const categoryKey = categoryParts.length > 0 ? categoryParts.join('+') : '';
+    // Sort category parts alphabetically to match Job 3's key format
+    const categoryKey = categoryParts.length > 0 ? categoryParts.sort().join('+') : '';
 
     const mappedDataElement = dhis2Mappings.dataElements?.[dataElementCode] || dhis2Mappings.dataElements?.[getCodeFromName(mappedRow.dataElement)];
     const mappedOrgUnit = dhis2Mappings.orgUnits?.[orgUnitName] || dhis2Mappings.orgUnits?.[getCodeFromName(orgUnitName)];
     const dataElement = mappedDataElement || (useCodeScheme ? dataElementCode : undefined);
     const orgUnit = mappedOrgUnit || (useNameOrgUnits ? orgUnitName : undefined);
-    const categoryOptionCombo = (dhis2Mappings.categoryOptionCombos?.[categoryKey]
-      || dhis2Mappings.categoryOptionCombos?.[`hsector:${mappedRow.categoryOptions?.hsector}`]
-      || dhis2Mappings.categoryOptionCombos?.[categoryKey]) || 'HllvX50cXC0';
+    
+    // Look up category option combo using sorted key
+    let categoryOptionCombo = dhis2Mappings.categoryOptionCombos?.[categoryKey];
+    
+    // Fallback for hsector-based lookups
+    if (!categoryOptionCombo && mappedRow.categoryOptions?.hsector) {
+      categoryOptionCombo = dhis2Mappings.categoryOptionCombos?.[`hsector:${mappedRow.categoryOptions.hsector}`];
+    }
+    
+    // Final fallback to default combo
+    if (!categoryOptionCombo) {
+      categoryOptionCombo = 'HllvX50cXC0';
+    }
+    
+    // Track category option combo usage
+    if (!cocUsage[categoryOptionCombo]) {
+      cocUsage[categoryOptionCombo] = { count: 0, key: categoryKey || '(no key)', isDefault: categoryOptionCombo === 'HllvX50cXC0' };
+    }
+    cocUsage[categoryOptionCombo].count++;
 
     if (!dataElement || !orgUnit) {
       continue;
@@ -391,6 +442,28 @@ function buildDataValues(records, fileTypeConfig, dhis2Mappings, metadataMapping
       categoryOptionCombo,
       value: mappedRow.value !== undefined && mappedRow.value !== null ? String(mappedRow.value) : '0'
     });
+  }
+  
+  // Log category option combo usage summary
+  const uniqueCombos = Object.keys(cocUsage).length;
+  const defaultUsage = cocUsage['HllvX50cXC0']?.count || 0;
+  const disaggregatedUsage = Object.values(cocUsage)
+    .filter(u => !u.isDefault)
+    .reduce((sum, u) => sum + u.count, 0);
+  
+  console.log(`   📊 Category option combo usage: ${uniqueCombos} unique combos used`);
+  console.log(`   ✓ Disaggregated: ${disaggregatedUsage} rows across ${uniqueCombos - (defaultUsage > 0 ? 1 : 0)} combos`);
+  if (defaultUsage > 0) {
+    console.log(`   ⚠️ Default combo used: ${defaultUsage} rows (may indicate missing category mappings)`);
+  }
+  
+  // Show sample of category option combos being used
+  const sampleCombos = Object.entries(cocUsage)
+    .filter(([id]) => id !== 'HllvX50cXC0')
+    .slice(0, 5)
+    .map(([id, data]) => `${data.key} → ${id}`);
+  if (sampleCombos.length > 0) {
+    console.log(`   📋 Sample combos: ${sampleCombos.join(', ')}`);
   }
 
   return values;

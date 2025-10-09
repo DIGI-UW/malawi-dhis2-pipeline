@@ -91,8 +91,8 @@ function prepareMetadata(dhis2Structures, options) {
     const categoryMappings = await createCategories(finalCategories, state);
     const { categoryOptionCombos, categoryCombinationId } = await createCategoryCombination(finalCategories, state);
 
-    // 2) Data elements
-    const dataElementMappings = await createDataElements(dataElements, state);
+    // 2) Data elements (pass category combo for disaggregation)
+    const dataElementMappings = await createDataElements(dataElements, categoryCombinationId, state);
     // Fail-fast: do not proceed if no data elements were mapped
     if (!dataElementMappings || Object.keys(dataElementMappings).length === 0) {
       throw new Error('No data elements mapped. Aborting metadata setup before data load.');
@@ -309,7 +309,7 @@ async function checkAndCreateIntegrationUser(countryOrgUnitId, state, options = 
     state = await get('users', {
       filter: `username:eq:${integrationUsername}`,
       fields: 'id,username,userCredentials[username],organisationUnits[id,name]',
-      paging: 'false'
+      paging: false
     })(state);
     
     let integrationUser = state.data.users && state.data.users[0];
@@ -321,7 +321,7 @@ async function checkAndCreateIntegrationUser(countryOrgUnitId, state, options = 
       state = await get('userRoles', {
         filter: 'name:eq:Superuser',
         fields: 'id,name,authorities',
-        paging: 'false'
+        paging: false
       })(state);
       
       const superuserRole = state.data.userRoles && state.data.userRoles[0];
@@ -368,7 +368,7 @@ async function checkAndCreateIntegrationUser(countryOrgUnitId, state, options = 
           state = await get('users', {
             filter: `username:eq:${integrationUsername}`,
             fields: 'id,username,organisationUnits[id,name]',
-            paging: 'false'
+            paging: false
           })(state);
           if (state.data.users && state.data.users.length > 0) {
             uid = state.data.users[0].id;
@@ -395,7 +395,7 @@ async function checkAndCreateIntegrationUser(countryOrgUnitId, state, options = 
             state = await get('users', {
               filter: `username:eq:${integrationUsername}`,
               fields: 'id,username,organisationUnits[id,name]',
-              paging: 'false'
+              paging: false
             })(state);
             console.log(`   🔍 AFTER USER GET: state.data keys:`, Object.keys(state.data || {}));
             console.log(`   🔍 GET users response:`, JSON.stringify(state.data, null, 2));
@@ -581,10 +581,13 @@ async function createCategoryCombination(categoryStructures, state) {
 }
 
 // Create data elements
-async function createDataElements(dataElementStructures, state) {
+async function createDataElements(dataElementStructures, categoryCombinationId, state) {
   const mappings = {};
   
   console.log(`📊 Creating ${dataElementStructures.length} data elements...`);
+  if (categoryCombinationId) {
+    console.log(`   Using category combination: ${categoryCombinationId}`);
+  }
   
   for (const dataElement of dataElementStructures) {
     try {
@@ -592,7 +595,7 @@ async function createDataElements(dataElementStructures, state) {
       state = await get(`dataElements`, {
         filter: `code:eq:${dataElement.code}`,
         fields: 'id',
-        paging: 'false'
+        paging: false
       })(state);
       
       if (state.data.dataElements && state.data.dataElements.length > 0) {
@@ -600,7 +603,7 @@ async function createDataElements(dataElementStructures, state) {
         console.log(`   ✓ Found existing: ${dataElement.name} (${existingId})`);
         mappings[dataElement.code] = existingId;
       } else {
-        // Create new data element
+        // Create new data element with category combo
         const payload = {
           name: dataElement.name,
           shortName: dataElement.shortName,
@@ -610,6 +613,11 @@ async function createDataElements(dataElementStructures, state) {
           domainType: dataElement.domainType
         };
         
+        // Assign category combo for disaggregation
+        if (categoryCombinationId) {
+          payload.categoryCombo = { id: categoryCombinationId };
+        }
+        
         state = await create('dataElements', payload)(state);
         
         if (state.data?.response?.uid) {
@@ -618,7 +626,7 @@ async function createDataElements(dataElementStructures, state) {
           mappings[dataElement.code] = newId;
         } else {
           // Follow-up GET by code to resolve ID even if UID not returned in response
-          state = await get('dataElements', { filter: `code:eq:${dataElement.code}`, fields: 'id', paging: 'false' })(state);
+          state = await get('dataElements', { filter: `code:eq:${dataElement.code}`, fields: 'id', paging: false })(state);
           if (state.data.dataElements && state.data.dataElements.length > 0) {
             const resolvedId = state.data.dataElements[0].id;
             console.log(`   ↩︎ Resolved created ${dataElement.name} to id ${resolvedId}`);

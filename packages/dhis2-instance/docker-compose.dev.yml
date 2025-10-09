@@ -1,10 +1,10 @@
 services:
   dhis2:
     environment:
-      DHIS2_DEMO_DATA: "true"
+      DHIS2_DEMO_DATA: "false"
       DHIS2_ADMIN_PASSWORD: "${DHIS2_ADMIN_PASSWORD:-district}"
       DHIS2_DEBUG: "true"
-      DHIS2_LOG_LEVEL: "DEBUG"
+      #DHIS2_LOG_LEVEL: "DEBUG"
     ports:
       - "${DHIS2_PORT:-8080}:8080"
 

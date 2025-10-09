@@ -82,15 +82,40 @@ docker swarm init
 
 ### Clone the Repository
 
+**Important**: This project uses git submodules for OpenFN adaptors and Lightning. You must initialize them during or after cloning.
+
 ```bash
-# Clone the repository
-git clone https://github.com/your-org/malawi-dhis2-pipeline.git
+# Clone the repository with submodules (recommended)
+git clone --recurse-submodules https://github.com/your-org/malawi-dhis2-pipeline.git
 cd malawi-dhis2-pipeline
 
 # Set up working directory environment variable
 export MALAWI_PROJECT_ROOT=$(pwd)
 echo "export MALAWI_PROJECT_ROOT=$(pwd)" >> ~/.bashrc
 ```
+
+### Initialize Submodules (if not cloned with --recurse-submodules)
+
+If you already cloned the repository without `--recurse-submodules`, or if the submodules are missing:
+
+```bash
+cd malawi-dhis2-pipeline
+
+# Initialize and update all submodules
+git submodule init
+git submodule update
+
+# Or use the combined command
+git submodule update --init --recursive
+
+# Verify submodules are populated
+ls -la projects/openfn-custom-adaptors/  # Should contain OpenFN adaptors
+ls -la projects/lightning/                # Should contain Lightning source
+```
+
+**Required Submodules**:
+- `projects/openfn-custom-adaptors` - OpenFN adaptors repository
+- `projects/lightning` - OpenFN Lightning repository
 
 ### Directory Structure Overview
 
@@ -324,6 +349,53 @@ docker exec $(docker ps -q -f name=sftp-server) ls -la /data/excel-files/
 ```
 
 ## Troubleshooting
+
+### Git Submodules
+
+#### Missing Submodules Error
+If you see errors like "directory not found" for `projects/openfn-custom-adaptors` or `projects/lightning`:
+
+```bash
+# Check if submodules are empty
+ls -la projects/openfn-custom-adaptors/
+ls -la projects/lightning/
+
+# Initialize and clone submodules
+git submodule update --init --recursive
+
+# Verify submodules are now populated
+git submodule status
+# Expected output showing commit hashes for:
+# - projects/openfn-custom-adaptors
+# - projects/lightning
+```
+
+#### Updating Submodules
+To update submodules to their latest versions:
+
+```bash
+# Update all submodules to latest commit
+git submodule update --remote --recursive
+
+# Or update specific submodule
+git submodule update --remote projects/openfn-custom-adaptors
+git submodule update --remote projects/lightning
+
+# Rebuild custom images after updating
+./build-custom-images.sh all
+```
+
+#### Submodule Configuration Issues
+If submodules are in a detached HEAD state or have uncommitted changes:
+
+```bash
+# Reset submodules to clean state
+git submodule foreach --recursive git reset --hard
+git submodule foreach --recursive git clean -fd
+
+# Re-initialize
+git submodule update --init --recursive
+```
 
 ### Docker Issues
 
