@@ -196,7 +196,7 @@ executeWithSftp(
     // Build upload options via query params (safer than embedding in path)
     const uploadQuery = {
       importStrategy: 'CREATE_AND_UPDATE',
-      skipExistingCheck: true,
+      skipExistingCheck: false,  // Check for duplicates to enable robust idempotent imports
       ...(useCodeScheme ? { dataElementIdScheme: 'CODE' } : {}),
       ...(useNameOrgUnits ? { orgUnitIdScheme: 'NAME' } : { orgUnitIdScheme: 'UID' })
     };
