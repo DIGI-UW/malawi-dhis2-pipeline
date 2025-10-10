@@ -4,9 +4,7 @@
  * Workflow position: 5/5 (final processing + cleanup). Native state tracks progress/resume info.
  */
 
-
-executeWithSftp(
-  fn(async state => {
+fn(async state => {
     const { fileName, totalChunks, chunkSize, filePath, fileType, data: { dhis2Mappings } } = state;
     if (!fileName || !totalChunks || !filePath) {
       throw new Error('Missing required state: fileName, totalChunks, and filePath must be provided.');
@@ -49,7 +47,6 @@ executeWithSftp(
 
     state.chunks = chunks;
     state.chunkResults = [];
-    state.processedChunks = [];
     state.batchProcessingStartTime = new Date().toISOString();
     state.data = {
       ...state.data,
@@ -137,10 +134,6 @@ executeWithSftp(
         message: 'Empty chunk'
       };
       
-      // Store result in parent state for final aggregation
-      if (!state.processedChunks) state.processedChunks = [];
-      state.processedChunks.push(result);
-      
       return result;
     }
 
@@ -180,10 +173,6 @@ executeWithSftp(
         message: 'No valid data values'
       };
       
-      // Store result in parent state for final aggregation
-      if (!state.processedChunks) state.processedChunks = [];
-      state.processedChunks.push(result);
-      
       return result;
     }
 
@@ -222,10 +211,6 @@ executeWithSftp(
         message: `Uploaded ${dataValues.length} data values`
       };
       
-      // Store result in parent state for final aggregation
-      if (!state.processedChunks) state.processedChunks = [];
-      state.processedChunks.push(result);
-      
       return result;
     } catch (error) {
       // Condense DHIS2 conflicts for readability
@@ -251,17 +236,13 @@ executeWithSftp(
         message: 'Upload failed with conflicts'
       };
       
-      // Store result in parent state for final aggregation
-      if (!state.processedChunks) state.processedChunks = [];
-      state.processedChunks.push(result);
-      
       return result;
     }
   })),
 
   fn(async state => {
-    // After each(), results are in state.data as an array
-    const results = Array.isArray(state.data) ? state.data : (state.processedChunks || state.references || []);
+    // Collect results from each() operation (now works without executeWithSftp wrapper)
+    const results = state.references || [];
     const successfulChunks = results.filter(r => r && r.uploadSuccess);
     const failedChunks = results.filter(r => r && !r.uploadSuccess);
     
@@ -269,11 +250,8 @@ executeWithSftp(
     const totalDataValuesUploaded = results.reduce((sum, r) => sum + (r.dataValuesUploaded || 0), 0);
     
     console.log(`✅ Job 4 Complete: ${successfulChunks.length}/${results.length} chunks succeeded`);
-    if (results.length === 0) {
-      console.log(`⚠️  Warning: No results collected.`);
-      console.log(`   state.data type=${typeof state.data}, isArray=${Array.isArray(state.data)}, length=${Array.isArray(state.data) ? state.data.length : 'N/A'}`);
-      console.log(`   state.references length=${(state.references || []).length}, state.processedChunks length=${(state.processedChunks || []).length}`);
-    }
+    console.log(`📊 Summary: ${totalRowsProcessed} rows processed, ${totalDataValuesUploaded} data values uploaded`);
+    
     if (failedChunks.length > 0) {
       console.log(`⚠️  Failed chunks: ${failedChunks.map(c => c.chunkIndex + 1).join(', ')}`);
     }
@@ -311,8 +289,7 @@ executeWithSftp(
       throw new Error('No data values uploaded');
     }
     return state;
-  })
-);
+  });
 
 function normalizeXlsxChunk(chunkData, fileTypeConfig) {
   if (!chunkData || chunkData.length === 0) return [];
