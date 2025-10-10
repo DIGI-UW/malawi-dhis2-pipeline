@@ -4,7 +4,8 @@
  * Workflow position: 5/5 (final processing + cleanup). Native state tracks progress/resume info.
  */
 
-fn(async state => {
+executeWithSftp(
+  fn(state => {
     const { fileName, totalChunks, chunkSize, filePath, fileType, data: { dhis2Mappings } } = state;
     if (!fileName || !totalChunks || !filePath) {
       throw new Error('Missing required state: fileName, totalChunks, and filePath must be provided.');
@@ -18,13 +19,6 @@ fn(async state => {
 
     // Preserve DHIS2 configuration explicitly for later upload calls
     state.__dhis2Config = state.configuration;
-
-    await updateIndex(state, fileName, {
-      status: 'processing',
-      inProgressAt: new Date().toISOString(),
-      totalChunks,
-      chunkSize
-    });
 
     const chunks = [];
     for (let i = 0; i < totalChunks; i++) {
@@ -50,37 +44,31 @@ fn(async state => {
     state.batchProcessingStartTime = new Date().toISOString();
     state.data = {
       ...state.data,
-        chunks
+      chunks
     };
 
-    return state;
+    // Return promise from updateIndex, then return state
+    return updateIndex(state, fileName, {
+      status: 'processing',
+      inProgressAt: new Date().toISOString(),
+      totalChunks,
+      chunkSize
+    }).then(() => state);
   }),
 
-  each('chunks[*]', fn(async state => {
-      const chunk = state.data;
+  each('chunks[*]', fn(state => {
+    const chunk = state.data;
     const { index, filePath, size, totalChunks, fileType, dhis2Mappings, fileTypeConfig, metadataMappings } = chunk;
-      
-      console.log(`📦 Processing chunk ${index + 1}/${totalChunks}`);
     
-    // Determine dataset periodType from DHIS2 (fallback to config)
+    console.log(`📦 Processing chunk ${index + 1}/${totalChunks}`);
+    
+    // Prepare config synchronously
     const cfgForDhis = chunk.dhis2Config || state.__dhis2Config || state.configuration;
-    let datasetPeriodType = (fileTypeConfig && fileTypeConfig.dhis2Config && fileTypeConfig.dhis2Config.periodType) || null;
-    try {
-      if (dhis2Mappings && dhis2Mappings.dataSetId) {
-        const dsState = await get(`dataSets/${dhis2Mappings.dataSetId}`, { fields: 'id,periodType,openFuturePeriods' })({
-          ...state,
-          configuration: cfgForDhis
-        });
-        datasetPeriodType = dsState?.data?.periodType || datasetPeriodType;
-        const ofp = dsState?.data?.openFuturePeriods;
-        if (datasetPeriodType) console.log(`   ℹ️ Using dataset periodType=${datasetPeriodType}${ofp !== undefined ? ", openFuturePeriods=" + ofp : ''}`);
-      }
-    } catch (e) {
-      // best-effort only
-    }
-    if (!datasetPeriodType) datasetPeriodType = 'Monthly';
+    const headerMapFromIndex = (state.filesIndex && state.fileName && state.filesIndex[state.fileName] && state.filesIndex[state.fileName].headerMap) || {};
+    const headerMap = (chunk.fileTypeConfig && chunk.fileTypeConfig.headerMap) || headerMapFromIndex || {};
+    let datasetPeriodType = (fileTypeConfig && fileTypeConfig.dhis2Config && fileTypeConfig.dhis2Config.periodType) || 'Monthly';
 
-    // Determine period derivation strategy
+    // Determine period derivation strategy (synchronous)
     const periodSource = (fileTypeConfig && fileTypeConfig.dhis2Config && fileTypeConfig.dhis2Config.periodSource) || 'filename';
     const fixedPeriodRaw = (fileTypeConfig && fileTypeConfig.dhis2Config && fileTypeConfig.dhis2Config.fixedPeriod) || null;
     const filename = state.fileName || chunk.fileName || '';
@@ -89,7 +77,6 @@ fn(async state => {
       derivedPeriod = String(fixedPeriodRaw);
     } else if (periodSource === 'filename') {
       try {
-        // Default pattern: ..._<YYYY>_Q<q>_...
         const m = filename.match(/_(\d{4})_Q([1-4])_/i);
         if (m) derivedPeriod = `${m[1]}Q${m[2]}`;
       } catch (_) {}
@@ -98,150 +85,171 @@ fn(async state => {
     if (overridePeriod) {
       console.log(`   ℹ️ Using override period from ${periodSource}: ${overridePeriod} (dataset periodType=${datasetPeriodType})`);
     }
-    // Period consistency check
-    try {
-      if (periodSource === 'fixed' && fixedPeriodRaw) {
-        const fromFilename = (state.fileName || '').match(/_(\d{4})_Q([1-4])_/i);
-        if (fromFilename) {
-          const fnPeriod = `${fromFilename[1]}Q${fromFilename[2]}`;
-          if (normalizePeriodForPeriodType(fnPeriod, datasetPeriodType) !== overridePeriod) {
-            console.log(`   ⚠️ Period mismatch: fixed=${overridePeriod}, filename=${fnPeriod}`);
-          }
-        }
-      }
-    } catch (_) {}
     
-    let records;
-    const headerMapFromIndex = (state.filesIndex && state.fileName && state.filesIndex[state.fileName] && state.filesIndex[state.fileName].headerMap) || {};
-    const headerMap = (chunk.fileTypeConfig && chunk.fileTypeConfig.headerMap) || headerMapFromIndex || {};
-    if (fileType === 'xlsx') {
-      const chunkState = await getExcelChunk(filePath, index, size)(state);
-      records = normalizeXlsxChunk(chunkState.chunkData, fileTypeConfig);
-    } else if (fileType === 'csv') {
-      const csvState = await getCsvChunk(filePath, index, size)({ ...state, configuration: state.configuration });
-      records = csvState.chunkData.map(row => applyHeaderMap(row, headerMap));
-    } else {
-      throw new Error(`Unsupported fileType '${fileType}' in chunk processing`);
-    }
-
-    if (!records || records.length === 0) {
-      console.log('   ⚠️ Chunk empty; skipping upload');
-      const result = {
-        chunkIndex: index,
-        uploadSuccess: true,
-        rowsProcessed: 0,
-        dataValuesUploaded: 0,
-        message: 'Empty chunk'
-      };
+    // Start promise chain with CSV/Excel read
+    const readPromise = fileType === 'xlsx'
+      ? getExcelChunk(filePath, index, size)(state)
+      : getCsvChunk(filePath, index, size)({ ...state, configuration: state.configuration });
+    
+    return readPromise.then(chunkState => {
+      // Process chunk data (synchronous)
+      const records = fileType === 'xlsx'
+        ? normalizeXlsxChunk(chunkState.chunkData, fileTypeConfig)
+        : chunkState.chunkData.map(row => applyHeaderMap(row, headerMap));
       
-      return result;
-    }
-
-    const useCodeSchemeForValues = !dhis2Mappings.dataElements || Object.keys(dhis2Mappings.dataElements).length === 0;
-    const useNameOrgUnitsForValues = !dhis2Mappings.orgUnits || Object.keys(dhis2Mappings.orgUnits).length === 0;
-    // Drop rows that look like headers even after normalization
-    const headerGuarded = records.filter(r => !isHeaderLikeRow(r, fileTypeConfig, headerMap));
-    const dataValues = buildDataValues(
-      headerGuarded,
-      fileTypeConfig,
-      dhis2Mappings,
-      metadataMappings,
-      { useCodeScheme: useCodeSchemeForValues, useNameOrgUnits: useNameOrgUnitsForValues, headerMap, periodType: datasetPeriodType, overridePeriod }
-    );
-    try {
-      const samplePeriods = Array.from(new Set(dataValues.slice(0, 50).map(v => v.period))).slice(0, 3);
-      console.log(`   ℹ️ Sample mapped periods: ${samplePeriods.join(', ')}`);
-    } catch (_) {}
-    if (dataValues.length === 0) {
-      // Log first 3 mapped rows to help troubleshooting
+      if (!records || records.length === 0) {
+        console.log('   ⚠️ Chunk empty; skipping upload');
+        return {
+          ...state,
+          references: [
+            ...(state.references || []),
+            {
+              chunkIndex: index,
+              uploadSuccess: true,
+              rowsProcessed: 0,
+              dataValuesUploaded: 0,
+              message: 'Empty chunk'
+            }
+          ]
+        };
+      }
+      
+      // Build data values (synchronous)
+      const useCodeSchemeForValues = !dhis2Mappings.dataElements || Object.keys(dhis2Mappings.dataElements).length === 0;
+      const useNameOrgUnitsForValues = !dhis2Mappings.orgUnits || Object.keys(dhis2Mappings.orgUnits).length === 0;
+      const headerGuarded = records.filter(r => !isHeaderLikeRow(r, fileTypeConfig, headerMap));
+      const dataValues = buildDataValues(
+        headerGuarded,
+        fileTypeConfig,
+        dhis2Mappings,
+        metadataMappings,
+        { useCodeScheme: useCodeSchemeForValues, useNameOrgUnits: useNameOrgUnitsForValues, headerMap, periodType: datasetPeriodType, overridePeriod }
+      );
+      
       try {
-        const preview = records.slice(0, 3).map(r => mapColumns(r, fileTypeConfig.columnMappings || {}, metadataMappings, { headerMap }));
-        console.log('   🔎 Preview first 3 mapped rows:', JSON.stringify(preview, null, 2));
-        console.log('   🔎 dhis2Mappings summary:', {
-          de: Object.keys(dhis2Mappings.dataElements || {}).length,
-          ou: Object.keys(dhis2Mappings.orgUnits || {}).length,
-          coc: Object.keys(dhis2Mappings.categoryOptionCombos || {}).length,
-          dataSetId: dhis2Mappings.dataSetId || null
-        });
-      } catch (e) {}
-      console.log('   ⚠️ No valid data values built');
-      const result = {
-        chunkIndex: index,
-        uploadSuccess: true,
-        rowsProcessed: records.length,
-        dataValuesUploaded: 0,
-        message: 'No valid data values'
+        const samplePeriods = Array.from(new Set(dataValues.slice(0, 50).map(v => v.period))).slice(0, 3);
+        console.log(`   ℹ️ Sample mapped periods: ${samplePeriods.join(', ')}`);
+      } catch (_) {}
+      
+      if (dataValues.length === 0) {
+        try {
+          const preview = records.slice(0, 3).map(r => mapColumns(r, fileTypeConfig.columnMappings || {}, metadataMappings, { headerMap }));
+          console.log('   🔎 Preview first 3 mapped rows:', JSON.stringify(preview, null, 2));
+          console.log('   🔎 dhis2Mappings summary:', {
+            de: Object.keys(dhis2Mappings.dataElements || {}).length,
+            ou: Object.keys(dhis2Mappings.orgUnits || {}).length,
+            coc: Object.keys(dhis2Mappings.categoryOptionCombos || {}).length,
+            dataSetId: dhis2Mappings.dataSetId || null
+          });
+        } catch (e) {}
+        console.log('   ⚠️ No valid data values built');
+        return {
+          ...state,
+          references: [
+            ...(state.references || []),
+            {
+              chunkIndex: index,
+              uploadSuccess: true,
+              rowsProcessed: records.length,
+              dataValuesUploaded: 0,
+              message: 'No valid data values'
+            }
+          ]
+        };
+      }
+      
+      // Build payload (synchronous)
+      const useCodeScheme = !dhis2Mappings.dataElements || Object.keys(dhis2Mappings.dataElements).length === 0;
+      const haveOrgUnitUIDs = dhis2Mappings.orgUnits && Object.keys(dhis2Mappings.orgUnits).length > 0;
+      const useNameOrgUnits = !haveOrgUnitUIDs;
+      const payload = { dataValues, dataSet: dhis2Mappings.dataSetId || undefined };
+      const uploadQuery = {
+        importStrategy: 'CREATE_AND_UPDATE',
+        skipExistingCheck: false,
+        ...(useCodeScheme ? { dataElementIdScheme: 'CODE' } : {}),
+        ...(useNameOrgUnits ? { orgUnitIdScheme: 'NAME' } : { orgUnitIdScheme: 'UID' })
       };
       
-      return result;
-    }
-
-    // If data elements are unmapped, attempt a code-based upload path
-    const useCodeScheme = !dhis2Mappings.dataElements || Object.keys(dhis2Mappings.dataElements).length === 0;
-    // Prefer UID scheme if we have orgUnit mappings
-    const haveOrgUnitUIDs = dhis2Mappings.orgUnits && Object.keys(dhis2Mappings.orgUnits).length > 0;
-    const useNameOrgUnits = !haveOrgUnitUIDs;
-    const payload = { dataValues, dataSet: dhis2Mappings.dataSetId || undefined };
-    // Build upload options via query params (safer than embedding in path)
-    const uploadQuery = {
-      importStrategy: 'CREATE_AND_UPDATE',
-      skipExistingCheck: false,  // Check for duplicates to enable robust idempotent imports
-      ...(useCodeScheme ? { dataElementIdScheme: 'CODE' } : {}),
-      ...(useNameOrgUnits ? { orgUnitIdScheme: 'NAME' } : { orgUnitIdScheme: 'UID' })
-    };
-
-    try {
-      const uploadState = await create('dataValueSets', payload, { query: uploadQuery })({
+      // Upload to DHIS2 - returns promise
+      return create('dataValueSets', payload, { query: uploadQuery })({
         ...state,
         configuration: cfgForDhis,
         data: payload
+      }).then(uploadState => {
+        // Update index after successful upload
+        return updateIndex(state, state.fileName, {
+          lastSuccessfulChunk: index,
+          lastChunkUploadedAt: new Date().toISOString()
+        }).then(() => {
+          // Return STATE with result in references
+          return {
+            ...state,
+            references: [
+              ...(state.references || []),
+              {
+                chunkIndex: index,
+                uploadSuccess: true,
+                rowsProcessed: records.length,
+                dataValuesUploaded: dataValues.length,
+                dhis2Response: uploadState?.data || uploadState?.response || uploadState,
+                message: `Uploaded ${dataValues.length} data values`
+              }
+            ]
+          };
+        });
+      }).catch(error => {
+        // Error handling - return plain result object
+        let condensed = {};
+        try {
+          const body = error?.body || error?.data || {};
+          const conflicts = body?.response?.conflicts || [];
+          const byCode = conflicts.reduce((acc, c) => {
+            const code = c.errorCode || 'UNKNOWN';
+            const count = Array.isArray(c.indexes) ? c.indexes.length : 1;
+            acc[code] = (acc[code] || 0) + count;
+            return acc;
+          }, {});
+          condensed = { error: error?.message, codes: byCode, sample: conflicts[0] ? { errorCode: conflicts[0].errorCode, object: conflicts[0].object, property: conflicts[0].property, value: conflicts[0].value } : undefined };
+        } catch (_) {}
+        console.log(`   ⚠️ Upload failed (condensed): ${JSON.stringify(condensed)}`);
+        
+        return {
+          ...state,
+          references: [
+            ...(state.references || []),
+            {
+              chunkIndex: index,
+              uploadSuccess: false,
+              rowsProcessed: records.length,
+              dataValuesUploaded: 0,
+              dhis2Error: condensed,
+              message: 'Upload failed with conflicts'
+            }
+          ]
+        };
       });
-
-      await updateIndex(state, state.fileName, {
-        lastSuccessfulChunk: index,
-        lastChunkUploadedAt: new Date().toISOString()
-      });
+    }).catch(readError => {
+      console.error(`❌ Chunk ${index + 1} read failed:`, readError.message);
       
-      const result = {
-        chunkIndex: index,
-        uploadSuccess: true,
-        rowsProcessed: records.length,
-        dataValuesUploaded: dataValues.length,
-        dhis2Response: uploadState?.data || uploadState?.response || uploadState,
-        message: `Uploaded ${dataValues.length} data values`
+      return {
+        ...state,
+        references: [
+          ...(state.references || []),
+          {
+            chunkIndex: index,
+            uploadSuccess: false,
+            rowsProcessed: 0,
+            dataValuesUploaded: 0,
+            error: readError.message,
+            message: 'Chunk read failed'
+          }
+        ]
       };
-      
-      return result;
-    } catch (error) {
-      // Condense DHIS2 conflicts for readability
-      let condensed = {};
-      try {
-        const body = error?.body || error?.data || {};
-        const conflicts = body?.response?.conflicts || [];
-        const byCode = conflicts.reduce((acc, c) => {
-          const code = c.errorCode || 'UNKNOWN';
-          const count = Array.isArray(c.indexes) ? c.indexes.length : 1;
-          acc[code] = (acc[code] || 0) + count;
-          return acc;
-        }, {});
-        condensed = { error: error?.message, codes: byCode, sample: conflicts[0] ? { errorCode: conflicts[0].errorCode, object: conflicts[0].object, property: conflicts[0].property, value: conflicts[0].value } : undefined };
-      } catch (_) {}
-      console.log(`   ⚠️ Upload failed (condensed): ${JSON.stringify(condensed)}`);
-      const result = {
-        chunkIndex: index,
-        uploadSuccess: false,
-        rowsProcessed: records.length,
-        dataValuesUploaded: 0,
-        dhis2Error: condensed,
-        message: 'Upload failed with conflicts'
-      };
-      
-      return result;
-    }
+    });
   })),
 
-  fn(async state => {
-    // Collect results from each() operation (now works without executeWithSftp wrapper)
+  fn(state => {
+    // Collect results from each() operation
     const results = state.references || [];
     const successfulChunks = results.filter(r => r && r.uploadSuccess);
     const failedChunks = results.filter(r => r && !r.uploadSuccess);
@@ -256,22 +264,10 @@ fn(async state => {
       console.log(`⚠️  Failed chunks: ${failedChunks.map(c => c.chunkIndex + 1).join(', ')}`);
     }
     
-    await updateIndex(state, state.fileName, {
-      summary: {
-        totalChunks: results.length,
-        successfulChunks: successfulChunks.length,
-        failedChunks: failedChunks.length,
-        totalRowsProcessed,
-        totalDataValuesUploaded,
-        processingStartTime: state.batchProcessingStartTime,
-        processingEndTime: new Date().toISOString()
-      },
-      status: failedChunks.length === 0 ? 'completed' : 'failed'
-    });
-
+    // Update state (synchronous)
     state.workflowLock = null;
     state.lock = null;
-
+    
     const hadAnyValues = totalDataValuesUploaded > 0;
     state.batchProcessingComplete = failedChunks.length === 0 && hadAnyValues;
     state.summary = {
@@ -284,12 +280,26 @@ fn(async state => {
     state.data = results.length > 0 ? results[results.length - 1] : {};
     delete state.chunks;
     delete state.chunkResults;
-
+    
     if (!hadAnyValues) {
       throw new Error('No data values uploaded');
     }
-    return state;
-  });
+    
+    // Return promise from updateIndex, then return state
+    return updateIndex(state, state.fileName, {
+      summary: {
+        totalChunks: results.length,
+        successfulChunks: successfulChunks.length,
+        failedChunks: failedChunks.length,
+        totalRowsProcessed,
+        totalDataValuesUploaded,
+        processingStartTime: state.batchProcessingStartTime,
+        processingEndTime: new Date().toISOString()
+      },
+      status: failedChunks.length === 0 ? 'completed' : 'failed'
+    }).then(() => state);
+  })
+);
 
 function normalizeXlsxChunk(chunkData, fileTypeConfig) {
   if (!chunkData || chunkData.length === 0) return [];
