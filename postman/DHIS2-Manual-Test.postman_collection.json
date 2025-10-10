@@ -1,0 +1,318 @@
+{
+  "info": {
+    "name": "DHIS2 Manual Data Value Test",
+    "description": "Manually test inserting a data value to verify persistence",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "dhis2_base_url",
+      "value": "http://127.0.0.1:8080",
+      "description": "DHIS2 base URL"
+    },
+    {
+      "key": "dhis2_username",
+      "value": "admin",
+      "description": "DHIS2 admin username"
+    },
+    {
+      "key": "dhis2_password",
+      "value": "district",
+      "description": "DHIS2 admin password"
+    },
+    {
+      "key": "data_element_id",
+      "value": "gpk3TRz39bX",
+      "description": "TX_CURR data element ID"
+    },
+    {
+      "key": "org_unit_id",
+      "value": "BHbI9d6SdSw",
+      "description": "Malawi root org unit ID"
+    },
+    {
+      "key": "data_set_id",
+      "value": "yJ0uyVJfRQT",
+      "description": "Malawi ART Data Set ID"
+    },
+    {
+      "key": "test_period",
+      "value": "2025Q3",
+      "description": "Test period for manual insert"
+    },
+    {
+      "key": "default_coc",
+      "value": "HllvX50cXC0",
+      "description": "Default category option combo"
+    }
+  ],
+  "auth": {
+    "type": "basic",
+    "basic": [
+      {
+        "key": "username",
+        "value": "{{dhis2_username}}",
+        "type": "string"
+      },
+      {
+        "key": "password",
+        "value": "{{dhis2_password}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "1. Verify Connectivity",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{dhis2_base_url}}/api/me?fields=id,username",
+          "host": ["{{dhis2_base_url}}"],
+          "path": ["api", "me"],
+          "query": [
+            { "key": "fields", "value": "id,username" }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('DHIS2 is accessible', function () {",
+              "    pm.response.to.have.status(200);",
+              "    console.log('✓ Connected as:', pm.response.json().username);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Check Data Element Details",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{dhis2_base_url}}/api/dataElements/{{data_element_id}}?fields=id,name,code,categoryCombo[id,name,code]",
+          "host": ["{{dhis2_base_url}}"],
+          "path": ["api", "dataElements", "{{data_element_id}}"],
+          "query": [
+            { "key": "fields", "value": "id,name,code,categoryCombo[id,name,code]" }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Data element exists', function () {",
+              "    pm.response.to.have.status(200);",
+              "    var jsonData = pm.response.json();",
+              "    console.log('✓ Data Element:', jsonData.name);",
+              "    console.log('✓ Category Combo:', jsonData.categoryCombo ? jsonData.categoryCombo.name : 'default');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Check Org Unit Details",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{dhis2_base_url}}/api/organisationUnits/{{org_unit_id}}?fields=id,name,code",
+          "host": ["{{dhis2_base_url}}"],
+          "path": ["api", "organisationUnits", "{{org_unit_id}}"],
+          "query": [
+            { "key": "fields", "value": "id,name,code" }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Org unit exists', function () {",
+              "    pm.response.to.have.status(200);",
+              "    var jsonData = pm.response.json();",
+              "    console.log('✓ Org Unit:', jsonData.name);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Delete Any Existing Test Data",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{dhis2_base_url}}/api/dataValues?de={{data_element_id}}&pe={{test_period}}&ou={{org_unit_id}}&co={{default_coc}}",
+          "host": ["{{dhis2_base_url}}"],
+          "path": ["api", "dataValues"],
+          "query": [
+            { "key": "de", "value": "{{data_element_id}}" },
+            { "key": "pe", "value": "{{test_period}}" },
+            { "key": "ou", "value": "{{org_unit_id}}" },
+            { "key": "co", "value": "{{default_coc}}" }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Cleanup successful or no data existed', function () {",
+              "    pm.expect([200, 204, 404, 409]).to.include(pm.response.code);",
+              "    console.log('✓ Cleanup completed with status:', pm.response.code);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Insert Test Data Value (POST)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"dataValues\": [\n    {\n      \"dataElement\": \"{{data_element_id}}\",\n      \"period\": \"{{test_period}}\",\n      \"orgUnit\": \"{{org_unit_id}}\",\n      \"categoryOptionCombo\": \"{{default_coc}}\",\n      \"value\": \"999\"\n    }\n  ]\n}"
+        },
+        "url": {
+          "raw": "{{dhis2_base_url}}/api/dataValueSets?importStrategy=CREATE_AND_UPDATE",
+          "host": ["{{dhis2_base_url}}"],
+          "path": ["api", "dataValueSets"],
+          "query": [
+            {
+              "key": "importStrategy",
+              "value": "CREATE_AND_UPDATE"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Data value inserted successfully', function () {",
+              "    pm.response.to.have.status(200);",
+              "    var jsonData = pm.response.json();",
+              "    console.log('✓ Import status:', jsonData.status);",
+              "    console.log('✓ Response:', JSON.stringify(jsonData, null, 2));",
+              "    ",
+              "    if (jsonData.importCount) {",
+              "        console.log('✓ Imported:', jsonData.importCount.imported);",
+              "        console.log('✓ Updated:', jsonData.importCount.updated);",
+              "        console.log('✓ Ignored:', jsonData.importCount.ignored);",
+              "    }",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. Verify Data Persisted (GET)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{dhis2_base_url}}/api/dataValueSets?dataSet={{data_set_id}}&period={{test_period}}&orgUnit={{org_unit_id}}",
+          "host": ["{{dhis2_base_url}}"],
+          "path": ["api", "dataValueSets"],
+          "query": [
+            { "key": "dataSet", "value": "{{data_set_id}}" },
+            { "key": "period", "value": "{{test_period}}" },
+            { "key": "orgUnit", "value": "{{org_unit_id}}" }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Data value persisted in DHIS2', function () {",
+              "    pm.response.to.have.status(200);",
+              "    var jsonData = pm.response.json();",
+              "    ",
+              "    pm.expect(jsonData).to.have.property('dataValues');",
+              "    pm.expect(jsonData.dataValues).to.be.an('array');",
+              "    pm.expect(jsonData.dataValues.length).to.be.at.least(1);",
+              "    ",
+              "    var testValue = jsonData.dataValues.find(v => v.value === '999');",
+              "    pm.expect(testValue).to.exist;",
+              "    ",
+              "    console.log('✓ Data persisted!');",
+              "    console.log('✓ Found', jsonData.dataValues.length, 'data value(s)');",
+              "    console.log('✓ Test value (999) confirmed:', testValue ? 'YES' : 'NO');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "7. Verify Using Direct API (Alternative)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{dhis2_base_url}}/api/dataValues?dataElement={{data_element_id}}&period={{test_period}}&orgUnit={{org_unit_id}}&categoryOptionCombo={{default_coc}}",
+          "host": ["{{dhis2_base_url}}"],
+          "path": ["api", "dataValues"],
+          "query": [
+            { "key": "dataElement", "value": "{{data_element_id}}" },
+            { "key": "period", "value": "{{test_period}}" },
+            { "key": "orgUnit", "value": "{{org_unit_id}}" },
+            { "key": "categoryOptionCombo", "value": "{{default_coc}}" }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Direct API query works', function () {",
+              "    if (pm.response.code === 200) {",
+              "        var jsonData = pm.response.json();",
+              "        console.log('✓ Value from direct query:', jsonData.value || 'NOT FOUND');",
+              "    } else {",
+              "        console.log('⚠️ Direct query returned:', pm.response.code, pm.response.text());",
+              "    }",
+              "});"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
+
+
+

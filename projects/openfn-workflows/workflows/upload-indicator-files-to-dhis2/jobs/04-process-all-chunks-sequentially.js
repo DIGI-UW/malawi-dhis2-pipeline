@@ -260,17 +260,19 @@ executeWithSftp(
   })),
 
   fn(async state => {
-    // Try state.processedChunks first, fall back to references
-    const results = state.processedChunks || state.references || [];
-    const successfulChunks = results.filter(r => r.uploadSuccess);
-    const failedChunks = results.filter(r => !r.uploadSuccess);
+    // After each(), results are in state.data as an array
+    const results = Array.isArray(state.data) ? state.data : (state.processedChunks || state.references || []);
+    const successfulChunks = results.filter(r => r && r.uploadSuccess);
+    const failedChunks = results.filter(r => r && !r.uploadSuccess);
     
     const totalRowsProcessed = results.reduce((sum, r) => sum + (r.rowsProcessed || 0), 0);
     const totalDataValuesUploaded = results.reduce((sum, r) => sum + (r.dataValuesUploaded || 0), 0);
     
     console.log(`✅ Job 4 Complete: ${successfulChunks.length}/${results.length} chunks succeeded`);
     if (results.length === 0) {
-      console.log(`⚠️  Warning: No results collected. state.references=${(state.references || []).length}, state.processedChunks=${(state.processedChunks || []).length}`);
+      console.log(`⚠️  Warning: No results collected.`);
+      console.log(`   state.data type=${typeof state.data}, isArray=${Array.isArray(state.data)}, length=${Array.isArray(state.data) ? state.data.length : 'N/A'}`);
+      console.log(`   state.references length=${(state.references || []).length}, state.processedChunks length=${(state.processedChunks || []).length}`);
     }
     if (failedChunks.length > 0) {
       console.log(`⚠️  Failed chunks: ${failedChunks.map(c => c.chunkIndex + 1).join(', ')}`);

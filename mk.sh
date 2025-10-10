@@ -15,8 +15,7 @@
 #./instant project destroy --env-file .env
 #./instant project init --env-file .env
 
-# ./instant package destroy -n sftp-storage
-# ./instant package init -n sftp-storage -d
+
 
 
 ./instant package init -n dhis2-instance -d --env-file .env.example
@@ -24,7 +23,8 @@
 # ./instant package down -n openfn
 # ./instant package up -n openfn -d
 
-
+./instant package destroy -n sftp-storage
+./instant package init -n sftp-storage -d --env-file .env.example
 
 
 # ./instant package destroy -n reverse-proxy-nginx

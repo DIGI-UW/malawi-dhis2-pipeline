@@ -147,6 +147,47 @@ function prepareMetadata(dhis2Structures, options) {
 
     // Use mappings from the combined upsert
     const orgUnitMappings = allMappings;
+    
+    // **CRITICAL FIX**: Assign ALL org units to integration user
+    // The integration user needs access to every org unit where data will be uploaded,
+    // not just the root. DHIS2 rejects data uploads with "not in hierarchy" error otherwise.
+    if (integrationUser && integrationUser.id && Object.keys(orgUnitMappings).length > 0) {
+      console.log(`   🔓 Assigning all ${Object.keys(orgUnitMappings).length} org units to integration user...`);
+      
+      // Get all valid org unit IDs
+      const allOrgUnitIds = Object.values(orgUnitMappings)
+        .filter(id => id && typeof id === 'string' && id.length === 11); // Valid DHIS2 UIDs
+      
+      console.log(`   📊 Total org units to assign: ${allOrgUnitIds.length}`);
+      
+      try {
+        // Get full user object with all required fields
+        state = await get(`users/${integrationUser.id}`, {
+          fields: 'id,username,firstName,surname,email,userCredentials,organisationUnits,dataViewOrganisationUnits,teiSearchOrganisationUnits'
+        })(state);
+        
+        const fullUser = state.data;
+        
+        // Replace org units with ALL created org units
+        fullUser.organisationUnits = allOrgUnitIds.map(id => ({ id }));
+        fullUser.dataViewOrganisationUnits = allOrgUnitIds.map(id => ({ id }));
+        fullUser.teiSearchOrganisationUnits = allOrgUnitIds.map(id => ({ id }));
+        
+        console.log(`   🔄 Updating user with ${allOrgUnitIds.length} org unit assignments...`);
+        
+        // Update user with PUT request
+        state = await update('users', integrationUser.id, fullUser)(state);
+        
+        console.log(`   ✅ Successfully assigned ${allOrgUnitIds.length} org units to integration user`);
+        console.log(`   💡 Integration user can now upload data to all facilities`);
+      } catch (error) {
+        console.log(`   ⚠️ Error assigning all org units: ${error.message}`);
+        console.log(`   💡 Integration user may not have access to all facilities - data uploads might fail`);
+        console.log(`   🔍 You may need to manually assign org units in DHIS2 UI`);
+      }
+    } else if (!integrationUser || !integrationUser.id) {
+      console.log(`   ⚠️ Integration user not available for org unit assignment`);
+    }
 
     // 4) Data set (assigns elements and any known org units)
     const dataSetId = await createDataSet(
