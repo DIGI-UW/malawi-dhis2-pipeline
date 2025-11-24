@@ -27,6 +27,20 @@ This project uses OpenFn to ingest indicator files (XLSX & CSV) from an SFTP ser
 3.  **Adaptor Logic in Jobs:**
     *   Job 3 contains significant DHIS2 API orchestration logic (`createCategories`, `createDataElements`, etc.) that ideally belongs in the `@openfn/language-dhis2` adaptor.
 
+## Critical Development Notes (November 2025)
+
+### Git Submodules
+**Important:** The project uses git submodules for `projects/lightning` and `projects/openfn-custom-adaptors`. These must be initialized for the build to work.
+```bash
+git submodule update --init --recursive
+```
+
+### Production Deployment
+A detailed production guide has been added to **`docs/production-deployment.md`**. This covers:
+- Submodule initialization
+- Deployment steps via `mk.sh` or Instant CLI
+- Security and Backup recommendations
+
 ## Historical Troubleshooting & Key Learnings (October 2025)
 
 ### Data Element & Category Combo Issues

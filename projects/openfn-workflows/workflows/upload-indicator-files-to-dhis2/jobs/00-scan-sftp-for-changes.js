@@ -28,6 +28,9 @@ const WORKFLOW_OWNER_KEY = 'workflow-owner';
  *   // OR use filePatterns for complex matching:
  *   // filePatterns: ['*pattern*.xlsx'],
  * }
+ * 
+ * NOTE: This configuration is mirrored in configs/file-type-definitions.json
+ * Future refactoring should load that file dynamically.
  */
 const FILE_TYPE_CONFIGS = {
   pepfar_tx_curr_csv: {
