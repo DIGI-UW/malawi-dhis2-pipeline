@@ -398,21 +398,26 @@ function buildDataValues(records, fileTypeConfig, dhis2Mappings, metadataMapping
       ? normalizePeriodForPeriodType(overridePeriod, periodType)
       : normalizePeriodForPeriodType(normalizePeriod(mappedRow.period), periodType);
     
-    // If this is a PEPFAR MMD file-type, emit up to three rows for durations
-    // TODO: Refactor this hardcoded logic to be configuration-driven (see docs/technical-debt-and-refactoring.md)
-    if (String(fileTypeConfig?.fileType || '').startsWith('pepfar_tx_mmd_csv')) {
-      const durations = [
-        { key: 'mmd_lt3', label: '<3 months' },
-        { key: 'mmd_3to5', label: '3-5 months' },
-        { key: 'mmd_ge6', label: '>=6 months' }
-      ];
-      for (const d of durations) {
-        const val = mappedRow[d.key];
+    // Handle multi-value mapping (e.g. MMD splitting) driven by config
+    const multiValueConfig = fileTypeConfig?.multiValueMapping;
+    if (multiValueConfig && multiValueConfig.strategy === 'split_by_column') {
+      const mappings = multiValueConfig.mappings || {};
+      const categoryCode = multiValueConfig.categoryCode;
+      const catConfig = fileTypeConfig.builders?.categories?.find(c => c.code === categoryCode);
+      
+      for (const [sourceKey, targetOptionCode] of Object.entries(mappings)) {
+        const val = mappedRow[sourceKey];
         if (val !== undefined && val !== null && String(val).trim() !== '') {
-          const cocKey = `mmdDuration:${d.label}`;
-          const coc = dhis2Mappings.categoryOptionCombos?.[cocKey]
-            || dhis2Mappings.categoryOptionCombos?.[`mmd:${d.label}`]
-            || categoryOptionCombo;
+          // Find option name to resolve category option combo
+          const optConfig = catConfig?.categoryOptions?.find(o => o.code === targetOptionCode);
+          const optName = optConfig?.name;
+          
+          let coc = categoryOptionCombo;
+          if (optName) {
+             // Try specific MMD mapping pattern first
+             coc = dhis2Mappings.categoryOptionCombos?.[`mmd:${optName}`] || categoryOptionCombo;
+          }
+          
           values.push({
             dataElement,
             period: finalPeriod,
@@ -424,6 +429,13 @@ function buildDataValues(records, fileTypeConfig, dhis2Mappings, metadataMapping
       }
       continue;
     }
+    
+    // Legacy hardcoded fallback (removed in favor of config-driven approach)
+    /*
+    if (String(fileTypeConfig?.fileType || '').startsWith('pepfar_tx_mmd_csv')) {
+       // ...
+    }
+    */
 
     values.push({
       dataElement,

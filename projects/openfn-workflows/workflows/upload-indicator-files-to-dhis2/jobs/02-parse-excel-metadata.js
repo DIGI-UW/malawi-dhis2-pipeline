@@ -255,16 +255,26 @@ function buildOrgUnits(config, uniqueValues, orgUnitParentMap, stateConfig, meta
 
 function buildCategories(config, uniqueValues, metadataMappings) {
   if (!config) return [];
-  return (config || []).map(category => ({
-    name: category.name,
-    shortName: category.shortName,
-    code: category.code,
-    categoryOptions: (uniqueValues[category.uniqueValueKey] || []).map(option => ({
-      name: option,
-      shortName: option.substring(0, 50),
-      code: generateCodeFromName(option)
-    }))
-  }));
+  return (config || []).map(category => {
+    let options = [];
+    if (category.categoryOptions && Array.isArray(category.categoryOptions)) {
+      // Use static options from config if provided
+      options = category.categoryOptions;
+    } else if (category.uniqueValueKey) {
+      // Build options from unique values found in data
+      options = (uniqueValues[category.uniqueValueKey] || []).map(option => ({
+        name: option,
+        shortName: option.substring(0, 50),
+        code: generateCodeFromName(option)
+      }));
+    }
+    return {
+      name: category.name,
+      shortName: category.shortName,
+      code: category.code,
+      categoryOptions: options
+    };
+  });
 }
 
 function buildDataElements(config, uniqueValues, metadataMappings) {
