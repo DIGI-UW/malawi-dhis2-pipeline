@@ -343,7 +343,7 @@ function buildDataValues(records, fileTypeConfig, dhis2Mappings, metadataMapping
     if (isHeaderMappedRow(mappedRow)) continue;
     const orgUnitName = mappedRow.orgUnit;
     // Prefer explicit code mapping if present; fallback to generated code from name
-    const dataElementCode = mappedRow.dataElementCode || getCodeFromName(mappedRow.dataElement);
+    const dataElementCode = mappedRow.dataElementCode || generateCodeFromName(mappedRow.dataElement);
     
     // Build category option combo key based on available category options
     // For PEPFAR files: use sex and age group
@@ -364,8 +364,8 @@ function buildDataValues(records, fileTypeConfig, dhis2Mappings, metadataMapping
     // Sort category parts alphabetically to match Job 3's key format
     const categoryKey = categoryParts.length > 0 ? categoryParts.sort().join('+') : '';
 
-    const mappedDataElement = dhis2Mappings.dataElements?.[dataElementCode] || dhis2Mappings.dataElements?.[getCodeFromName(mappedRow.dataElement)];
-    const mappedOrgUnit = dhis2Mappings.orgUnits?.[orgUnitName] || dhis2Mappings.orgUnits?.[getCodeFromName(orgUnitName)];
+    const mappedDataElement = dhis2Mappings.dataElements?.[dataElementCode] || dhis2Mappings.dataElements?.[generateCodeFromName(mappedRow.dataElement)];
+    const mappedOrgUnit = dhis2Mappings.orgUnits?.[orgUnitName] || dhis2Mappings.orgUnits?.[generateCodeFromName(orgUnitName)];
     const dataElement = mappedDataElement || (useCodeScheme ? dataElementCode : undefined);
     const orgUnit = mappedOrgUnit || (useNameOrgUnits ? orgUnitName : undefined);
     
@@ -399,6 +399,7 @@ function buildDataValues(records, fileTypeConfig, dhis2Mappings, metadataMapping
       : normalizePeriodForPeriodType(normalizePeriod(mappedRow.period), periodType);
     
     // If this is a PEPFAR MMD file-type, emit up to three rows for durations
+    // TODO: Refactor this hardcoded logic to be configuration-driven (see docs/technical-debt-and-refactoring.md)
     if (String(fileTypeConfig?.fileType || '').startsWith('pepfar_tx_mmd_csv')) {
       const durations = [
         { key: 'mmd_lt3', label: '<3 months' },
@@ -553,7 +554,7 @@ function normalizePeriodForPeriodType(period, periodType) {
   return s;
 }
 
-function getCodeFromName(name) {
+function generateCodeFromName(name) {
   const util = (globalThis && globalThis.util) || {};
   const fn = util.generateCodeFromName;
   if (typeof fn === 'function') return fn(name);

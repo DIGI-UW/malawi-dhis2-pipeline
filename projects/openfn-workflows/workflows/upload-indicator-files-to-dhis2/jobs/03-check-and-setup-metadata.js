@@ -67,6 +67,7 @@ function prepareMetadata(dhis2Structures, options) {
     const { orgUnits = [], categories = [], dataElements = [] } = dhis2Structures || {};
 
     // Inject MMD Duration category for PEPFAR TxCURRMMD files
+    // TODO: Refactor this hardcoded logic to be configuration-driven (see docs/technical-debt-and-refactoring.md)
     const finalCategories = Array.isArray(categories) ? [...categories] : [];
     try {
       const ft = state.fileTypeConfig?.fileType;
@@ -734,6 +735,9 @@ async function mapOrgUnitsByName(names, state) {
 
 // Minimal helper for stable codes
 function generateCodeFromName(name) {
+  const util = (globalThis && globalThis.util) || {};
+  const fn = util.generateCodeFromName;
+  if (typeof fn === 'function') return fn(name);
   return String(name || '')
     .toUpperCase()
     .replace(/[^A-Z0-9]/g, '_')
