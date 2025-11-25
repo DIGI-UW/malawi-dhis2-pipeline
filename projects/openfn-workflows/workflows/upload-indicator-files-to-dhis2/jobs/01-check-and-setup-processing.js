@@ -10,6 +10,8 @@
 // Input:  { fileName, filePath, fileType, fileTypeConfigKey, fileTypeConfig, ... }
 // Output: { fileName, filePath, fileType, fileTypeConfigKey, fileTypeConfig, metadataMappings, ... }
 
+// PLACEHOLDER: metadataMappings reserved for future external lookup tables.
+// Currently unused - passed through workflow as {} for API compatibility.
 function loadMetadataMappings() { return {}; }
 
 fn(async state => {
@@ -56,6 +58,12 @@ fn(async state => {
   };
 }); 
 
+/**
+ * DUPLICATED FOR SANDBOX COMPATIBILITY
+ * OpenFN Lightning jobs are self-contained; imports not supported.
+ * Canonical version: Job 00 (00-scan-sftp-for-changes.js)
+ * TODO: Move to @openfn/language-sftp adaptor for single-source maintenance.
+ */
 function inferFileType(name) {
   const lower = String(name || '').toLowerCase();
   if (lower.endsWith('.xlsx')) return 'xlsx';

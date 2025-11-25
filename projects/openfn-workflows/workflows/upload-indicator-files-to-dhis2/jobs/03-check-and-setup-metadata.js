@@ -732,7 +732,13 @@ async function mapOrgUnitsByName(names, state) {
   return mappings;
 }
 
-// Minimal helper for stable codes
+/**
+ * CANONICAL VERSION - Also duplicated in Job 02 for sandbox compatibility.
+ * Generates a DHIS2-compatible code from a name (uppercase, underscores, max 50 chars).
+ * TODO: Move to @openfn/language-dhis2 adaptor for single-source maintenance.
+ * @param {string} name - Human-readable name (e.g., "Health Facility ABC")
+ * @returns {string} DHIS2-compatible code (e.g., "HEALTH_FACILITY_ABC")
+ */
 function generateCodeFromName(name) {
   return String(name || '')
     .toUpperCase()

@@ -93,7 +93,6 @@ async function parseXlsxMetadata(state, filePath, chunkSize, fileTypeConfig, met
 }
 
 async function parseCsvMetadata(state, filePath, fileTypeConfig, metadataMappings) {
-  const headerRowIndex = (fileTypeConfig.sheetConfig?.headerRow || 1) - 1;
   const dataStartRow = (fileTypeConfig.sheetConfig?.dataStartRow || 2) - 1;
   const columnHeaders = new Set();
   const uniqueValueSets = {};
@@ -299,6 +298,12 @@ function createFnv1a() {
   };
 }
 
+/**
+ * DUPLICATED FOR SANDBOX COMPATIBILITY
+ * OpenFN Lightning jobs are self-contained; imports not supported.
+ * Canonical version: Job 03 (03-check-and-setup-metadata.js)
+ * TODO: Move to @openfn/language-dhis2 adaptor for single-source maintenance.
+ */
 function generateCodeFromName(name) {
   // Prefer adaptor util if present; fallback to local
   const util = (globalThis && globalThis.util) || {};
@@ -312,10 +317,22 @@ function generateCodeFromName(name) {
     .substring(0, 50);
 }
 
+/**
+ * DUPLICATED FOR SANDBOX COMPATIBILITY
+ * OpenFN Lightning jobs are self-contained; imports not supported.
+ * Canonical version: Job 04 (04-process-all-chunks-sequentially.js)
+ * TODO: Move to @openfn/language-dhis2 adaptor for single-source maintenance.
+ */
 function normalizeHeader(header, headerMap = {}) {
   return headerMap[header] || headerMap[header?.toLowerCase?.()] || header;
 }
 
+/**
+ * DUPLICATED FOR SANDBOX COMPATIBILITY
+ * OpenFN Lightning jobs are self-contained; imports not supported.
+ * Canonical version: Job 04 (04-process-all-chunks-sequentially.js)
+ * TODO: Move to @openfn/language-dhis2 adaptor for single-source maintenance.
+ */
 function mapColumns(record, mappings, metadataMappings, options = {}) {
   const out = { categoryOptions: {} };
   const headerMap = options.headerMap || {};
