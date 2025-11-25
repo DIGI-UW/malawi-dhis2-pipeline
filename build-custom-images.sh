@@ -58,16 +58,21 @@ build_custom_openfn_adaptors() {
     
     echo "🔧 Building custom OpenFn adaptors for local adaptors mode..."
     
-    # Build the adaptors using the Dockerfile.build with volume mount
-    echo "🏗️  Building OpenFn adaptors using Dockerfile.build with volume mount..."
-    cd "$PROJECT_ROOT/projects/openfn-custom-adaptors"
+    # Build the adaptors using the projects/Dockerfile.adaptors-build with volume mount
+    echo "🏗️  Building OpenFn adaptors using Dockerfile.adaptors-build..."
+    
+    # Ensure we are in the project root to resolve paths correctly
+    cd "$PROJECT_ROOT"
     
     # Build the Docker image with the build process
-    docker build -f Dockerfile.build -t openfn-adaptors-builder .
+    # We point to the submodule as context (though we only need it for the run step really,
+    # but docker build needs a context). We use the Dockerfile from projects/
+    docker build -f projects/Dockerfile.adaptors-build -t openfn-adaptors-builder projects/openfn-custom-adaptors
     
     # Run the container with volume mount - build output will be created directly in host filesystem
+    # We mount the submodule to /workspace so the build artifacts persist in the submodule dir
     docker run --rm \
-        -v "$(pwd):/workspace" \
+        -v "$PROJECT_ROOT/projects/openfn-custom-adaptors:/workspace" \
         -w /workspace \
         openfn-adaptors-builder
     

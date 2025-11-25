@@ -1,0 +1,15 @@
+FROM node:18-alpine
+
+# Install build dependencies
+RUN apk add --no-cache git
+
+# Install pnpm
+RUN npm install -g pnpm@8.15.0
+
+WORKDIR /workspace
+
+# Default command to build adaptors and prepare published artifacts
+# 1. Install dependencies
+# 2. Build the specific packages we need
+# 3. Create the structure expected by the OpenFN Dockerfile (published-adaptors/packages/...)
+CMD ["sh", "-c", "echo '📦 Installing dependencies...' && pnpm install && echo '🔨 Building adaptors...' && pnpm build --filter @openfn/language-sftp --filter @openfn/language-dhis2 && echo '📂 Preparing published artifacts...' && mkdir -p published-adaptors/packages && rm -rf published-adaptors/packages/* && cp -r packages/sftp published-adaptors/packages/ && cp -r packages/dhis2 published-adaptors/packages/ && echo '✅ Build complete'"]
