@@ -29,6 +29,7 @@ echo ""
 
 echo "🚀 Running complete SFTP → Excel → DHIS2 workflow..."
 docker run --rm -i \
+    --network openfn_public \
     -v "$(pwd)/../../../openfn-workflows/workflows/sftp-test/state:/state" \
     -v "$(pwd)/outputs:/outputs" \
     "$DOCKER_IMAGE" /bin/sh <<'EOF'
