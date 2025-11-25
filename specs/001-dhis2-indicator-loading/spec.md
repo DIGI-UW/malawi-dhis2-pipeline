@@ -198,7 +198,7 @@ These adaptors include fixes for SFTP authentication handling and enhanced DHIS2
 
 ### Workflow Structure
 
-The pipeline consists of four chained jobs (numbered 0-4 in code):
+The pipeline consists of five chained jobs (numbered 0-4 in code):
 
 1. **Job 0 (scan)**: Scan SFTP for files, select next file, load FILE_TYPE_CONFIGS
 2. **Job 1 (setup)**: Validate configuration and prepare processing context

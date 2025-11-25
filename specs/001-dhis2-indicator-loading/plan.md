@@ -35,11 +35,22 @@ Configuration-driven data integration pipeline that automates the import of HIV/
 
 ## Constitution Check
 
-*Note: Project constitution is a template - no specific gates enforced.*
+The implementation adheres to the project constitution at [`.specify/memory/constitution.md`](../../.specify/memory/constitution.md).
 
-The implementation follows OpenFN design principles documented in:
-- `docs/07-openfn-design-compliance.md`
-- `docs/08-dhis2-pattern-examples.md`
+**Principle Compliance:**
+
+| Principle | Status | Evidence |
+|-----------|--------|----------|
+| I. Configuration-Driven Design | ✅ | FILE_TYPE_CONFIGS in Job 00 |
+| II. State-Driven Workflows | ✅ | Jobs return `{ ...state, newProps }` |
+| III. Single Responsibility Jobs | ✅ | 5 focused jobs (scan, setup, parse, metadata, upload) |
+| IV. DHIS2 API Compliance | ✅ | Uses `create("dataValueSets", ...)` with CREATE_AND_UPDATE |
+| V. Resumable Processing | ✅ | `lastSuccessfulChunk` tracking in Job 04 |
+| VI. Graceful Error Handling | ✅ | Returns `{ ...state, workflowComplete: true, error }` |
+
+**Additional Design References:**
+- [OpenFN Design Compliance](../../docs/07-openfn-design-compliance.md)
+- [DHIS2 Pattern Examples](../../docs/08-dhis2-pattern-examples.md)
 
 ## Project Structure
 

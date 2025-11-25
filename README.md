@@ -175,7 +175,7 @@ The pipeline automatically detects and processes these file types:
 - **DQ Sites**: `*Q*FY*DQ*sites*.xlsx` - Data quality reports with completeness scores
 - **Direct Queries**: `*Direct*Queries*.xlsx` - MoH quarterly reports with multi-sheet support
 
-Configuration files in `projects/openfn-workflows/configs/file-types/` define the mapping rules.
+File type configurations are defined inline in `FILE_TYPE_CONFIGS` within [jobs/00-scan-sftp-for-changes.js](projects/openfn-workflows/workflows/upload-indicator-files-to-dhis2/jobs/00-scan-sftp-for-changes.js). See [data-model.md](specs/001-dhis2-indicator-loading/data-model.md) for configuration structure.
 
 ### Workflow Sync System
 
@@ -233,7 +233,7 @@ See [Workflow Sync Documentation](docs/openfn-workflow-sync.md) for full details
 
 #### Workflow Structure
 
-Workflows are defined in `projects/openfn-workflows/workflows/sftp-dhis2/`:
+Workflows are defined in `projects/openfn-workflows/workflows/upload-indicator-files-to-dhis2/`:
 - `project.yaml` - Project configuration with workflows, jobs, triggers
 - `jobs/` - Individual job definitions (.js files)
 - `.versions/` - Downloaded workflow versions (auto-created)
@@ -277,32 +277,37 @@ For workflow changes without full rebuild:
 
 ### File Type Configuration
 
-Each file type has a JSON configuration specifying:
+File type configurations are defined inline in `FILE_TYPE_CONFIGS` within [jobs/00-scan-sftp-for-changes.js](projects/openfn-workflows/workflows/upload-indicator-files-to-dhis2/jobs/00-scan-sftp-for-changes.js).
+
+Each configuration specifies:
+- File patterns (glob matching)
 - Column mappings (source → DHIS2 fields)
-- Data transformations (dates, percentages, quarters)
-- Validation rules (required fields, data types, ranges)
-- DHIS2 import settings
+- Period format and extraction rules
+- Category configurations for disaggregation
 
 Example structure:
-```json
+```javascript
 {
-  "fileType": "identifier",
-  "filePatterns": ["*.xlsx"],
-  "columnMappings": {
-    "indicator": {
-      "sourceColumns": ["Indicator", "Data Element"],
-      "targetField": "dataElement",
-      "required": true
-    }
-  }
+  fileType: 'pepfar_tx_curr_csv',
+  filePatterns: ['PEPFAR_TxCURR*.csv'],
+  periodFormat: 'YYYY-Qx',
+  columnMappings: {
+    facility: ['site_id', 'facility_name'],
+    indicator: 'TX_CURR',
+    value: ['value', 'count']
+  },
+  periodExtraction: 'filename'
 }
 ```
 
 ### Adding New File Types
 
-1. Create configuration in `packages/openfn/importer/configs/file-types/`
-2. Copy to workflows: `cp -r packages/openfn/importer/configs projects/openfn-workflows/`
-3. Rebuild image: `./build-custom-images.sh openfn-workflows`
+1. Edit `FILE_TYPE_CONFIGS` in `projects/openfn-workflows/workflows/upload-indicator-files-to-dhis2/jobs/00-scan-sftp-for-changes.js`
+2. Add sample file to `projects/sftp/data/samples/` for testing
+3. Rebuild workflow image: `./build-custom-images.sh openfn-workflows`
+4. Deploy: `./mk.sh`
+
+See [data-model.md](specs/001-dhis2-indicator-loading/data-model.md) for detailed configuration documentation.
 
 ## Testing
 

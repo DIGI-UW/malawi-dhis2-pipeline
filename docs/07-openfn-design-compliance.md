@@ -12,11 +12,11 @@ Each job in our workflow has a single, well-defined responsibility:
 
 | Job | Responsibility | OpenFn Principle | DHIS2 Pattern |
 |-----|---------------|------------------|---------------|
-| `check-sftp-files.js` | Check for new/updated files | ✅ Single purpose | N/A |
-| `download-sftp-files.js` | Download files from SFTP | ✅ Single purpose | N/A |
-| `process-excel-data.js` | Parse and validate Excel data | ✅ Single purpose | N/A |
-| `generate-dhis2-payload.js` | Transform to DHIS2 format | ✅ Single purpose | ✅ Follows DHIS2 mapping pattern |
-| `upload-to-dhis2.js` | Upload to DHIS2 API | ✅ Single purpose | ✅ Follows simple `create()` pattern |
+| `00-scan-sftp-for-changes.js` | Scan SFTP, select next file, load FILE_TYPE_CONFIGS | ✅ Single purpose | N/A |
+| `01-check-and-setup-processing.js` | Validate configuration and prepare context | ✅ Single purpose | N/A |
+| `02-parse-excel-metadata.js` | Parse Excel/CSV, build dhis2Structures | ✅ Single purpose | N/A |
+| `03-check-and-setup-metadata.js` | Ensure DHIS2 metadata exists (upsert) | ✅ Single purpose | ✅ Follows DHIS2 metadata pattern |
+| `04-process-all-chunks-sequentially.js` | Stream chunks to DHIS2 with resume support | ✅ Single purpose | ✅ Follows simple `create()` pattern |
 
 ### ✅ **2. State-Driven Design**
 
@@ -114,24 +114,31 @@ Our `project.yaml` follows OpenFn's declarative workflow format:
 
 ```yaml
 workflows:
-  HIVIndicatorsSFTPtoDHIS2Workflow:
-    name: HIV Indicators SFTP to DHIS2 Workflow
+  UploadIndicatorFilesToDHIS2Workflow:
+    name: Upload Indicator Files to DHIS2 Workflow
+    concurrency: 1
     jobs:
-      GenerateDHIS2Payload:
-        name: Generate DHIS2 Payload
-        adaptor: '@openfn/language-common@2.4.0'
-        credential: null
+      ScanSftpForChanges:
+        name: Discover indicator files and manage workflow lock
+        adaptor: '@openfn/language-sftp@2.1.0-custom'
+        credential: sftp-credential
         body:
-          path: ./jobs/generate-dhis2-payload.js
-      UploadToDHIS2:
-        name: Upload to DHIS2
-        adaptor: '@openfn/language-dhis2@6.3.4'
+          path: ./jobs/00-scan-sftp-for-changes.js
+      CheckAndSetupMetadata:
+        name: Ensure DHIS2 metadata exists per file config
+        adaptor: '@openfn/language-dhis2@7.1.3-custom'
         credential: dhis2-credential
         body:
-          path: ./jobs/upload-to-dhis2.js
+          path: ./jobs/03-check-and-setup-metadata.js
+      ProcessAllChunksSequentially:
+        name: Stream chunks to DHIS2 with resume support
+        adaptor: '@openfn/language-dhis2@7.1.3-custom'
+        credential: combined-credential
+        body:
+          path: ./jobs/04-process-all-chunks-sequentially.js
 ```
 
-**DHIS2 Pattern Compliance**: Following the exact structure from the original OpenFn setup.
+**Note**: Uses custom forked adaptors (`@2.1.0-custom`, `@7.1.3-custom`) from `projects/openfn-custom-adaptors/`.
 
 
 ### ✅ **8. Credential Management**
@@ -241,16 +248,17 @@ function generateDataValueSet(processedFiles, config) {
 
 ## Compliance Checklist
 
-- ✅ **Single Responsibility**: Each job has one clear purpose
-- ✅ **State Immutability**: Jobs return new state objects
-- ✅ **Error Handling**: Graceful failure with clear messages
-- ✅ **Configuration-Driven**: Externalized business logic
-- ✅ **DHIS2 API Compliance**: Follows official DHIS2 patterns
-- ✅ **OpenFn Patterns**: Uses established OpenFn job patterns
-- ✅ **Credential Management**: Proper credential structure
-- ✅ **Workflow Structure**: Declarative project.yaml format
-- ✅ **Adaptor Usage**: Correct adaptors for each operation
-- ✅ **Documentation**: Comprehensive inline documentation
+- ✅ **Single Responsibility**: Each job has one clear purpose (5 jobs: scan, setup, parse, metadata, upload)
+- ✅ **State Immutability**: Jobs return new state objects with `filesIndex` tracking
+- ✅ **Error Handling**: Graceful failure with `workflowComplete: true` and error details
+- ✅ **Configuration-Driven**: FILE_TYPE_CONFIGS define all file processing rules
+- ✅ **DHIS2 API Compliance**: Uses `create("dataValueSets", ...)` with CREATE_AND_UPDATE strategy
+- ✅ **OpenFn Patterns**: Uses established OpenFn job patterns with conditional edges
+- ✅ **Credential Management**: Proper credential structure (sftp-credential, dhis2-credential, combined-credential)
+- ✅ **Workflow Structure**: Declarative project.yaml format with cron triggers
+- ✅ **Adaptor Usage**: Custom adaptors (@openfn/language-sftp@2.1.0-custom, @openfn/language-dhis2@7.1.3-custom)
+- ✅ **Resumable Processing**: Chunk-based with `lastSuccessfulChunk` tracking
+- ✅ **Documentation**: Comprehensive inline documentation and SDD specs
 
 ## Conclusion
 

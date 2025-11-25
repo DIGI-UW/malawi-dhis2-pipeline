@@ -75,7 +75,7 @@ All DHIS2 interactions MUST follow official API patterns from [DHIS2 documentati
 
 Large file processing MUST support interruption and resumption.
 
-- Files MUST be processed in configurable chunks (default: 1000 rows)
+- Files MUST be processed in configurable chunks (default: 5000 rows)
 - `state.filesIndex[filename].lastSuccessfulChunk` MUST track progress
 - On workflow restart, processing MUST resume from lastSuccessfulChunk + 1
 - Chunk boundaries MUST NOT split logical data units (e.g., all values for one facility/period)
