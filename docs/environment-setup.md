@@ -498,7 +498,7 @@ After successful setup:
 1. **Explore OpenFN Workflows**: Navigate to http://localhost:4000 and review the loaded workflows
 2. **Test Data Processing**: Upload a test Excel file to SFTP and monitor workflow execution
 3. **Review Documentation**: Check the [project documentation](../README.md#documentation-index) for detailed guides
-4. **Customize Configurations**: Modify file type mappings in `projects/openfn-workflows/configs/`
+4. **Customize Configurations**: Modify file type mappings in `FILE_TYPE_CONFIGS` within `projects/openfn-workflows/workflows/upload-indicator-files-to-dhis2/jobs/00-scan-sftp-for-changes.js` (see [data-model.md](../specs/001-dhis2-indicator-loading/data-model.md))
 
 ## Production Deployment
 

@@ -13,6 +13,20 @@ This project implements a flexible, configuration-driven pipeline for importing 
 - **Time-Based Protection**: Configurable update windows to prevent accidental overwrites
 - **Docker Swarm Deployment**: Production-ready containerized architecture
 
+## Quick Navigation
+
+### For Operators (Deployment & Configuration)
+- **[Quick Start Guide](specs/001-dhis2-indicator-loading/quickstart.md)** - Deploy in 15 minutes
+- **[Environment Setup](docs/environment-setup.md)** - Full installation guide
+- **[Production Deployment](docs/production-deployment.md)** - Government instance setup
+- **[Credential Configuration](#credential-configuration)** - DHIS2 & SFTP credentials
+
+### For Developers (Technical Reference)
+- **[Technical Specifications](specs/001-dhis2-indicator-loading/)** - SDD artifacts (spec, plan, tasks)
+- **[Development Guide](docs/02-development-guide.md)** - Workflow development
+- **[OpenFN Design Patterns](docs/07-openfn-design-compliance.md)** - Best practices
+- **[Testing Strategy](docs/03-testing-strategy.md)** - Testing approach
+
 ## CI/CD
 
 The project includes automated CI testing via GitHub Actions:
@@ -100,6 +114,32 @@ After ~5 minutes for initialization:
 - **DHIS2**: http://localhost:8080 (admin / district)
 - **SFTP**: sftp://localhost:2225 (openfn / instant101)
 
+## Credential Configuration
+
+The pipeline requires two credentials in OpenFN for production deployment.
+
+### DHIS2 Admin Credential (for metadata operations)
+Configure in OpenFN UI → Projects → Credentials → `dhis2-credential`:
+- **Host URL**: `https://your-dhis2-instance.gov.mw` (no trailing slash)
+- **Username**: DHIS2 admin account
+- **Password**: Admin password
+
+### Combined SFTP+DHIS2 Credential (for data uploads)
+Configure in OpenFN UI → Credentials → `combined-sftp-dhis2-credential`:
+- **SFTP Host**: Your SFTP server IP/hostname
+- **SFTP Port**: 2225 (default)
+- **SFTP Username**: openfn
+- **DHIS2 Host URL**: Same as above
+- **DHIS2 Username**: `openfn_integration` (service account)
+- **DHIS2 Password**: Integration user password
+
+### DHIS2 Integration User Requirements
+The `openfn_integration` user in DHIS2 needs:
+- **Roles**: Data Entry (minimum) or ALL authority
+- **Org Units**: Assigned to all facilities data will be imported to
+
+See [quickstart.md](specs/001-dhis2-indicator-loading/quickstart.md) for step-by-step credential setup.
+
 ## Documentation
 
 ### 📚 Essential Guides
@@ -107,7 +147,7 @@ After ~5 minutes for initialization:
 - **[Environment Setup Guide](docs/environment-setup.md)** - Detailed installation and configuration
 - **[Quick Start Tutorial](docs/quick-start-tutorial.md)** - Get running in 15 minutes
 - **[Testing Guide](docs/Testing-Guide-CSV-XLSX.md)** - Comprehensive testing procedures
-- **[Troubleshooting Guide](projects/openfn-workflows/docs/06-troubleshooting.md)** - Common issues and solutions
+- **[Troubleshooting Guide](docs/06-troubleshooting.md)** - Common issues and solutions
 
 ### 🔧 Configuration & Development
 
@@ -135,7 +175,7 @@ The pipeline automatically detects and processes these file types:
 - **DQ Sites**: `*Q*FY*DQ*sites*.xlsx` - Data quality reports with completeness scores
 - **Direct Queries**: `*Direct*Queries*.xlsx` - MoH quarterly reports with multi-sheet support
 
-Configuration files in `projects/openfn-workflows/configs/file-types/` define the mapping rules.
+File type configurations are defined inline in `FILE_TYPE_CONFIGS` within [jobs/00-scan-sftp-for-changes.js](projects/openfn-workflows/workflows/upload-indicator-files-to-dhis2/jobs/00-scan-sftp-for-changes.js). See [data-model.md](specs/001-dhis2-indicator-loading/data-model.md) for configuration structure.
 
 ### Workflow Sync System
 
@@ -193,7 +233,7 @@ See [Workflow Sync Documentation](docs/openfn-workflow-sync.md) for full details
 
 #### Workflow Structure
 
-Workflows are defined in `projects/openfn-workflows/workflows/sftp-dhis2/`:
+Workflows are defined in `projects/openfn-workflows/workflows/upload-indicator-files-to-dhis2/`:
 - `project.yaml` - Project configuration with workflows, jobs, triggers
 - `jobs/` - Individual job definitions (.js files)
 - `.versions/` - Downloaded workflow versions (auto-created)
@@ -233,101 +273,41 @@ For workflow changes without full rebuild:
 ./mk.sh
 ```
 
-## Documentation Index
-
-### 📋 Project Documentation
-
-- **[Project Overview](DHIS2-Indicator-Pipeline-Project-Page.md)** - Business overview and project benefits
-- **[Deliverables](docs/Deliverables.md)** - Project requirements and deliverables
-- **[Testing Guide](docs/Testing-Guide-CSV-XLSX.md)** - Comprehensive testing procedures
-- **[CSV/XLSX Integration Guide](docs/CSV-XLSX-Import-Integration.md)** - Configuration-based file processing
-
-### 🔧 Setup Guides
-
-- **[Google Sheets Setup](docs/google-sheets-setup.md)** - Google Sheets API configuration
-- **[SFTP Excel Integration](docs/sftp-excel-integration.md)** - SFTP-based file processing
-- **[OpenFN Workflow Sync](docs/openfn-workflow-sync.md)** - Bidirectional workflow synchronization
-- **[OpenFN State Management](docs/openfn-state-management-guide.md)** - State management best practices
-- **[OpenFN Testing Guide](docs/openfn-testing-guide.md)** - OpenFN-specific testing procedures
-
-### 🧪 Testing & Validation
-
-- **[Workflow Testing Framework](projects/indicator_workflow_testing/README.md)** - Automated testing suite for workflows
-- **[Testing Guide](docs/Testing-Guide-CSV-XLSX.md)** - Comprehensive testing procedures
-- **[API Testing](projects/indicator_workflow_testing/tests/)** - OpenFN API connectivity tests
-
-### 🔄 Migration & History
-
-- **[Migration Guide](docs/migration-guide.md)** - PostgreSQL to Google Sheets migration
-- **[Refactoring Summary](docs/refactoring-summary.md)** - Summary of major changes
-
-### 📦 Package Documentation
-
-#### Core Packages
-- **[OpenFN Package](packages/openfn/README.md)** - Workflow orchestration engine
-- **[DHIS2 Instance](packages/dhis2-instance/README.md)** - DHIS2 server configuration
-  - **[DHIS2 Database Setup](packages/dhis2-instance/importer/README.md)** - Database initialization
-- **[PostgreSQL Database](packages/database-postgres/README.md)** - Database setup
-- **[SFTP Storage](packages/sftp-storage/README.md)** - File storage and transfer
-- **[Nginx Reverse Proxy](packages/reverse-proxy-nginx/README.md)** - Load balancing and routing
-
-#### Workflow Components
-- **[SFTP-DHIS2 Workflow](projects/openfn-workflows/workflows/sftp-dhis2/README.md)** - Main data import workflow
-
-#### Other Resources
-- **[Original OpenFN Setup](projects/original-openfn-setup/README.md)** - Legacy setup documentation
-- **[Environment Variables](environment-variables.md)** - OpenFN environment variables reference
-- **[Config Override Scripts](scripts/cmd/override-configs/README.md)** - Configuration management scripts
-
-## Supported File Formats
-
-The pipeline supports multiple file formats through configuration files:
-
-### 1. ART Data Long Format
-- **Pattern**: `*ART*data*long*.xlsx`
-- **Config**: `configs/file-types/art_data_long_format.json`
-- **Features**: Age/gender disaggregation, ART regimen tracking
-
-### 2. Data Quality (DQ) Sites
-- **Pattern**: `*Q*FY*DQ*sites*.xlsx`
-- **Config**: `configs/file-types/dq_sites.json`
-- **Features**: Quarterly reports, completeness scores, fiscal year handling
-
-### 3. MoH Direct Queries
-- **Pattern**: `*Direct*Queries*.xlsx`
-- **Config**: `configs/file-types/moh_direct_queries.json`
-- **Features**: Multi-sheet support, flexible date parsing, calculated indicators
-
 ## Configuration
 
 ### File Type Configuration
 
-Each file type has a JSON configuration specifying:
+File type configurations are defined inline in `FILE_TYPE_CONFIGS` within [jobs/00-scan-sftp-for-changes.js](projects/openfn-workflows/workflows/upload-indicator-files-to-dhis2/jobs/00-scan-sftp-for-changes.js).
+
+Each configuration specifies:
+- File patterns (glob matching)
 - Column mappings (source → DHIS2 fields)
-- Data transformations (dates, percentages, quarters)
-- Validation rules (required fields, data types, ranges)
-- DHIS2 import settings
+- Period format and extraction rules
+- Category configurations for disaggregation
 
 Example structure:
-```json
+```javascript
 {
-  "fileType": "identifier",
-  "filePatterns": ["*.xlsx"],
-  "columnMappings": {
-    "indicator": {
-      "sourceColumns": ["Indicator", "Data Element"],
-      "targetField": "dataElement",
-      "required": true
-    }
-  }
+  fileType: 'pepfar_tx_curr_csv',
+  filePatterns: ['PEPFAR_TxCURR*.csv'],
+  periodFormat: 'YYYY-Qx',
+  columnMappings: {
+    facility: ['site_id', 'facility_name'],
+    indicator: 'TX_CURR',
+    value: ['value', 'count']
+  },
+  periodExtraction: 'filename'
 }
 ```
 
 ### Adding New File Types
 
-1. Create configuration in `packages/openfn/importer/configs/file-types/`
-2. Copy to workflows: `cp -r packages/openfn/importer/configs projects/openfn-workflows/`
-3. Rebuild image: `./build-custom-images.sh openfn-workflows`
+1. Edit `FILE_TYPE_CONFIGS` in `projects/openfn-workflows/workflows/upload-indicator-files-to-dhis2/jobs/00-scan-sftp-for-changes.js`
+2. Add sample file to `projects/sftp/data/samples/` for testing
+3. Rebuild workflow image: `./build-custom-images.sh openfn-workflows`
+4. Deploy: `./mk.sh`
+
+See [data-model.md](specs/001-dhis2-indicator-loading/data-model.md) for detailed configuration documentation.
 
 ## Testing
 
@@ -365,7 +345,7 @@ The project includes a comprehensive testing framework for validating workflows 
 
 ## Troubleshooting
 
-For detailed troubleshooting, see the [Environment Setup Guide](docs/environment-setup.md#troubleshooting) or the [Troubleshooting Guide](projects/openfn-workflows/docs/06-troubleshooting.md).
+For detailed troubleshooting, see the [Environment Setup Guide](docs/environment-setup.md#troubleshooting) or the [Troubleshooting Guide](docs/06-troubleshooting.md).
 
 Common quick fixes:
 
@@ -420,14 +400,16 @@ Common quick fixes:
 ## 📚 Documentation
 
 ### Workflow Development & Testing
-All workflow documentation has been consolidated in [`projects/openfn-workflows/docs/`](projects/openfn-workflows/docs/):
+All workflow documentation has been consolidated in [`docs/`](docs/):
 
-1. **[Overview](projects/openfn-workflows/docs/01-overview.md)** - Project architecture and quick start
-2. **[Development Guide](projects/openfn-workflows/docs/02-development-guide.md)** - How to create and modify workflows
-3. **[Testing Strategy](projects/openfn-workflows/docs/03-testing-strategy.md)** - Comprehensive testing approach
-4. **[SFTP to DHIS2 Testing Plan](projects/openfn-workflows/docs/04-sftp-dhis2-testing-plan.md)** - Detailed testing plan
-5. **[Docker Environment](projects/openfn-workflows/docs/05-docker-environment.md)** - Docker setup and configuration
-6. **[Troubleshooting Guide](projects/openfn-workflows/docs/06-troubleshooting.md)** - Common issues and solutions
+1. **[Overview](docs/01-overview.md)** - Project architecture and quick start
+2. **[Development Guide](docs/02-development-guide.md)** - How to create and modify workflows
+3. **[Testing Strategy](docs/03-testing-strategy.md)** - Comprehensive testing approach
+4. **[SFTP to DHIS2 Testing Plan](docs/04-sftp-dhis2-testing-plan.md)** - Detailed testing plan
+5. **[Docker Environment](docs/05-docker-environment.md)** - Docker setup and configuration
+6. **[Troubleshooting Guide](docs/06-troubleshooting.md)** - Common issues and solutions
+7. **[OpenFN Design Compliance](docs/07-openfn-design-compliance.md)** - Design patterns and best practices
+8. **[DHIS2 Pattern Examples](docs/08-dhis2-pattern-examples.md)** - DHIS2 integration patterns
 
 ### Testing Framework
 For the complete testing framework documentation, see:
@@ -490,12 +472,4 @@ docker exec $(docker ps -q -f name=sftp-server) ls -la /data/excel-files/
 
 ## Production Deployment
 
-> **Note**: Production deployment guide coming soon. The current setup is optimized for development and testing environments.
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Add tests for new functionality
-4. Update documentation
-5. Submit a pull request
+See the [Production Deployment Guide](docs/production-deployment.md) for deploying to government DHIS2 instances.
