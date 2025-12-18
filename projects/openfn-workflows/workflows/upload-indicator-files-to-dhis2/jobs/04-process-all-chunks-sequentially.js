@@ -4,6 +4,9 @@
  * Workflow position: 5/5 (final processing + cleanup). Native state tracks progress/resume info.
  */
 
+// DHIS2 default category option combo (used when no disaggregation applies)
+const DEFAULT_COC_UID = DEFAULT_COC_UID;
+
 executeWithSftp(
   fn(state => {
     const { fileName, totalChunks, chunkSize, filePath, fileType, data: { dhis2Mappings } } = state;
@@ -322,6 +325,16 @@ function normalizeXlsxChunk(chunkData, fileTypeConfig) {
 
 // removed readCsvChunk; CSV handled via adaptor getCsvChunk()
 
+/**
+ * Transforms parsed data records into DHIS2 dataValue format.
+ * Handles column mapping, category option combo lookup, and period normalization.
+ * @param {Object[]} records - Raw parsed rows from CSV/Excel
+ * @param {Object} fileTypeConfig - File type configuration with columnMappings
+ * @param {Object} dhis2Mappings - DHIS2 ID mappings (dataElements, orgUnits, categoryOptionCombos)
+ * @param {Object} metadataMappings - Reserved for future metadata lookup (currently unused)
+ * @param {Object} options - Optional settings (headerMap, periodType, overridePeriod, useCodeScheme)
+ * @returns {Object[]} Array of DHIS2 dataValue objects ready for upload
+ */
 function buildDataValues(records, fileTypeConfig, dhis2Mappings, metadataMappings, options = {}) {
   const values = [];
   const mappings = fileTypeConfig.columnMappings || {};
@@ -379,12 +392,12 @@ function buildDataValues(records, fileTypeConfig, dhis2Mappings, metadataMapping
     
     // Final fallback to default combo
     if (!categoryOptionCombo) {
-      categoryOptionCombo = 'HllvX50cXC0';
+      categoryOptionCombo = DEFAULT_COC_UID;
     }
     
     // Track category option combo usage
     if (!cocUsage[categoryOptionCombo]) {
-      cocUsage[categoryOptionCombo] = { count: 0, key: categoryKey || '(no key)', isDefault: categoryOptionCombo === 'HllvX50cXC0' };
+      cocUsage[categoryOptionCombo] = { count: 0, key: categoryKey || '(no key)', isDefault: categoryOptionCombo === DEFAULT_COC_UID };
     }
     cocUsage[categoryOptionCombo].count++;
 
@@ -435,7 +448,7 @@ function buildDataValues(records, fileTypeConfig, dhis2Mappings, metadataMapping
   
   // Log category option combo usage summary
   const uniqueCombos = Object.keys(cocUsage).length;
-  const defaultUsage = cocUsage['HllvX50cXC0']?.count || 0;
+  const defaultUsage = cocUsage[DEFAULT_COC_UID]?.count || 0;
   const disaggregatedUsage = Object.values(cocUsage)
     .filter(u => !u.isDefault)
     .reduce((sum, u) => sum + u.count, 0);
@@ -448,7 +461,7 @@ function buildDataValues(records, fileTypeConfig, dhis2Mappings, metadataMapping
   
   // Show sample of category option combos being used
   const sampleCombos = Object.entries(cocUsage)
-    .filter(([id]) => id !== 'HllvX50cXC0')
+    .filter(([id]) => id !== DEFAULT_COC_UID)
     .slice(0, 5)
     .map(([id, data]) => `${data.key} → ${id}`);
   if (sampleCombos.length > 0) {
@@ -458,9 +471,15 @@ function buildDataValues(records, fileTypeConfig, dhis2Mappings, metadataMapping
   return values;
 }
 
+/**
+ * CANONICAL VERSION - Also duplicated in Job 02 for sandbox compatibility.
+ * Normalizes a header name using the provided header map.
+ * TODO: Move to @openfn/language-dhis2 adaptor for single-source maintenance.
+ */
 function normalizeHeader(header, headerMap = {}) {
   return headerMap[header] || headerMap[header?.toLowerCase?.()] || header;
 }
+
 function applyHeaderMap(row, headerMap = {}) {
   const normalized = {};
   Object.keys(row || {}).forEach(header => {
@@ -470,6 +489,16 @@ function applyHeaderMap(row, headerMap = {}) {
   return normalized;
 }
 
+/**
+ * CANONICAL VERSION - Also duplicated in Job 02 for sandbox compatibility.
+ * Maps raw record columns to target fields using configuration-based mappings.
+ * TODO: Move to @openfn/language-dhis2 adaptor for single-source maintenance.
+ * @param {Object} record - Raw data row from parsed CSV/Excel
+ * @param {Object} mappings - Column mapping config (sourceColumns -> targetField)
+ * @param {Object} metadataMappings - Reserved for future use (currently unused)
+ * @param {Object} options - Options including headerMap for column name normalization
+ * @returns {Object} Mapped row with standard field names (orgUnit, dataElement, value, etc.)
+ */
 function mapColumns(record, mappings, metadataMappings, options = {}) {
   const out = { categoryOptions: {} };
   const headerMap = options.headerMap || {};
@@ -574,7 +603,8 @@ async function updateIndex(state, fileName, patch) {
   state.filesIndex = filesIndex;
 } 
 
-// Guard: detect header-like rows from raw records
+// Guard: detect header-like rows from RAW records (before mapColumns)
+// Used to filter records before processing in buildDataValues
 function isHeaderLikeRow(record, fileTypeConfig, headerMap = {}) {
   const headers = Object.keys(headerMap || {});
   if (headers.length === 0) return false;
@@ -595,7 +625,8 @@ function isHeaderLikeRow(record, fileTypeConfig, headerMap = {}) {
   return looksLikeHeader;
 }
 
-// Guard: detect header-like rows after mapping
+// Guard: detect header-like rows from MAPPED records (after mapColumns)
+// Used inside buildDataValues loop to skip rows that still look like headers
 function isHeaderMappedRow(mappedRow) {
   const facilityIsHeader = String(mappedRow.orgUnit || '').trim().toLowerCase() === 'facility';
   const indicatorIsHeader = String(mappedRow.dataElement || '').trim().toLowerCase() === 'indicator';

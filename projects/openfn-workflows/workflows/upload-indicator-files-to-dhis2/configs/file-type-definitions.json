@@ -1,0 +1,1229 @@
+{
+  "pepfar_tx_curr_csv": {
+    "fileType": "csv",
+    "displayName": "PEPFAR TxCURR CSV",
+    "description": "PEPFAR CSV for TX_CURR indicator",
+    "filePrefix": "PEPFAR_TxCURR",
+    "columnMappings": {
+      "facility": {
+        "sourceColumns": [
+          "facility",
+          "Facility",
+          "Health Facility",
+          "Site",
+          "site",
+          "Site Name"
+        ],
+        "targetField": "orgUnit",
+        "required": true
+      },
+      "indicator": {
+        "sourceColumns": [
+          "indicator",
+          "Indicator",
+          "TX_CURR"
+        ],
+        "targetField": "dataElement",
+        "required": true
+      },
+      "sex": {
+        "sourceColumns": [
+          "sex",
+          "Sex"
+        ],
+        "targetField": "categoryOptions.sex",
+        "required": false
+      },
+      "age_group": {
+        "sourceColumns": [
+          "age_group",
+          "Age Group",
+          "Age"
+        ],
+        "targetField": "categoryOptions.ageGroup",
+        "required": false
+      },
+      "Date_Submitted": {
+        "sourceColumns": [
+          "Date_Submitted"
+        ],
+        "targetField": "period",
+        "required": true
+      },
+      "value": {
+        "sourceColumns": [
+          "tx_curr",
+          "Value",
+          "value"
+        ],
+        "targetField": "value",
+        "required": true,
+        "dataType": "numeric"
+      }
+    },
+    "headerMap": {
+      "site_id": "site_id",
+      "facility": "facility",
+      "indicator": "indicator",
+      "sex": "sex",
+      "age_group": "age_group",
+      "Date_Submitted": "Date_Submitted",
+      "tx_curr": "tx_curr"
+    },
+    "uniqueValueCollectors": {
+      "sites": {
+        "targetField": "orgUnit"
+      },
+      "indicators": {
+        "targetField": "dataElement"
+      },
+      "sexValues": {
+        "targetField": "categoryOptions.sex"
+      },
+      "ageGroups": {
+        "targetField": "categoryOptions.ageGroup"
+      }
+    },
+    "builders": {
+      "dataElements": {
+        "uniqueValueKey": "indicators",
+        "valueType": "INTEGER",
+        "aggregationType": "SUM",
+        "domainType": "AGGREGATE"
+      },
+      "categories": [
+        {
+          "name": "Sex",
+          "shortName": "Sex",
+          "code": "SEX",
+          "uniqueValueKey": "sexValues"
+        },
+        {
+          "name": "Age Group",
+          "shortName": "Age Group",
+          "code": "AGE_GROUP",
+          "uniqueValueKey": "ageGroups"
+        }
+      ]
+    },
+    "dhis2Builder": "default",
+    "dhis2Config": {
+      "periodType": "Quarterly",
+      "periodSource": "filename",
+      "openFuturePeriods": 4
+    }
+  },
+  "pepfar_tx_mmd_csv": {
+    "fileType": "pepfar_tx_mmd_csv",
+    "displayName": "PEPFAR TxCURR MMD CSV",
+    "description": "PEPFAR CSV for TX_CURR_MMD indicator (MMD durations)",
+    "filePrefix": "PEPFAR_TxCURRMMD",
+    "columnMappings": {
+      "facility": {
+        "sourceColumns": [
+          "facility",
+          "Facility",
+          "Health Facility",
+          "Site",
+          "site",
+          "Site Name"
+        ],
+        "targetField": "orgUnit",
+        "required": true
+      },
+      "indicator": {
+        "sourceColumns": [
+          "indicator",
+          "Indicator",
+          "TX_CURR_MMD"
+        ],
+        "targetField": "dataElement",
+        "required": true
+      },
+      "sex": {
+        "sourceColumns": [
+          "sex",
+          "Sex"
+        ],
+        "targetField": "categoryOptions.sex",
+        "required": false
+      },
+      "age_group": {
+        "sourceColumns": [
+          "age_group",
+          "Age Group",
+          "Age"
+        ],
+        "targetField": "categoryOptions.ageGroup",
+        "required": false
+      },
+      "Date_Submitted": {
+        "sourceColumns": [
+          "Date_Submitted"
+        ],
+        "targetField": "period",
+        "required": true
+      },
+      "mmd_lt3": {
+        "sourceColumns": [
+          "# of clients on <3 months of ARVs"
+        ],
+        "targetField": "mmd_lt3",
+        "required": false,
+        "dataType": "numeric"
+      },
+      "mmd_3to5": {
+        "sourceColumns": [
+          "# of clients on 3 - 5 months of ARVs"
+        ],
+        "targetField": "mmd_3to5",
+        "required": false,
+        "dataType": "numeric"
+      },
+      "mmd_ge6": {
+        "sourceColumns": [
+          "# of clients on >= 6 months of ARVs"
+        ],
+        "targetField": "mmd_ge6",
+        "required": false,
+        "dataType": "numeric"
+      }
+    },
+    "headerMap": {
+      "site_id": "site_id",
+      "facility": "facility",
+      "indicator": "indicator",
+      "sex": "sex",
+      "age_group": "age_group",
+      "Date_Submitted": "Date_Submitted",
+      "# of clients on <3 months of ARVs": "# of clients on <3 months of ARVs",
+      "# of clients on 3 - 5 months of ARVs": "# of clients on 3 - 5 months of ARVs",
+      "# of clients on >= 6 months of ARVs": "# of clients on >= 6 months of ARVs"
+    },
+    "uniqueValueCollectors": {
+      "sites": {
+        "targetField": "orgUnit"
+      },
+      "indicators": {
+        "targetField": "dataElement"
+      },
+      "sexValues": {
+        "targetField": "categoryOptions.sex"
+      },
+      "ageGroups": {
+        "targetField": "categoryOptions.ageGroup"
+      }
+    },
+    "builders": {
+      "dataElements": {
+        "uniqueValueKey": "indicators",
+        "valueType": "INTEGER",
+        "aggregationType": "SUM",
+        "domainType": "AGGREGATE"
+      },
+      "categories": [
+        {
+          "name": "Sex",
+          "shortName": "Sex",
+          "code": "SEX",
+          "uniqueValueKey": "sexValues"
+        },
+        {
+          "name": "Age Group",
+          "shortName": "Age Group",
+          "code": "AGE_GROUP",
+          "uniqueValueKey": "ageGroups"
+        }
+      ]
+    },
+    "dhis2Builder": "default",
+    "dhis2Config": {
+      "periodType": "Quarterly",
+      "periodSource": "filename",
+      "openFuturePeriods": 4
+    }
+  },
+  "pepfar_tx_ml_csv": {
+    "fileType": "pepfar_tx_ml_csv",
+    "displayName": "PEPFAR TxML CSV",
+    "description": "PEPFAR CSV for TX_ML indicator",
+    "filePrefix": "PEPFAR_TxML",
+    "columnMappings": {
+      "facility": {
+        "sourceColumns": [
+          "facility",
+          "Facility",
+          "Health Facility",
+          "Site",
+          "site",
+          "Site Name"
+        ],
+        "targetField": "orgUnit",
+        "required": true
+      },
+      "indicator": {
+        "sourceColumns": [
+          "indicator",
+          "Indicator",
+          "TX_ML"
+        ],
+        "targetField": "dataElement",
+        "required": true
+      },
+      "sex": {
+        "sourceColumns": [
+          "sex",
+          "Sex"
+        ],
+        "targetField": "categoryOptions.sex",
+        "required": false
+      },
+      "age_group": {
+        "sourceColumns": [
+          "age_group",
+          "Age Group",
+          "Age"
+        ],
+        "targetField": "categoryOptions.ageGroup",
+        "required": false
+      },
+      "Date_Submitted": {
+        "sourceColumns": [
+          "Date_Submitted"
+        ],
+        "targetField": "period",
+        "required": true
+      },
+      "value": {
+        "sourceColumns": [
+          "value",
+          "Value"
+        ],
+        "targetField": "value",
+        "required": true,
+        "dataType": "numeric"
+      }
+    },
+    "headerMap": {
+      "site_id": "site_id",
+      "facility": "facility",
+      "indicator": "indicator",
+      "sex": "sex",
+      "age_group": "age_group",
+      "Date_Submitted": "Date_Submitted"
+    },
+    "uniqueValueCollectors": {
+      "sites": {
+        "targetField": "orgUnit"
+      },
+      "indicators": {
+        "targetField": "dataElement"
+      },
+      "sexValues": {
+        "targetField": "categoryOptions.sex"
+      },
+      "ageGroups": {
+        "targetField": "categoryOptions.ageGroup"
+      }
+    },
+    "builders": {
+      "dataElements": {
+        "uniqueValueKey": "indicators",
+        "valueType": "INTEGER",
+        "aggregationType": "SUM",
+        "domainType": "AGGREGATE"
+      },
+      "categories": [
+        {
+          "name": "Sex",
+          "shortName": "Sex",
+          "code": "SEX",
+          "uniqueValueKey": "sexValues"
+        },
+        {
+          "name": "Age Group",
+          "shortName": "Age Group",
+          "code": "AGE_GROUP",
+          "uniqueValueKey": "ageGroups"
+        }
+      ]
+    },
+    "dhis2Builder": "default",
+    "dhis2Config": {
+      "periodType": "Quarterly",
+      "periodSource": "filename",
+      "openFuturePeriods": 4
+    }
+  },
+  "pepfar_tx_new_csv": {
+    "fileType": "pepfar_tx_new_csv",
+    "displayName": "PEPFAR TxNEW CSV",
+    "description": "PEPFAR CSV for TX_NEW indicator",
+    "filePrefix": "PEPFAR_TxNEW",
+    "columnMappings": {
+      "facility": {
+        "sourceColumns": [
+          "facility",
+          "Facility",
+          "Health Facility",
+          "Site",
+          "site",
+          "Site Name"
+        ],
+        "targetField": "orgUnit",
+        "required": true
+      },
+      "indicator": {
+        "sourceColumns": [
+          "indicator",
+          "Indicator",
+          "TX_NEW"
+        ],
+        "targetField": "dataElement",
+        "required": true
+      },
+      "sex": {
+        "sourceColumns": [
+          "sex",
+          "Sex"
+        ],
+        "targetField": "categoryOptions.sex",
+        "required": false
+      },
+      "age_group": {
+        "sourceColumns": [
+          "age_group",
+          "Age Group",
+          "Age"
+        ],
+        "targetField": "categoryOptions.ageGroup",
+        "required": false
+      },
+      "Date_Submitted": {
+        "sourceColumns": [
+          "Date_Submitted"
+        ],
+        "targetField": "period",
+        "required": true
+      },
+      "value": {
+        "sourceColumns": [
+          "value",
+          "Value"
+        ],
+        "targetField": "value",
+        "required": true,
+        "dataType": "numeric"
+      }
+    },
+    "headerMap": {
+      "site_id": "site_id",
+      "facility": "facility",
+      "indicator": "indicator",
+      "sex": "sex",
+      "age_group": "age_group",
+      "Date_Submitted": "Date_Submitted"
+    },
+    "uniqueValueCollectors": {
+      "sites": {
+        "targetField": "orgUnit"
+      },
+      "indicators": {
+        "targetField": "dataElement"
+      },
+      "sexValues": {
+        "targetField": "categoryOptions.sex"
+      },
+      "ageGroups": {
+        "targetField": "categoryOptions.ageGroup"
+      }
+    },
+    "builders": {
+      "dataElements": {
+        "uniqueValueKey": "indicators",
+        "valueType": "INTEGER",
+        "aggregationType": "SUM",
+        "domainType": "AGGREGATE"
+      },
+      "categories": [
+        {
+          "name": "Sex",
+          "shortName": "Sex",
+          "code": "SEX",
+          "uniqueValueKey": "sexValues"
+        },
+        {
+          "name": "Age Group",
+          "shortName": "Age Group",
+          "code": "AGE_GROUP",
+          "uniqueValueKey": "ageGroups"
+        }
+      ]
+    },
+    "dhis2Builder": "default",
+    "dhis2Config": {
+      "periodType": "Quarterly",
+      "periodSource": "filename",
+      "openFuturePeriods": 4
+    }
+  },
+  "pepfar_tx_rtt_csv": {
+    "fileType": "pepfar_tx_rtt_csv",
+    "displayName": "PEPFAR TxRTT CSV",
+    "description": "PEPFAR CSV for TX_RTT indicator",
+    "filePrefix": "PEPFAR_TxRTT",
+    "columnMappings": {
+      "facility": {
+        "sourceColumns": [
+          "facility",
+          "Facility",
+          "Health Facility",
+          "Site",
+          "site",
+          "Site Name"
+        ],
+        "targetField": "orgUnit",
+        "required": true
+      },
+      "indicator": {
+        "sourceColumns": [
+          "indicator",
+          "Indicator",
+          "TX_RTT"
+        ],
+        "targetField": "dataElement",
+        "required": true
+      },
+      "sex": {
+        "sourceColumns": [
+          "sex",
+          "Sex"
+        ],
+        "targetField": "categoryOptions.sex",
+        "required": false
+      },
+      "age_group": {
+        "sourceColumns": [
+          "age_group",
+          "Age Group",
+          "Age"
+        ],
+        "targetField": "categoryOptions.ageGroup",
+        "required": false
+      },
+      "Date_Submitted": {
+        "sourceColumns": [
+          "Date_Submitted"
+        ],
+        "targetField": "period",
+        "required": true
+      },
+      "value": {
+        "sourceColumns": [
+          "value",
+          "Value"
+        ],
+        "targetField": "value",
+        "required": true,
+        "dataType": "numeric"
+      }
+    },
+    "headerMap": {
+      "site_id": "site_id",
+      "facility": "facility",
+      "indicator": "indicator",
+      "sex": "sex",
+      "age_group": "age_group",
+      "Date_Submitted": "Date_Submitted"
+    },
+    "uniqueValueCollectors": {
+      "sites": {
+        "targetField": "orgUnit"
+      },
+      "indicators": {
+        "targetField": "dataElement"
+      },
+      "sexValues": {
+        "targetField": "categoryOptions.sex"
+      },
+      "ageGroups": {
+        "targetField": "categoryOptions.ageGroup"
+      }
+    },
+    "builders": {
+      "dataElements": {
+        "uniqueValueKey": "indicators",
+        "valueType": "INTEGER",
+        "aggregationType": "SUM",
+        "domainType": "AGGREGATE"
+      },
+      "categories": [
+        {
+          "name": "Sex",
+          "shortName": "Sex",
+          "code": "SEX",
+          "uniqueValueKey": "sexValues"
+        },
+        {
+          "name": "Age Group",
+          "shortName": "Age Group",
+          "code": "AGE_GROUP",
+          "uniqueValueKey": "ageGroups"
+        }
+      ]
+    },
+    "dhis2Builder": "default",
+    "dhis2Config": {
+      "periodType": "Quarterly",
+      "periodSource": "filename",
+      "openFuturePeriods": 4
+    }
+  },
+  "art_data_long_format": {
+    "fileType": "art_data_long_format",
+    "displayName": "ART Data Long Format",
+    "description": "Configuration for processing ART supervision data in long format",
+    "filePrefix": "ART_data_long",
+    "sheetConfig": {
+      "targetSheet": 0,
+      "headerRow": 1,
+      "dataStartRow": 2
+    },
+    "columnMappings": {
+      "facility": {
+        "sourceColumns": [
+          "Facility",
+          "facility",
+          "Health Facility",
+          "Site"
+        ],
+        "targetField": "orgUnit",
+        "required": true
+      },
+      "indicator": {
+        "sourceColumns": [
+          "Indicator",
+          "indicator",
+          "Indicator Name",
+          "Data Element"
+        ],
+        "targetField": "dataElement",
+        "required": true
+      },
+      "value": {
+        "sourceColumns": [
+          "Value",
+          "value",
+          "Count",
+          "Total",
+          "Result"
+        ],
+        "targetField": "value",
+        "required": true,
+        "dataType": "numeric"
+      },
+      "period": {
+        "sourceColumns": [
+          "Period",
+          "period",
+          "Month",
+          "Quarter",
+          "Reporting Period"
+        ],
+        "targetField": "period",
+        "required": true,
+        "format": "YYYYMM"
+      },
+      "ageGroup": {
+        "sourceColumns": [
+          "Age Group",
+          "age_group",
+          "Age",
+          "Age Category"
+        ],
+        "targetField": "categoryOptions.ageGroup",
+        "required": false
+      },
+      "gender": {
+        "sourceColumns": [
+          "Gender",
+          "gender",
+          "Sex"
+        ],
+        "targetField": "categoryOptions.gender",
+        "required": false
+      },
+      "artRegimen": {
+        "sourceColumns": [
+          "ART Regimen",
+          "Regimen",
+          "Treatment"
+        ],
+        "targetField": "categoryOptions.artRegimen",
+        "required": false
+      }
+    },
+    "dataValidation": {
+      "rules": [
+        {
+          "field": "value",
+          "type": "numeric",
+          "min": 0,
+          "max": 999999,
+          "allowNull": false
+        },
+        {
+          "field": "period",
+          "type": "regex",
+          "pattern": "^\\d{6}$",
+          "message": "Period must be in YYYYMM format"
+        },
+        {
+          "field": "indicator",
+          "type": "notEmpty",
+          "message": "Indicator name cannot be empty"
+        }
+      ],
+      "skipEmptyRows": true,
+      "stopOnError": false
+    },
+    "transformations": [
+      {
+        "field": "period",
+        "type": "dateFormat",
+        "from": [
+          "MM/YYYY",
+          "MM-YYYY",
+          "MMMM YYYY"
+        ],
+        "to": "YYYYMM"
+      },
+      {
+        "field": "value",
+        "type": "numeric",
+        "removeCommas": true,
+        "defaultValue": 0
+      }
+    ],
+    "uniqueValueCollectors": {
+      "sites": {
+        "targetField": "orgUnit"
+      },
+      "indicators": {
+        "targetField": "dataElement"
+      },
+      "quarters": {
+        "targetField": "period"
+      },
+      "hsectors": {
+        "targetField": "categoryOptions.hsector"
+      },
+      "reportingPeriods": {
+        "targetField": "categoryOptions.reportingPeriodType"
+      },
+      "regions": {
+        "targetField": "Region"
+      },
+      "zones": {
+        "targetField": "Zone"
+      },
+      "districts": {
+        "targetField": "District"
+      }
+    },
+    "orgUnitHierarchy": [
+      {
+        "childField": "orgUnit",
+        "parentField": "District"
+      },
+      {
+        "childField": "District",
+        "parentField": "Zone"
+      },
+      {
+        "childField": "Zone",
+        "parentField": "Region"
+      }
+    ],
+    "builders": {
+      "orgUnits": {
+        "levels": [
+          {
+            "level": 2,
+            "uniqueValueKey": "regions",
+            "parentKey": "root"
+          },
+          {
+            "level": 3,
+            "uniqueValueKey": "zones",
+            "parentKey": "Region"
+          },
+          {
+            "level": 4,
+            "uniqueValueKey": "districts",
+            "parentKey": "Zone"
+          },
+          {
+            "level": 5,
+            "uniqueValueKey": "sites",
+            "parentKey": "District"
+          }
+        ]
+      },
+      "categories": [
+        {
+          "name": "Health Sector",
+          "shortName": "Health Sector",
+          "code": "HEALTH_SECTOR",
+          "uniqueValueKey": "hsectors"
+        },
+        {
+          "name": "Reporting Period Type",
+          "shortName": "Report Period Type",
+          "code": "REPORTING_PERIOD_TYPE",
+          "uniqueValueKey": "reportingPeriods"
+        }
+      ],
+      "dataElements": {
+        "uniqueValueKey": "indicators"
+      }
+    },
+    "aggregation": {
+      "enabled": false,
+      "groupBy": [
+        "orgUnit",
+        "dataElement",
+        "period",
+        "categoryOptions"
+      ],
+      "method": "sum"
+    },
+    "dhis2Config": {
+      "dataSetId": "ARTSupervisionDataSet",
+      "importStrategy": "CREATE_AND_UPDATE",
+      "skipAudit": false,
+      "dryRun": false,
+      "idScheme": "UID",
+      "orgUnitIdScheme": "CODE"
+    }
+  },
+  "dq_sites": {
+    "fileType": "dq_sites",
+    "displayName": "Data Quality Sites Report",
+    "description": "Configuration for processing quarterly DQ site reports",
+    "filePatterns": [
+      "*Q*FY*DQ*sites*.xlsx",
+      "*DQ*253*sites*.xlsx",
+      "Q2FY25_DQ_253_sites.xlsx"
+    ],
+    "sheetConfig": {
+      "targetSheet": 0,
+      "headerRow": 1,
+      "dataStartRow": 2
+    },
+    "columnMappings": {
+      "site": {
+        "sourceColumns": [
+          "Site",
+          "site",
+          "Facility",
+          "Health Facility",
+          "Site Name"
+        ],
+        "targetField": "orgUnit",
+        "required": true
+      },
+      "indicator": {
+        "sourceColumns": [
+          "Indicator",
+          "indicator",
+          "Data Element",
+          "Measure"
+        ],
+        "targetField": "dataElement",
+        "required": true
+      },
+      "value": {
+        "sourceColumns": [
+          "Value",
+          "value",
+          "Score",
+          "Result",
+          "Count"
+        ],
+        "targetField": "value",
+        "required": true,
+        "dataType": "numeric"
+      },
+      "period": {
+        "sourceColumns": [
+          "Period",
+          "period",
+          "Quarter",
+          "Reporting Period"
+        ],
+        "targetField": "period",
+        "required": true,
+        "format": "YYYYQQ"
+      },
+      "dataQualityScore": {
+        "sourceColumns": [
+          "DQ Score",
+          "Quality Score",
+          "Score",
+          "Completeness"
+        ],
+        "targetField": "attributeOptions.dqScore",
+        "required": false,
+        "dataType": "numeric"
+      },
+      "completeness": {
+        "sourceColumns": [
+          "Completeness",
+          "completeness",
+          "Complete %",
+          "Reporting Rate"
+        ],
+        "targetField": "attributeOptions.completeness",
+        "required": false,
+        "dataType": "percentage"
+      },
+      "timeliness": {
+        "sourceColumns": [
+          "Timeliness",
+          "timeliness",
+          "On Time",
+          "Timely Submission"
+        ],
+        "targetField": "attributeOptions.timeliness",
+        "required": false,
+        "dataType": "percentage"
+      }
+    },
+    "dataValidation": {
+      "rules": [
+        {
+          "field": "value",
+          "type": "numeric",
+          "min": 0,
+          "max": 999999,
+          "allowNull": false
+        },
+        {
+          "field": "period",
+          "type": "regex",
+          "pattern": "^\\d{4}Q[1-4]$",
+          "message": "Period must be in YYYYQQ format (e.g., 2025Q2)"
+        },
+        {
+          "field": "dataQualityScore",
+          "type": "numeric",
+          "min": 0,
+          "max": 100,
+          "allowNull": true
+        }
+      ],
+      "skipEmptyRows": true,
+      "stopOnError": false
+    },
+    "transformations": [
+      {
+        "field": "period",
+        "type": "quarterToMonth",
+        "from": [
+          "Q1 FY25",
+          "Q2 FY25",
+          "Q3 FY25",
+          "Q4 FY25",
+          "Q1FY25",
+          "Q2FY25"
+        ],
+        "fiscalYearStart": 7,
+        "to": "YYYYMM"
+      },
+      {
+        "field": "value",
+        "type": "numeric",
+        "removeCommas": true,
+        "defaultValue": 0
+      },
+      {
+        "field": "completeness",
+        "type": "percentage",
+        "from": "decimal",
+        "to": "whole"
+      }
+    ],
+    "aggregation": {
+      "enabled": false,
+      "groupBy": [
+        "orgUnit",
+        "dataElement",
+        "period"
+      ],
+      "method": "average"
+    },
+    "dhis2Config": {
+      "dataSetId": "DataQualityMonitoring",
+      "importStrategy": "CREATE_AND_UPDATE",
+      "skipAudit": false,
+      "dryRun": false,
+      "idScheme": "UID",
+      "orgUnitIdScheme": "CODE"
+    }
+  },
+  "moh_direct_queries": {
+    "fileType": "moh_direct_queries",
+    "displayName": "MoH Direct Queries Reports",
+    "description": "Configuration for processing quarterly MoH direct query reports",
+    "filePatterns": [
+      "*Direct*Queries*.xlsx",
+      "*MoH*Reports*.xlsx",
+      "Direct Queries - Q1 2025 MoH Reports.xlsx"
+    ],
+    "sheetConfig": {
+      "multiSheet": true,
+      "sheetPatterns": [
+        "HIV*",
+        "TB*",
+        "Malaria*",
+        "Summary"
+      ],
+      "headerRow": 1,
+      "dataStartRow": 2
+    },
+    "columnMappings": {
+      "facility": {
+        "sourceColumns": [
+          "Facility",
+          "facility",
+          "Health Facility",
+          "Site",
+          "Facility Name"
+        ],
+        "targetField": "orgUnit",
+        "required": true
+      },
+      "district": {
+        "sourceColumns": [
+          "District",
+          "district",
+          "District Name"
+        ],
+        "targetField": "orgUnitParent",
+        "required": false
+      },
+      "indicator": {
+        "sourceColumns": [
+          "Indicator",
+          "indicator",
+          "Query",
+          "Data Element",
+          "Measure"
+        ],
+        "targetField": "dataElement",
+        "required": true
+      },
+      "value": {
+        "sourceColumns": [
+          "Value",
+          "value",
+          "Result",
+          "Count",
+          "Total"
+        ],
+        "targetField": "value",
+        "required": true,
+        "dataType": "numeric"
+      },
+      "numerator": {
+        "sourceColumns": [
+          "Numerator",
+          "numerator",
+          "Num"
+        ],
+        "targetField": "numerator",
+        "required": false,
+        "dataType": "numeric"
+      },
+      "denominator": {
+        "sourceColumns": [
+          "Denominator",
+          "denominator",
+          "Denom",
+          "Den"
+        ],
+        "targetField": "denominator",
+        "required": false,
+        "dataType": "numeric"
+      },
+      "period": {
+        "sourceColumns": [
+          "Period",
+          "period",
+          "Quarter",
+          "Month",
+          "Reporting Period"
+        ],
+        "targetField": "period",
+        "required": true,
+        "format": "flexible"
+      },
+      "target": {
+        "sourceColumns": [
+          "Target",
+          "target",
+          "Expected",
+          "Goal"
+        ],
+        "targetField": "attributeOptions.target",
+        "required": false,
+        "dataType": "numeric"
+      },
+      "comment": {
+        "sourceColumns": [
+          "Comment",
+          "comment",
+          "Note",
+          "Remark"
+        ],
+        "targetField": "comment",
+        "required": false
+      }
+    },
+    "dataValidation": {
+      "rules": [
+        {
+          "field": "value",
+          "type": "numeric",
+          "min": 0,
+          "max": 9999999,
+          "allowNull": false
+        },
+        {
+          "field": "period",
+          "type": "flexible",
+          "formats": [
+            "YYYYMM",
+            "YYYY-MM",
+            "MMM YYYY",
+            "Q[1-4] YYYY",
+            "YYYY Q[1-4]"
+          ],
+          "message": "Period must be a valid date format"
+        },
+        {
+          "field": "numerator",
+          "type": "conditionalRequired",
+          "condition": "denominator",
+          "message": "Numerator required when denominator is present"
+        }
+      ],
+      "skipEmptyRows": true,
+      "stopOnError": false,
+      "customValidation": {
+        "checkPercentages": true,
+        "checkOutliers": true,
+        "outlierThreshold": 3.5
+      }
+    },
+    "transformations": [
+      {
+        "field": "period",
+        "type": "flexibleDateParse",
+        "formats": [
+          {
+            "from": "Q1 2025",
+            "to": "202501"
+          },
+          {
+            "from": "Q2 2025",
+            "to": "202504"
+          },
+          {
+            "from": "Q3 2025",
+            "to": "202507"
+          },
+          {
+            "from": "Q4 2025",
+            "to": "202510"
+          },
+          {
+            "from": "January 2025",
+            "to": "202501"
+          },
+          {
+            "from": "Jan 2025",
+            "to": "202501"
+          }
+        ],
+        "defaultQuarterStart": true
+      },
+      {
+        "field": "value",
+        "type": "calculateIfMissing",
+        "formula": "numerator / denominator * 100",
+        "condition": "numerator && denominator && !value",
+        "precision": 2
+      },
+      {
+        "field": "orgUnit",
+        "type": "lookup",
+        "lookupFile": "../metadata/org_unit_mapping.json",
+        "keyField": "name",
+        "valueField": "id"
+      }
+    ],
+    "aggregation": {
+      "enabled": true,
+      "groupBy": [
+        "orgUnit",
+        "dataElement",
+        "period"
+      ],
+      "method": "sum",
+      "handleDuplicates": "warn"
+    },
+    "uniqueValueCollectors": {
+      "sites": {
+        "targetField": "orgUnit"
+      },
+      "indicators": {
+        "targetField": "dataElement"
+      }
+    },
+    "builders": {
+      "dataElements": {
+        "uniqueValueKey": "indicators",
+        "valueType": "INTEGER",
+        "aggregationType": "SUM",
+        "domainType": "AGGREGATE"
+      }
+    },
+    "dhis2Builder": "default",
+    "dhis2Config": {
+      "dataSetId": "MoHQuarterlyReports",
+      "importStrategy": "CREATE_AND_UPDATE",
+      "skipAudit": false,
+      "dryRun": false,
+      "idScheme": "UID",
+      "orgUnitIdScheme": "CODE",
+      "dataElementIdScheme": "CODE",
+      "preheatCache": true
+    },
+    "postProcessing": {
+      "generateSummaryReport": true,
+      "validateAgainstTargets": true,
+      "calculateIndicators": [
+        {
+          "name": "ART Coverage",
+          "formula": "CurrentOnART / EstimatedPLHIV * 100",
+          "dataElements": [
+            "CurrentOnART",
+            "EstimatedPLHIV"
+          ]
+        }
+      ]
+    }
+  }
+}

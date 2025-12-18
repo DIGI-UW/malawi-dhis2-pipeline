@@ -15,6 +15,11 @@
 const LOCK_KEY = 'workflow-lock';
 const WORKFLOW_OWNER_KEY = 'workflow-owner';
 
+// Configuration constants (extracted from magic numbers for clarity)
+const LOCK_TTL_SECONDS = 600;       // Lock timeout: 10 minutes
+const PRUNE_DAYS = 30;              // Remove completed entries older than 30 days
+const MAX_DIRECTORY_DEPTH = 3;      // Max recursion depth for SFTP directory scanning
+
 /*
  * FILE TYPE CONFIGURATION TEMPLATE
  * 
@@ -725,14 +730,14 @@ execute(fn(async state => {
       '^PEPFAR_TxCURR_.*\\.(csv)(\\.csv)?$'
     ],
     fileTypesEnabled: ['csv'],
-    lockTtlSeconds: 600,
-    pruneProcessedAfterDays: 30,
+    lockTtlSeconds: LOCK_TTL_SECONDS,
+    pruneProcessedAfterDays: PRUNE_DAYS,
     ...baseConfig,
     ...params
   };
 
   const now = Date.now();
-  const lockTtlMillis = (config.lockTtlSeconds || 600) * 1000;
+  const lockTtlMillis = (config.lockTtlSeconds || LOCK_TTL_SECONDS) * 1000;
   const existingLock = state.workflowLock;
   const existingExpires = existingLock?.expiresAt ? new Date(existingLock.expiresAt).getTime() : 0;
 
@@ -939,7 +944,11 @@ execute(fn(async state => {
   })(state);
 }));
 
-// Local helper to infer file type from filename
+/**
+ * CANONICAL VERSION - Also duplicated in Job 01 for sandbox compatibility.
+ * Infers file type (xlsx, csv, unknown) from filename extension.
+ * TODO: Move to @openfn/language-sftp adaptor for single-source maintenance.
+ */
 function inferFileType(name) {
   const lower = String(name || '').toLowerCase();
   if (lower.endsWith('.xlsx')) return 'xlsx';
@@ -947,7 +956,7 @@ function inferFileType(name) {
   return 'unknown';
 }
 
-function pruneOldEntries(filesIndex, days = 30) {
+function pruneOldEntries(filesIndex, days = PRUNE_DAYS) {
   const cutoff = Date.now() - days * 24 * 60 * 60 * 1000;
   let changed = false;
 
