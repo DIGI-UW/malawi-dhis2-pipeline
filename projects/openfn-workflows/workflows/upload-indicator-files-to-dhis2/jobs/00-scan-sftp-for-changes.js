@@ -677,6 +677,320 @@ const FILE_TYPE_CONFIGS = {
         }
       ]
     }
+  },
+  // ============================================
+  // MOH CSV File Types
+  // ============================================
+  moh_cohort_report_csv: {
+    fileType: 'csv',
+    displayName: 'MoH Cohort Report CSV',
+    description: 'MoH quarterly cohort report with registration and initiation indicators',
+    filePrefix: 'MoH_CohortReport',
+    columnMappings: {
+      facility: {
+        sourceColumns: ['Facility Name', 'facility', 'Facility'],
+        targetField: 'orgUnit',
+        required: true
+      },
+      indicator: {
+        sourceColumns: ['Indicator Name', 'indicator', 'Indicator'],
+        targetField: 'dataElement',
+        required: true
+      },
+      period: {
+        sourceColumns: ['reporting_period', 'Period', 'Quarter'],
+        targetField: 'period',
+        required: true
+      },
+      value: {
+        sourceColumns: ['newly_reg_in_quarter', 'Value', 'value'],
+        targetField: 'value',
+        required: true,
+        dataType: 'numeric'
+      }
+    },
+    headerMap: {
+      'Facility Name': 'Facility Name',
+      'indicator_number': 'indicator_number',
+      'site_id': 'site_id',
+      'Indicator Name': 'Indicator Name',
+      'newly_reg_in_quarter': 'newly_reg_in_quarter',
+      'cumulative_ever_reg': 'cumulative_ever_reg',
+      'reporting_period': 'reporting_period'
+    },
+    uniqueValueCollectors: {
+      sites: { targetField: 'orgUnit' },
+      indicators: { targetField: 'dataElement' }
+    },
+    builders: {
+      dataElements: {
+        uniqueValueKey: 'indicators',
+        valueType: 'NUMBER',
+        aggregationType: 'SUM',
+        domainType: 'AGGREGATE'
+      }
+    },
+    dhis2Builder: 'default',
+    dhis2Config: {
+      periodType: 'Quarterly',
+      periodSource: 'filename',
+      openFuturePeriods: 4
+    }
+  },
+  moh_regimen_distribution_csv: {
+    fileType: 'csv',
+    displayName: 'MoH Regimen Distribution by Weight CSV',
+    description: 'MoH regimen distribution disaggregated by gender, age, weight band, and regimen category',
+    filePrefix: 'MoH_RegimenDistributionByWeight',
+    columnMappings: {
+      site_id: {
+        sourceColumns: ['site_id'],
+        targetField: 'orgUnit',
+        required: true
+      },
+      gender: {
+        sourceColumns: ['gender', 'Gender', 'sex', 'Sex'],
+        targetField: 'categoryOptions.sex',
+        required: false
+      },
+      age_group: {
+        sourceColumns: ['age_group', 'Age Group', 'Age'],
+        targetField: 'categoryOptions.ageGroup',
+        required: false
+      },
+      weight_band: {
+        sourceColumns: ['weight_band', 'Weight Band', 'Weight'],
+        targetField: 'categoryOptions.weightBand',
+        required: false
+      },
+      regimen_category: {
+        sourceColumns: ['regimen_category', 'Regimen', 'Regimen Category'],
+        targetField: 'dataElement',
+        required: true
+      },
+      value: {
+        sourceColumns: ['total_clients', 'Total', 'Count', 'Value'],
+        targetField: 'value',
+        required: true,
+        dataType: 'numeric'
+      }
+    },
+    headerMap: {
+      'site_id': 'site_id',
+      'gender': 'gender',
+      'age_group': 'age_group',
+      'weight_band': 'weight_band',
+      'regimen_category': 'regimen_category',
+      'total_clients': 'total_clients'
+    },
+    uniqueValueCollectors: {
+      sites: { targetField: 'orgUnit' },
+      indicators: { targetField: 'dataElement' },
+      sexValues: { targetField: 'categoryOptions.sex' },
+      ageGroups: { targetField: 'categoryOptions.ageGroup' },
+      weightBands: { targetField: 'categoryOptions.weightBand' }
+    },
+    builders: {
+      dataElements: {
+        uniqueValueKey: 'indicators',
+        valueType: 'INTEGER',
+        aggregationType: 'SUM',
+        domainType: 'AGGREGATE'
+      },
+      categories: [
+        { name: 'Sex', shortName: 'Sex', code: 'SEX', uniqueValueKey: 'sexValues' },
+        { name: 'Age Group', shortName: 'Age Group', code: 'AGE_GROUP', uniqueValueKey: 'ageGroups' },
+        { name: 'Weight Band', shortName: 'Weight Band', code: 'WEIGHT_BAND', uniqueValueKey: 'weightBands' }
+      ]
+    },
+    dhis2Builder: 'default',
+    dhis2Config: {
+      periodType: 'Quarterly',
+      periodSource: 'filename',
+      openFuturePeriods: 4
+    }
+  },
+  moh_survival_analysis_csv: {
+    fileType: 'csv',
+    displayName: 'MoH Survival Analysis CSV',
+    description: 'MoH survival analysis report with multiple outcome columns (General, Women, Children)',
+    filePatterns: ['MoH_SurvivalAnalysis*.csv'],
+    columnMappings: {
+      site_id: {
+        sourceColumns: ['site_id'],
+        targetField: 'orgUnit',
+        required: true
+      },
+      year: {
+        sourceColumns: ['Year'],
+        targetField: 'categoryOptions.year',
+        required: true
+      },
+      quarter: {
+        sourceColumns: ['Quarter'],
+        targetField: 'period',
+        required: true
+      },
+      interval: {
+        sourceColumns: ['Interval'],
+        targetField: 'categoryOptions.interval',
+        required: false
+      },
+      // Multi-value columns - each becomes a separate dataValue
+      total_registered: {
+        sourceColumns: ['Total Registered'],
+        targetField: 'survival_total_registered',
+        required: false,
+        dataType: 'numeric'
+      },
+      total_alive: {
+        sourceColumns: ['Total Alive'],
+        targetField: 'survival_total_alive',
+        required: false,
+        dataType: 'numeric'
+      },
+      patient_died: {
+        sourceColumns: ['Patient Died'],
+        targetField: 'survival_patient_died',
+        required: false,
+        dataType: 'numeric'
+      },
+      total_defaulted: {
+        sourceColumns: ['Total Defaulted'],
+        targetField: 'survival_total_defaulted',
+        required: false,
+        dataType: 'numeric'
+      },
+      treatment_stopped: {
+        sourceColumns: ['Treatment Stopped'],
+        targetField: 'survival_treatment_stopped',
+        required: false,
+        dataType: 'numeric'
+      },
+      transferred_out: {
+        sourceColumns: ['Patient transferred out'],
+        targetField: 'survival_transferred_out',
+        required: false,
+        dataType: 'numeric'
+      },
+      unknown: {
+        sourceColumns: ['Unknown'],
+        targetField: 'survival_unknown',
+        required: false,
+        dataType: 'numeric'
+      }
+    },
+    headerMap: {
+      'site_id': 'site_id',
+      'Year': 'Year',
+      'Quarter': 'Quarter',
+      'Interval': 'Interval',
+      'Total Registered': 'Total Registered',
+      'Total Alive': 'Total Alive',
+      'Patient Died': 'Patient Died',
+      'Total Defaulted': 'Total Defaulted',
+      'Treatment Stopped': 'Treatment Stopped',
+      'Patient transferred out': 'Patient transferred out',
+      'Unknown': 'Unknown'
+    },
+    uniqueValueCollectors: {
+      sites: { targetField: 'orgUnit' },
+      intervals: { targetField: 'categoryOptions.interval' }
+    },
+    builders: {
+      dataElements: {
+        uniqueValueKey: 'indicators',
+        valueType: 'INTEGER',
+        aggregationType: 'SUM',
+        domainType: 'AGGREGATE'
+      }
+    },
+    dhis2Builder: 'default',
+    dhis2Config: {
+      periodType: 'Quarterly',
+      periodSource: 'data',
+      openFuturePeriods: 4
+    }
+  },
+  moh_tpt_initiations_csv: {
+    fileType: 'csv',
+    displayName: 'MoH TPT New Initiations CSV',
+    description: 'MoH TB Preventive Therapy initiations with multiple regimen columns',
+    filePrefix: 'MoH_TPTNewInitiations',
+    columnMappings: {
+      site_id: {
+        sourceColumns: ['site_id'],
+        targetField: 'orgUnit',
+        required: true
+      },
+      gender: {
+        sourceColumns: ['gender', 'Gender', 'sex', 'Sex'],
+        targetField: 'categoryOptions.sex',
+        required: false
+      },
+      age_group: {
+        sourceColumns: ['age_group', 'Age Group', 'Age'],
+        targetField: 'categoryOptions.ageGroup',
+        required: false
+      },
+      // Multi-value columns - each becomes a separate dataValue
+      tpt_3hp_new: {
+        sourceColumns: ['3HP (Started New on ART)'],
+        targetField: 'tpt_3hp_new',
+        required: false,
+        dataType: 'numeric'
+      },
+      tpt_6h_new: {
+        sourceColumns: ['6H (Started New on ART)'],
+        targetField: 'tpt_6h_new',
+        required: false,
+        dataType: 'numeric'
+      },
+      tpt_3hp_previous: {
+        sourceColumns: ['3HP (Started Previously on ART)'],
+        targetField: 'tpt_3hp_previous',
+        required: false,
+        dataType: 'numeric'
+      },
+      tpt_6h_previous: {
+        sourceColumns: ['6H (Started Previously on ART)'],
+        targetField: 'tpt_6h_previous',
+        required: false,
+        dataType: 'numeric'
+      }
+    },
+    headerMap: {
+      'site_id': 'site_id',
+      'gender': 'gender',
+      'age_group': 'age_group',
+      '3HP (Started New on ART)': '3HP (Started New on ART)',
+      '6H (Started New on ART)': '6H (Started New on ART)',
+      '3HP (Started Previously on ART)': '3HP (Started Previously on ART)',
+      '6H (Started Previously on ART)': '6H (Started Previously on ART)'
+    },
+    uniqueValueCollectors: {
+      sites: { targetField: 'orgUnit' },
+      sexValues: { targetField: 'categoryOptions.sex' },
+      ageGroups: { targetField: 'categoryOptions.ageGroup' }
+    },
+    builders: {
+      dataElements: {
+        uniqueValueKey: 'indicators',
+        valueType: 'INTEGER',
+        aggregationType: 'SUM',
+        domainType: 'AGGREGATE'
+      },
+      categories: [
+        { name: 'Sex', shortName: 'Sex', code: 'SEX', uniqueValueKey: 'sexValues' },
+        { name: 'Age Group', shortName: 'Age Group', code: 'AGE_GROUP', uniqueValueKey: 'ageGroups' }
+      ]
+    },
+    dhis2Builder: 'default',
+    dhis2Config: {
+      periodType: 'Quarterly',
+      periodSource: 'filename',
+      openFuturePeriods: 4
+    }
   }
 };
 
