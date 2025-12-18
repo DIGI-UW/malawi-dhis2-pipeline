@@ -148,33 +148,33 @@ jobs:
           
       - name: Deploy PostgreSQL
         run: |
-          ./instant package init -n database-postgres -d
-          
+          ./instant package init -n database-postgres -d --env-file .env.example
+
           # Wait for PostgreSQL to be ready
           echo "Waiting for PostgreSQL..."
           timeout 120s bash -c 'until docker service ls | grep -q "postgres_postgres-1.*1/1"; do sleep 5; done'
           sleep 10
-          
+
       - name: Deploy SFTP Storage
         run: |
-          ./instant package init -n sftp-storage -d
-          
+          ./instant package init -n sftp-storage -d --env-file .env.example
+
           # Wait for SFTP to be ready
           echo "Waiting for SFTP server..."
           timeout 60s bash -c 'until docker service ls | grep -q "sftp-storage_sftp-server.*1/1"; do sleep 5; done'
-          
+
       - name: Deploy DHIS2
         run: |
-          ./instant package init -n dhis2-instance -d
-          
-          # Wait for DHIS2 to be ready 
+          ./instant package init -n dhis2-instance -d --env-file .env.example
+
+          # Wait for DHIS2 to be ready
           echo "Waiting for DHIS2..."
           timeout 300s bash -c 'until docker service ls | grep -q "dhis2_dhis2.*1/1"; do sleep 10; done'
-          
+
       - name: Deploy OpenFN
         run: |
-          ./instant package init -n openfn -d
-          
+          ./instant package init -n openfn -d --env-file .env.example
+
           # Wait for OpenFN to be ready
           echo "Waiting for OpenFN..."
           timeout 120s bash -c 'until docker service ls | grep -q "openfn_openfn.*1/1"; do sleep 5; done'

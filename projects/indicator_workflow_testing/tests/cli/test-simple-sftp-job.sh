@@ -28,6 +28,7 @@ echo ""
 # Run the job directly using CLI with state file containing credentials
 echo "🚀 Running simple SFTP job with unified state file..."
 docker run --rm -i \
+    --network openfn_public \
     -v "$(pwd)/../../../openfn-workflows/workflows/sftp-test/state:/state" \
     -v "$(pwd)/outputs:/outputs" \
     "$DOCKER_IMAGE" /bin/sh <<EOF
