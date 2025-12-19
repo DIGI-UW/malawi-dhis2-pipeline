@@ -86,7 +86,7 @@ cd projects/indicator_workflow_testing && ./run-tests.sh
 
 FILE_TYPE_CONFIGS location: `projects/openfn-workflows/workflows/upload-indicator-files-to-dhis2/jobs/00-scan-sftp-for-changes.js`
 
-### Currently Configured (8 types)
+### Currently Configured (12 types)
 
 | Config Key | Source | Pattern | Format |
 |------------|--------|---------|--------|
@@ -98,16 +98,18 @@ FILE_TYPE_CONFIGS location: `projects/openfn-workflows/workflows/upload-indicato
 | art_data_long_format | MOH/ART | ART_data_long*.xlsx | XLSX |
 | dq_sites | MOH/DQ | *Q*FY*DQ*sites*.xlsx | XLSX |
 | moh_direct_queries | MOH | *Direct*Queries*.xlsx | XLSX |
+| moh_cohort_report_csv | MOH | MoH_CohortReport*.csv | CSV |
+| moh_regimen_distribution_csv | MOH | MoH_RegimenDistributionByWeight*.csv | CSV |
+| moh_survival_analysis_csv | MOH | MoH_SurvivalAnalysis*.csv | CSV |
+| moh_tpt_initiations_csv | MOH | MoH_TPTNewInitiations*.csv | CSV |
 
-### Pending MOH CSV Configs (6 types)
+### MOH CSV Sample Files
 
 Sample files in `projects/sftp/data/samples/moh/`:
-- MoH_CohortReport_*.csv
-- MoH_RegimenDistributionByWeight_*.csv
-- MoH_SurvivalAnalysisGeneral_*.csv
-- MoH_SurvivalAnalysisWomen_*.csv
-- MoH_SurvivalAnalysisChildren_*.csv
-- MoH_TPTNewInitiations_*.csv
+- MoH_CohortReport_*.csv - Quarterly cohort reports with registration indicators
+- MoH_RegimenDistributionByWeight_*.csv - Regimen distribution by gender/age/weight
+- MoH_SurvivalAnalysis*.csv - Survival analysis (General, Women, Children variants)
+- MoH_TPTNewInitiations_*.csv - TB Preventive Therapy initiations
 
 Filename convention: `MoH_{ReportType}_{YEAR}_{QUARTER}_{VERSION}_{TIMESTAMP}.csv`
 
